@@ -2872,7 +2872,7 @@ ${stonePositionsMarkup(4)}
     const badge = document.createElement("div");
     badge.className = "altar-cursor-badge";
     badge.setAttribute("aria-hidden", "true");
-    badge.innerHTML = `<span class="altar-cursor-badge__label"></span><span class="altar-cursor-badge__arrow"><svg viewBox="0 0 11 11" fill="currentColor"><path d="M1 5h7L5 2l1-1 4.5 4.5L6 10l-1-1 3-3H1z"/></svg></span>`;
+    badge.innerHTML = `<span class="altar-cursor-badge__label"></span><span class="altar-cursor-badge__arrow"><svg class="altar-cursor-badge__go" viewBox="0 0 11 11" fill="currentColor"><path d="M1 5h7L5 2l1-1 4.5 4.5L6 10l-1-1 3-3H1z"/></svg><svg class="altar-cursor-badge__move" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 1v9M1 5.5h9M4 2.5 5.5 1 7 2.5M4 8.5 5.5 10 7 8.5M2.5 4 1 5.5 2.5 7M8.5 4 10 5.5 8.5 7"/></svg></span>`;
     document.body.append(badge);
     const label = badge.querySelector(".altar-cursor-badge__label");
 
@@ -2898,6 +2898,7 @@ ${stonePositionsMarkup(4)}
       const text = labelFor(target);
       if (label.textContent !== text) label.textContent = text;
       badge.classList.toggle("is-back", isBack(target));
+      badge.classList.toggle("is-move", target.dataset.cursorIcon === "move");
       if (target !== active) {
         active = target;
         badge.classList.add("is-active");
@@ -3693,6 +3694,115 @@ function initSolarExperiences() {
   document.querySelectorAll("[data-altar-solar]").forEach((root) => {
     if (!root.solarExperience) root.solarExperience = new SolarExperience(root);
   });
+  playIntro();
+}
+
+// Opening sequence, after virgilabloh.com: the frame (metadata, dashed rules) assembles first,
+// then the ELEMENTAL card rises as the one spatial gesture, and the bottom bar loads in last.
+// Pure CSS animations driven by delays; <html class="altar-intro"> (set in <head>) hides the
+// pieces until this runs, and the head script lifts it on its own if the bundle never arrives.
+const INTRO_END = 4200;
+
+function splitChars(element, { base, stagger, duration = 120, ease = "ease-out" }) {
+  if (!element || element.dataset.introSplit) return;
+  element.dataset.introSplit = "true";
+  // Screen readers get one hidden copy of the whole text; the animated letters are hidden from them.
+  const fullText = element.textContent.replace(/\s+/g, " ").trim();
+  let index = 0;
+  const walk = (node) => {
+    [...node.childNodes].forEach((child) => {
+      if (child.nodeType === Node.ELEMENT_NODE) return walk(child);
+      if (child.nodeType !== Node.TEXT_NODE || !child.textContent) return;
+      const fragment = document.createDocumentFragment();
+      [...child.textContent].forEach((char) => {
+        const span = document.createElement("span");
+        span.className = "altar-intro__char";
+        span.setAttribute("aria-hidden", "true");
+        span.textContent = char;
+        span.style.animation = `altar-intro-fade ${duration}ms ${ease} ${base + index * stagger}ms both`;
+        index += 1;
+        fragment.append(span);
+      });
+      child.replaceWith(fragment);
+    });
+  };
+  walk(element);
+  const spoken = document.createElement("span");
+  spoken.className = "visually-hidden";
+  spoken.textContent = fullText;
+  element.append(spoken);
+}
+
+function introAnimate(element, animation) {
+  if (element) element.style.animation = animation;
+}
+
+function playIntro() {
+  const html = document.documentElement;
+  if (playIntro.done || !html.classList.contains("altar-intro")) return;
+  playIntro.done = true;
+  // Only for a fresh landing at the top; reduced motion or a restored scroll just shows everything.
+  if (REDUCED_MOTION.matches || window.scrollY > window.innerHeight * 0.5) {
+    html.classList.remove("altar-intro");
+    return;
+  }
+  const $ = (selector) => document.querySelector(selector);
+  const fade = (duration, delay, ease = "ease-out") => `altar-intro-fade ${duration}ms ${ease} ${delay}ms both`;
+
+  // 0–1 s · the frame: the brand surfaces, metadata types in, dashed rules and dividers draw themselves.
+  introAnimate($(".altar-nav__logo"), fade(600, 0));
+  splitChars($(".altar-nav__wordmark"), { base: 150, stagger: 70, duration: 160 });
+  splitChars($(".altar-nav__eyebrow"), { base: 0, stagger: 35 });
+  splitChars($(".altar-solar__scroll-prompt"), { base: 0, stagger: 40 });
+  introAnimate($(".altar-nav__divider--brand"), "altar-intro-divider 350ms ease-out 550ms both");
+  introAnimate($(".altar-nav__rule--top"), "altar-intro-rule 350ms ease-out 560ms both");
+  introAnimate($(".altar-nav__rule--bottom"), "altar-intro-rule 350ms ease-out 720ms both");
+  introAnimate($(".altar-nav__divider--metadata"), "altar-intro-divider 350ms ease-out 900ms both");
+  introAnimate($("[data-fortune-flip]"), fade(300, 950));
+  // The inviting dashed frame draws itself around the card, then hands over to its idle pulse
+  // (the reveal ends at the pulse's starting opacity, so the swap is seamless).
+  const ctaFrame = $(".altar-solar__fortune-cta-frame");
+  introAnimate(ctaFrame, "altar-intro-frame 600ms ease-out 1250ms both");
+  ctaFrame?.addEventListener("animationend", () => { ctaFrame.style.animation = ""; }, { once: true });
+  introAnimate($(".altar-nav__divider--navigation"), "altar-intro-divider 350ms ease-out 1200ms both");
+  introAnimate($(".altar-nav__divider--actions"), "altar-intro-divider 350ms ease-out 1350ms both");
+
+  // 1.2 s · the ELEMENTAL card rises rotated and settles (the single spatial move), its title lighting up as it turns.
+  const campaign = $(".altar-solar__campaign");
+  introAnimate(campaign, `altar-intro-rise 1600ms cubic-bezier(0.16, 1, 0.3, 1) 1200ms both, ${fade(200, 1200)}`);
+  splitChars(campaign?.querySelector(".altar-solar__campaign-heading span"), { base: 1200, stagger: 40 });
+  splitChars($("[data-live-date]"), { base: 1250, stagger: 35 });
+  splitChars($(".altar-solar__fortune-cta-text span"), { base: 1460, stagger: 20 });
+  splitChars($(".altar-nav__metadata > span"), { base: 1550, stagger: 35 });
+  introAnimate($(".altar-solar__fortune-cta-icon"), fade(200, 1440));
+  // Menu and actions type in left to right, each arrow icon just ahead of its label.
+  document.querySelectorAll(".altar-nav__menu a").forEach((link, index) => splitChars(link, { base: 1000 + index * 120, stagger: 35 }));
+  [".altar-nav__cart", ".altar-nav__search"].forEach((selector, index) => {
+    const link = $(selector);
+    introAnimate(link?.querySelector(".altar-nav__action-icon"), fade(200, 1400 + index * 150));
+    link?.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 1450 + index * 150 + partIndex * 140, stagger: 35 }));
+  });
+  document.querySelectorAll(".altar-solar__manifesto-ids > span").forEach((part, index) => splitChars(part, { base: 2200 + index * 300, stagger: 35 }));
+
+  // 1.7–3 s · controls load in; the ticker is unmasked left to right.
+  introAnimate($(".altar-solar__pagination"), fade(200, 1700));
+  introAnimate($(".altar-solar__channel-switcher"), fade(200, 1780));
+  splitChars($(".altar-solar__channel-label"), { base: 1800, stagger: 35 });
+  introAnimate($(".altar-solar__reveal-card"), fade(200, 1860));
+  introAnimate($(".altar-solar__open-player"), fade(200, 2000));
+  introAnimate($(".altar-solar__marquee"), "altar-intro-clip 500ms ease-out 2500ms both");
+
+  // 3.5 s · the live clock closes the sequence, like a last datum arriving.
+  splitChars($(".altar-solar__player-label"), { base: 3500, stagger: 35 });
+
+  html.classList.add("altar-intro--play");
+  setTimeout(() => {
+    html.classList.remove("altar-intro", "altar-intro--play");
+    document.querySelectorAll("[data-intro-split], .altar-nav__logo, .altar-nav__action-icon, .altar-solar__fortune-cta-icon, .altar-nav__divider, .altar-nav__rule, [data-fortune-flip], .altar-solar__campaign, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player, .altar-solar__marquee")
+      .forEach((element) => {
+        if (element.style.animation.startsWith("altar-intro")) element.style.animation = "";
+      });
+  }, INTRO_END);
 }
 
 if (document.readyState === "loading") {

@@ -77,6 +77,10 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-cursor-badge__arrow { width: 0; padding: 0; opacity: 0; }
 .altar-cursor-badge__arrow svg { display: block; width: calc(11 * var(--u)); height: calc(11 * var(--u)); flex: none; }
 .altar-cursor-badge.is-back .altar-cursor-badge__arrow svg { transform: scaleX(-1); }
+.altar-cursor-badge__arrow .altar-cursor-badge__move, .altar-cursor-badge.is-move .altar-cursor-badge__arrow .altar-cursor-badge__go { display: none; }
+.altar-cursor-badge.is-move .altar-cursor-badge__arrow .altar-cursor-badge__move { display: block; }
+.altar-solar__campaign-heading, .altar-solar__ground-campaign-heading { cursor: pointer; }
+.altar-solar__campaign-image, .altar-solar__ground-campaign-media { cursor: grab; }
 .altar-cursor-badge.is-active .altar-cursor-badge__label { max-width: calc(200 * var(--u)); padding: calc(4 * var(--u)) calc(6 * var(--u)); margin-right: calc(2 * var(--u)); opacity: 1; }
 .altar-cursor-badge.is-active .altar-cursor-badge__arrow { width: calc(20 * var(--u)); padding: calc(4 * var(--u)); opacity: 1; }
 
@@ -135,7 +139,7 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-solar__fortune-symbol { display: block; width: calc(165.686 * var(--u)); height: calc(149.413 * var(--u)); max-width: none; flex: none; }
 .altar-solar__fortune-copy { display: flex; width: 100%; height: calc(65 * var(--u)); flex: none; flex-direction: column; justify-content: space-between; color: #8c8c8c; font-family: Inter, Arial, Helvetica, sans-serif; font-size: calc(12 * var(--u)); font-weight: 400; line-height: 1.1; text-transform: uppercase; }
 .altar-solar__fortune-copy span, .altar-solar__fortune-copy p { margin: 0; }
-.altar-solar__campaign { --campaign-gap: calc(6 * var(--u)); position: absolute; right: calc(96 * var(--u)); translate: calc(var(--drag-x, 0px) + var(--pos-x, 0px) + 106 * var(--u) * var(--campaign-scale, .99) + 96 * var(--u) - 50vw) calc(var(--drag-y, 0px) + var(--pos-y, 0px)); transform: scale(var(--campaign-scale, .99)); transform-origin: right top; cursor: grab; touch-action: none; user-select: none; pointer-events: auto; top: calc(50svh - calc(142.878 * var(--u)) * var(--campaign-scale, .99)); display: flex; width: calc(212 * var(--u)); height: calc(285.756 * var(--u)); margin: 0; padding: calc(7.067 * var(--u)); flex-direction: column; gap: calc(7.067 * var(--u)); overflow: hidden; color: #fffec2; background: rgb(255 254 194 / 8%); border-radius: 0 0 calc(7.067 * var(--u)) calc(7.067 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; }
+.altar-solar__campaign { --campaign-gap: calc(6 * var(--u)); position: absolute; right: calc(96 * var(--u)); translate: calc(var(--drag-x, 0px) + var(--pos-x, 0px) + 106 * var(--u) * var(--campaign-scale, .99) + 96 * var(--u) - 50vw) calc(var(--drag-y, 0px) + var(--pos-y, 0px) + var(--intro-y, 0px)); rotate: var(--intro-rot, 0deg); transform: scale(var(--campaign-scale, .99)); transform-origin: right top; cursor: grab; touch-action: none; user-select: none; pointer-events: auto; top: calc(50svh - calc(142.878 * var(--u)) * var(--campaign-scale, .99)); display: flex; width: calc(212 * var(--u)); height: calc(285.756 * var(--u)); margin: 0; padding: calc(7.067 * var(--u)); flex-direction: column; gap: calc(7.067 * var(--u)); overflow: hidden; color: #fffec2; background: rgb(255 254 194 / 8%); border-radius: 0 0 calc(7.067 * var(--u)) calc(7.067 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; }
 .altar-solar__campaign { transition: translate 900ms cubic-bezier(.2, .7, .2, 1); }
 .altar-solar.is-card-open .altar-solar__campaign { translate: calc(var(--drag-x, 0px) + var(--campaign-open-x, calc(80 * var(--u)))) calc(var(--drag-y, 0px) + var(--campaign-open-y, calc(-177 * var(--u)))); }
 .altar-solar__campaign.is-dragging { transition: none; }
@@ -223,6 +227,23 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-nav__action-stack { display: flex; height: calc(54 * var(--u)); flex-direction: column; align-items: flex-end; justify-content: space-between; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-align: right; text-transform: uppercase; }
 .altar-nav__cart, .altar-nav__search { display: flex; gap: calc(3 * var(--u)); align-items: center; justify-content: flex-end; white-space: nowrap; }
 .altar-nav__action-icon { display: block; width: calc(12 * var(--u)); height: calc(12 * var(--u)); max-width: none; flex: 0 0 calc(12 * var(--u)); }
+/* Opening sequence (see playIntro in solar-experience.js). <html class="altar-intro"> is set in <head>. */
+@property --intro-y { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --intro-rot { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes altar-intro-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes altar-intro-rule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes altar-intro-divider { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes altar-intro-clip { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+@keyframes altar-intro-frame { from { clip-path: inset(0 0 100% 0 round calc(12 * var(--u))); opacity: .65; } to { clip-path: inset(0 0 0 0 round calc(12 * var(--u))); opacity: .65; } }
+@keyframes altar-intro-rise { from { --intro-y: 20vw; --intro-rot: -20deg; } to { --intro-y: 0px; --intro-rot: 0deg; } }
+.altar-nav__rule { transform-origin: left center; }
+.altar-nav__divider { transform-origin: center top; }
+.altar-intro:not(.altar-intro--play) :is(.altar-nav__logo, .altar-nav__wordmark, .altar-nav__menu, .altar-nav__cart, .altar-nav__search, .altar-solar__manifesto-ids, .altar-nav__eyebrow, .altar-nav__metadata, .altar-solar__scroll-prompt, .altar-solar__campaign, [data-fortune-flip], .altar-solar__fortune-cta-text, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player) { opacity: 0; }
+.altar-intro:not(.altar-intro--play) .altar-nav__rule { transform: scaleX(0); }
+.altar-intro:not(.altar-intro--play) .altar-nav__divider { transform: scaleY(0); }
+.altar-intro:not(.altar-intro--play) .altar-solar__marquee { clip-path: inset(0 100% 0 0); }
+.altar-intro:not(.altar-intro--play) .altar-solar__fortune-cta-frame { opacity: 0; animation: none; }
+.altar-intro__char { white-space: pre; }
 @media (max-width: 749px) {
   .altar-solar__fortune-cards { transform: scale(.75); transform-origin: left bottom; }
   .altar-solar__manifesto { flex-direction: column; align-items: flex-start; gap: 20px; }
@@ -245,7 +266,7 @@ a.altar-collection__photo { display: block; color: inherit; }
   .altar-collection__gallery { flex: none; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; gap: 12px; }
   .altar-collection__photo { height: auto; aspect-ratio: 339 / 472; }
   .altar-solar__ground-campaign { right: 12px; scale: calc(var(--ground-campaign-scale, 1) * .6); transform-origin: right center; }
-  .altar-solar__campaign { right: 12px; translate: var(--drag-x, 0px) var(--drag-y, 0px); transform: scale(calc(var(--campaign-scale, .99) * .6)); }
+  .altar-solar__campaign { right: 12px; translate: var(--drag-x, 0px) calc(var(--drag-y, 0px) + var(--intro-y, 0px)); transform: scale(calc(var(--campaign-scale, .99) * .6)); }
   .altar-solar__bottom-controls { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
   .altar-solar__channel-controls { justify-self: center; }
   .altar-solar__scroll-prompt { display: none; }

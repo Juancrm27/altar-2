@@ -3,6 +3,10 @@
   <head>
     {{ component('head-tags') }}
     <title>{{ page_title }}</title>
+    <script>(function(d){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("altar-intro");setTimeout(function(){d.classList.remove("altar-intro")},4000)})(document.documentElement)</script>
+    <link rel="icon" href="{{ 'images/favicon.svg' | static_url }}" type="image/svg+xml">
+    <link rel="icon" href="{{ 'images/favicon-32.png' | static_url }}" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="{{ 'images/apple-touch-icon.png' | static_url }}">
     {% if page_description %}<meta name="description" content="{{ page_description }}">{% endif %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

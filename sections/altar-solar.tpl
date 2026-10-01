@@ -90,12 +90,12 @@
       </div>
     </div>
     <div class="altar-solar__sticky-track altar-solar__sticky-track--content">
-      <aside class="altar-solar__campaign" aria-label="{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}" data-cursor-label="{{ 'Ver colección' | translate }}" data-scroll-to=".altar-collection">
-        <div class="altar-solar__campaign-heading">
+      <aside class="altar-solar__campaign" aria-label="{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}">
+        <div class="altar-solar__campaign-heading" data-cursor-label="{{ 'Ver colección' | translate }}" data-scroll-to=".altar-collection">
           <img src="{{ 'images/altar-status-dot.svg' | static_url }}" alt="">
           <span>{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}</span>
         </div>
-        <div class="altar-solar__campaign-image">
+        <div class="altar-solar__campaign-image" data-cursor-label="{{ 'Arrastrar' | translate }}" data-cursor-icon="move">
           <div class="altar-solar__campaign-crop">
             <img src="{{ 'images/altar-elemental-fw27.png' | static_url }}" alt="" width="1952" height="1080" data-channel-image-2="{{ 'images/altar-channel-2.jpg' | static_url }}" data-channel-image-3="{{ 'images/altar-channel-3.jpg' | static_url }}" data-channel-image-4="{{ 'images/altar-channel-4.jpg' | static_url }}">
           </div>
@@ -149,11 +149,11 @@
     {% endif %}
     <span class="visually-hidden" role="status">{{ 'La experiencia tridimensional está cargando' | translate }}</span>
   </div>
-  <aside class="altar-solar__ground-campaign" data-ground-campaign aria-label="{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}" data-cursor-label="{{ 'Ver colección' | translate }}" data-scroll-to=".altar-collection">
-    <div class="altar-solar__ground-campaign-media">
+  <aside class="altar-solar__ground-campaign" data-ground-campaign aria-label="{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}">
+    <div class="altar-solar__ground-campaign-media" data-cursor-label="{{ 'Arrastrar' | translate }}" data-cursor-icon="move">
       <img src="{{ 'images/altar-elemental-tierra.jpg' | static_url }}" alt="" width="221" height="263" loading="lazy" data-channel-image-2="{{ 'images/altar-elemental-tierra-2.jpg' | static_url }}" data-channel-image-3="{{ 'images/altar-elemental-tierra-3.jpg' | static_url }}" data-channel-image-4="{{ 'images/altar-elemental-tierra-4.jpg' | static_url }}">
     </div>
-    <div class="altar-solar__ground-campaign-heading">
+    <div class="altar-solar__ground-campaign-heading" data-cursor-label="{{ 'Ver colección' | translate }}" data-scroll-to=".altar-collection">
       <img src="{{ 'images/altar-status-dot.svg' | static_url }}" alt="" width="7" height="7">
       <span>{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}</span>
     </div>
