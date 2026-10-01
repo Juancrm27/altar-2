@@ -57,3 +57,13 @@ No subas `.nuvem` al repositorio: contiene la configuración de acceso a la tien
 - El catálogo local usa datos ficticios para validar la experiencia.
 - Las plantillas comerciales del tema siguen siendo marcadores de posición hasta importar el tema oficial.
 - No publicar este scaffold directamente sobre una tienda activa.
+
+## Preview online (Netlify)
+
+Netlify solo publica una copia del preview local para revisar el diseño; la tienda final es el tema de Tiendanube.
+
+- `netlify.toml` define el build (`node .dev/netlify-build.mjs`) y publica `dist/` (generado, no se commitea).
+- El build copia `.dev/preview.html` y el storefront de prueba a `dist/preview/` y los assets a `dist/static/`, así las rutas `../static/...` siguen funcionando.
+- No instala dependencias: antes de pushear cambios en `.dev/src/solar-experience.js`, compilar con `cd .dev && npm run build` (el JS compilado vive en `static/js/`).
+- El sitio responde con `X-Robots-Tag: noindex` para que no lo indexen.
+- Probar local: `node .dev/netlify-build.mjs && cd dist && python3 -m http.server`.

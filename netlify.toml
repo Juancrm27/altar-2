@@ -1,0 +1,24 @@
+# Netlify only hosts a review copy of the local preview. The real store is the Tiendanube theme in this repo.
+[build]
+  command = "node .dev/netlify-build.mjs"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Home opens the experience.
+[[redirects]]
+  from = "/"
+  to = "/preview/"
+  status = 302
+
+# Preview only: keep it out of search engines.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/static/models/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
