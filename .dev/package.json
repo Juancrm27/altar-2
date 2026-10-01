@@ -1,0 +1,17 @@
+{
+  "name": "altar-tiendanube-theme-dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/solar-experience.js --bundle --minify --format=iife --target=es2020 --outfile=../static/js/solar-experience.js",
+    "build:watch": "npm run build -- --watch",
+    "preview": "python3 serve.py 4173"
+  },
+  "dependencies": {
+    "gsap": "3.15.0",
+    "three": "0.186.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

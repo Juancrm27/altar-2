@@ -1,0 +1,4 @@
+.page-shell { width: min(1100px, calc(100% - 40px)); margin: 0 auto; padding: 120px 0; }
+.eyebrow { letter-spacing: .18em; text-transform: uppercase; opacity: .65; }
+.button { display: inline-flex; padding: 12px 20px; border: 1px solid currentColor; border-radius: 999px; text-decoration: none; }
+

@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Identidad de Altar",
+    "settings": [
+      { "type": "setting", "setting_type": "color", "id": "space_color", "label": "Color del espacio", "default": "#2d2838" },
+      { "type": "setting", "setting_type": "color", "id": "horizon_color", "label": "Color del horizonte", "default": "#ff9a70" },
+      { "type": "setting", "setting_type": "color", "id": "sky_color", "label": "Color del cielo", "default": "#aebfc0" },
+      { "type": "setting", "setting_type": "color", "id": "text_color", "label": "Color de texto", "default": "#f7f2ec" }
+    ]
+  }
+]
+

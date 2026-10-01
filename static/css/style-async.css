@@ -1,0 +1,54 @@
+.footer-shell { width: min(1200px, calc(100% - 40px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 72px; }
+.footer-shell a { text-decoration: none; }
+.site-footer { border-top: 1px solid rgb(255 255 255 / 12%); }
+.footer-shell { min-height: 96px; color: rgb(255 255 255 / 64%); font-size: 13px; }
+
+.lighting-panel { position: fixed; right: 0; bottom: 0; z-index: 100; display: flex; flex-direction: column; width: 245px; max-width: 100vw; color: #eee; background: #1a1a1a; font: 11px/1 "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif; text-shadow: 0 -1px 0 #111; user-select: none; }
+.lighting-panel__body { max-height: calc(100svh - 20px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: #444 #1a1a1a; }
+.lighting-panel.is-collapsed .lighting-panel__body { display: none; }
+.lighting-panel__layer { position: sticky; top: 0; z-index: 1; height: 22px; margin: 0; padding: 0 8px; color: #8ed6f7; border-top: 1px solid #444; border-bottom: 1px solid #2c2c2c; background: #202020; font-size: 9px; font-weight: 700; line-height: 22px; letter-spacing: .08em; text-transform: uppercase; }
+.lighting-panel details { border-bottom: 1px solid #2c2c2c; }
+.lighting-panel summary { display: flex; align-items: center; gap: 6px; height: 27px; padding: 0 6px; color: #fff; background: #000; list-style: none; cursor: pointer; }
+.lighting-panel summary::-webkit-details-marker { display: none; }
+.lighting-panel summary::before { content: ""; border: 4px solid transparent; border-top-color: #fff; border-bottom: 0; transform: rotate(-90deg); transition: transform 100ms; }
+.lighting-panel details[open] > summary::before { transform: none; }
+.lighting-panel__subgroup { margin-left: 10px; border-left: 1px solid #333; }
+.lighting-panel__subgroup > summary { height: 24px; color: #cfcfcf; background: #111; font-size: 10px; }
+.lighting-panel label { display: grid; grid-template-columns: 40% 1fr; align-items: center; height: 27px; padding: 0 4px 0 8px; border-bottom: 1px solid #2c2c2c; border-left: 3px solid #2fa1d6; overflow: hidden; white-space: nowrap; }
+.lighting-panel label.is-color { border-left-color: #d6a42f; }
+.lighting-panel label.is-select { border-left-color: #806787; }
+.lighting-panel label.is-boolean { border-left-color: #806787; cursor: pointer; }
+.lighting-panel input[type="checkbox"] { justify-self: start; margin: 0; accent-color: #2fa1d6; cursor: pointer; }
+.lighting-panel label > span { display: grid; grid-template-columns: 1fr 52px; align-items: center; gap: 4px; }
+.lighting-panel input[type="range"] { width: 100%; height: 19px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: ew-resize; }
+.lighting-panel input[type="range"]::-webkit-slider-runnable-track { height: 19px; background: #303030; }
+.lighting-panel input[type="range"]::-webkit-slider-thumb { width: 3px; height: 19px; border: 0; background: #2fa1d6; -webkit-appearance: none; appearance: none; }
+.lighting-panel input[type="range"]::-moz-range-track { height: 19px; background: #303030; }
+.lighting-panel input[type="range"]::-moz-range-progress { height: 19px; background: #2fa1d6; }
+.lighting-panel input[type="range"]::-moz-range-thumb { width: 3px; height: 19px; border: 0; border-radius: 0; background: #2fa1d6; }
+.lighting-panel output { display: block; height: 19px; padding: 0 3px; color: #2fa1d6; background: #303030; font: inherit; line-height: 19px; font-variant-numeric: tabular-nums; }
+.lighting-panel__number { display: block; width: 100%; min-width: 0; height: 19px; margin: 0; padding: 0 3px; color: #2fa1d6; background: #303030; border: 1px solid transparent; border-radius: 0; font: inherit; line-height: 17px; font-variant-numeric: tabular-nums; cursor: text; user-select: text; }
+.lighting-panel__number:hover { border-color: #444; }
+.lighting-panel__number:focus { color: #fff; border-color: #2fa1d6; outline: none; }
+.lighting-panel input[type="color"] { width: 100%; height: 19px; padding: 0; border: 0; background: #303030; cursor: pointer; }
+.lighting-panel input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+.lighting-panel input[type="color"]::-webkit-color-swatch { border: 0; }
+.lighting-panel select { width: 100%; height: 19px; color: #eee; border: 0; border-radius: 0; background: #303030; font: inherit; }
+.lighting-panel__reset { display: block; width: 100%; height: 27px; padding: 0 8px; color: #eee; border: 0; border-left: 3px solid #e61d5f; background: #1a1a1a; font: inherit; text-align: left; cursor: pointer; }
+.lighting-panel__action { display: block; width: 100%; height: 27px; padding: 0 8px; color: #eee; border: 0; border-bottom: 1px solid #2c2c2c; border-left: 3px solid #e61d5f; background: #1a1a1a; font: inherit; text-align: left; cursor: pointer; }
+.lighting-panel__action:hover, .lighting-panel__reset:hover, .lighting-panel label:hover, .lighting-panel summary:hover { background: #111; }
+.lighting-panel__toggle { display: block; width: 100%; height: 20px; padding: 0; color: #eee; border: 0; background: #000; font: inherit; text-align: center; cursor: pointer; }
+.lighting-panel__toggle:hover { background: #111; }
+.altar-tramos { position: absolute; inset: 0; z-index: 6; pointer-events: none; font: 11px/1.2 "Lucida Grande", Arial, sans-serif; }
+.altar-tramos__item { position: absolute; right: 0; left: 0; border-top: 1px dashed #2fa1d6; }
+.altar-tramos__item::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 28px; background: rgb(47 161 214 / 55%); }
+.altar-tramos__item.is-alt::before { background: rgb(230 29 95 / 55%); }
+.altar-tramos__number { position: sticky; top: calc(50svh - 14px); display: flex; width: 28px; height: 28px; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 700; }
+.altar-tramos__label { position: absolute; top: 0; left: 36px; padding: 4px 8px; color: #fff; background: #2fa1d6; }
+.altar-tramos__item.is-alt .altar-tramos__label { background: #e61d5f; }
+.altar-tramos__item:first-child .altar-tramos__label { top: 96px; }
+.altar-tramos__hud { position: fixed; bottom: 45px; left: 36px; padding: 6px 10px; color: #eee; background: #000; }
+@media (max-width: 749px) {
+  .altar-solar__stage { min-height: 960px; margin-bottom: min(-100svh, -480px); }
+  .altar-solar__earth { min-height: 480px; }
+}

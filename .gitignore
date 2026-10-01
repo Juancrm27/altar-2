@@ -1,0 +1,5 @@
+.DS_Store
+.nuvem
+node_modules/
+.dev/node_modules/
+
