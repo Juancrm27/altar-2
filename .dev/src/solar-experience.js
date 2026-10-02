@@ -2660,6 +2660,34 @@ ${stonePositionsMarkup(4)}
     const groundImage = this.root.querySelector(".altar-solar__ground-campaign-media img");
     const defaultGroundImage = groundImage?.getAttribute("src");
 
+    const photoSources = (index) => [
+      index === 0 ? defaultImage : image?.getAttribute(`data-channel-image-${index + 1}`),
+      (index > 0 && groundImage?.getAttribute(`data-channel-image-${index + 1}`)) || defaultGroundImage,
+    ].filter(Boolean);
+
+    // Downloaded and decoded ahead of time (and kept referenced), so a switch never swaps a
+    // half-loaded photo in the middle of the zoom.
+    const decodedPhotos = new Map();
+    const decodePhoto = (src) => {
+      if (!decodedPhotos.has(src)) {
+        const preload = new Image();
+        preload.src = src;
+        decodedPhotos.set(src, preload.decode().catch(() => {}).then(() => preload));
+      }
+      return decodedPhotos.get(src);
+    };
+    const photosReady = (index) => Promise.race([
+      Promise.all(photoSources(index).map(decodePhoto)),
+      // On a very slow connection don't hold the switch forever.
+      new Promise((resolve) => setTimeout(resolve, 1200)),
+    ]);
+    afterIntro(() => {
+      CHANNELS.forEach((_, index) => {
+        photoSources(index).forEach(decodePhoto);
+        this.preloadCardChannel(index);
+      });
+    });
+
     const applyPhoto = (index) => {
       if (groundImage) {
         const channelSrc = index > 0 && groundImage.getAttribute(`data-channel-image-${index + 1}`);
@@ -2709,27 +2737,31 @@ ${stonePositionsMarkup(4)}
     const go = (step, button) => {
       // Like the reference, a new switch is ignored while a reveal is still playing.
       if (busy) return;
-      current = (current + step + CHANNELS.length) % CHANNELS.length;
-      const background = backgroundFor(current);
-      applyLabel(current);
-      this.closeFortuneCard?.();
-      this.setCardChannel(current);
-      this.moveSystemToChannel(current, !REDUCED_MOTION.matches);
-      this.moveGroundToChannel(current, !REDUCED_MOTION.matches);
-      if (REDUCED_MOTION.matches || !this.channelReveal) {
-        applyPhoto(current);
-        applyBackground(background);
-        return;
-      }
       busy = true;
-      applyPhoto(current);
-      const source = waveSource() ?? button;
-      zoomPhoto(source === groundCampaign ? groundImage : image);
-      // From the ground card, the wave front also passes over the horizon, ground and stones.
-      if (source === groundCampaign) this.channelRings?.play(background, source, () => {});
-      this.channelReveal.play(background, source, () => {
-        applyBackground(background);
-        busy = false;
+      current = (current + step + CHANNELS.length) % CHANNELS.length;
+      const index = current;
+      const background = backgroundFor(index);
+      applyLabel(index);
+      this.closeFortuneCard?.();
+      this.setCardChannel(index);
+      // Everything animated starts together once the new photos are decoded.
+      photosReady(index).then(() => {
+        this.moveSystemToChannel(index, !REDUCED_MOTION.matches);
+        this.moveGroundToChannel(index, !REDUCED_MOTION.matches);
+        applyPhoto(index);
+        if (REDUCED_MOTION.matches || !this.channelReveal) {
+          applyBackground(background);
+          busy = false;
+          return;
+        }
+        const source = waveSource() ?? button;
+        zoomPhoto(source === groundCampaign ? groundImage : image);
+        // From the ground card, the wave front also passes over the horizon, ground and stones.
+        if (source === groundCampaign) this.channelRings?.play(background, source, () => {});
+        this.channelReveal.play(background, source, () => {
+          applyBackground(background);
+          busy = false;
+        });
       });
     };
     // Used by the GUI: editing a channel's system pose jumps straight to that channel.
@@ -3131,6 +3163,16 @@ ${stonePositionsMarkup(4)}
         effect.material.uniforms.uFoilMap.value = foilMap;
         effect.maskSize.set(foilMap.image.width, foilMap.image.height);
       });
+    });
+  }
+
+  // Fetches a channel's card textures early so the first switch to it doesn't wait on the network.
+  preloadCardChannel(index) {
+    const suffix = index + 1;
+    this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
+      [card.getAttribute(`data-channel-base-${suffix}`), card.getAttribute(`data-channel-map-${suffix}`)]
+        .filter(Boolean)
+        .forEach((url) => this.loadFoilTexture(url).catch(() => {}));
     });
   }
 
@@ -3580,6 +3622,27 @@ function createChannelReveal(stage, { ringsOnly = false } = {}) {
   let frame = 0;
   let finish = null;
 
+  // Resizing reallocates the drawing buffer, so only do it when the stage really changed.
+  let sizeKey = "";
+  const resize = (width, height) => {
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.6);
+    const key = `${width}x${height}@${pixelRatio}`;
+    if (key === sizeKey) return;
+    sizeKey = key;
+    renderer.setPixelRatio(pixelRatio);
+    renderer.setSize(width, height, false);
+  };
+
+  // Compile the shader and allocate the buffer ahead of time (the canvas is still hidden), so the
+  // first wave — a channel switch or the fortune card opening — doesn't stall mid-animation.
+  const warmUp = () => {
+    const bounds = stage.getBoundingClientRect();
+    resize(bounds.width, bounds.height);
+    renderer.compile(scene, camera);
+    if (!frame) renderer.render(scene, camera);
+  };
+  afterIntro(warmUp);
+
   const complete = () => {
     cancelAnimationFrame(frame);
     frame = 0;
@@ -3600,8 +3663,7 @@ function createChannelReveal(stage, { ringsOnly = false } = {}) {
       const width = stageBounds.width;
       const height = stageBounds.height;
       // Rings are soft gradients, so a capped pixel ratio keeps this cheap.
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.6));
-      renderer.setSize(width, height, false);
+      resize(width, height);
 
       const viewportHeight = window.innerHeight;
       const sourceBounds = source.getBoundingClientRect();
@@ -3741,6 +3803,13 @@ function initSolarExperiences() {
 // pieces until this runs, and the head script lifts it on its own if the bundle never arrives.
 const INTRO_END = 4200;
 
+// Background warm-up work (preloads, shader compiles) waits for the opening sequence to finish
+// and then for an idle moment, so it never competes with the intro animations.
+function afterIntro(callback) {
+  const idle = window.requestIdleCallback ?? ((next) => setTimeout(next, 200));
+  setTimeout(() => idle(callback), INTRO_END);
+}
+
 function splitChars(element, { base, stagger, duration = 120, ease = "ease-out" }) {
   if (!element || element.dataset.introSplit) return;
   element.dataset.introSplit = "true";
@@ -3807,7 +3876,17 @@ function playIntro() {
 
   // 1.2 s · the ELEMENTAL card rises rotated and settles (the single spatial move), its title lighting up as it turns.
   const campaign = $(".altar-solar__campaign");
-  introAnimate(campaign, `altar-intro-rise 1600ms cubic-bezier(0.16, 1, 0.3, 1) 1200ms both, ${fade(200, 1200)}`);
+  introAnimate(campaign, fade(200, 1200));
+  if (campaign) {
+    // Animated on transform with resolved values so the compositor runs it: custom-property keyframes
+    // run on the main thread and froze mid-rise while the 3D scene was still being built.
+    const settled = getComputedStyle(campaign).transform;
+    const base = settled === "none" ? "" : settled;
+    campaign.animate([
+      { transform: `translateY(${window.innerWidth * 0.2}px) rotate(-20deg) ${base}` },
+      { transform: `translateY(0px) rotate(0deg) ${base}` },
+    ], { duration: 1600, delay: 1200, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "backwards" });
+  }
   splitChars(campaign?.querySelector(".altar-solar__campaign-heading span"), { base: 1200, stagger: 40 });
   splitChars($("[data-live-date]"), { base: 1250, stagger: 35 });
   splitChars($(".altar-solar__fortune-cta-text span"), { base: 1460, stagger: 20 });
