@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Altar — prueba comercial</title>
+    <link rel="icon" href="../static/images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../static/images/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="../static/images/apple-touch-icon.png">
+    <link rel="stylesheet" href="./storefront.css">
+  </head>
+  <body>
+    <header class="preview-header" data-store="header">
+      <a class="preview-brand" href="./preview.html">Altar</a>
+      <nav class="preview-nav" aria-label="Navegación principal">
+        <a href="./preview.html">Experiencia</a>
+        <a href="./storefront-mock.html">Tienda</a>
+        <button class="cart-trigger" type="button" data-cart-open>Carrito (<span data-cart-count>0</span>)</button>
+      </nav>
+    </header>
+
+    <main class="preview-main" data-page-content></main>
+
+    <button class="cart-backdrop" type="button" data-cart-close aria-label="Cerrar carrito"></button>
+    <aside class="cart-drawer" data-cart-drawer data-store="cart" aria-hidden="true" aria-label="Carrito">
+      <div class="cart-drawer__header">
+        <h2>Carrito</h2>
+        <button type="button" data-cart-close aria-label="Cerrar">×</button>
+      </div>
+      <div class="cart-items" data-cart-items></div>
+      <div class="cart-summary">
+        <div class="cart-summary__row"><span>Total</span><strong data-cart-total>$0</strong></div>
+        <button class="primary-button" type="button" data-checkout>Iniciar compra</button>
+        <p class="cart-note" data-cart-note>Checkout desactivado en el modo de prueba.</p>
+      </div>
+    </aside>
+
+    <script type="module" src="./src/storefront-preview.js"></script>
+  </body>
+</html>

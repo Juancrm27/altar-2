@@ -66,7 +66,7 @@ const DEFAULT_LIGHTING = {
   starCount: 700,
   starSize: 1.6,
   starBrightness: 4,
-  starColor: "#fffec2",
+  starColor: "#fff3a9",
   starColorVariation: 1,
   twinkleSpeed: 7.95,
   twinkleAmount: 0.5,
@@ -631,7 +631,7 @@ const DEFAULT_LIGHTING = {
   shootingLength: 6,
   shootingWidth: 0.25,
   shootingBrightness: 3.1,
-  shootingColor: "#fffec2",
+  shootingColor: "#fff3a9",
   shootingAngle: -30,
   shootingAngleVariation: 57,
   horizonGlowColor: "#ff9c71",
@@ -714,7 +714,7 @@ const X_AXIS = new THREE.Vector3(1, 0, 0);
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 const STAR_FIELD = { width: 90, top: 24, bottom: -64, near: -8, far: -40 };
-const STAR_TINTS = ["#fffec2", "#ffd9b0", "#c9d6ff", "#ffffff", "#ffb28e"].map((hex) => new THREE.Color(hex));
+const STAR_TINTS = ["#fff3a9", "#ffd9b0", "#c9d6ff", "#ffffff", "#ffb28e"].map((hex) => new THREE.Color(hex));
 
 const STAR_VERTEX_SHADER = `
   attribute float aPhase;
@@ -3012,7 +3012,12 @@ ${stonePositionsMarkup(4)}
       clearTimeout(this.fortuneFocusTimer);
       cardsContainer.classList.add("is-animating-focus");
       this.fortuneFocusTimer = setTimeout(() => cardsContainer.classList.remove("is-animating-focus"), 1000);
+      // Campaign cards head to their exact spot for each state (top right while open, home after).
+      const campaigns = this.root.querySelectorAll(".altar-solar__campaign, [data-ground-campaign]");
+      campaigns.forEach(resetDrag);
       if (!focused) {
+        // The fortune card flies home too, not back to wherever it had been dragged.
+        resetDrag(cardsContainer);
         cardsContainer.classList.remove("is-focused");
         this.root.classList.remove("is-card-open");
         ["--focus-x", "--focus-y", "--card-scale"].forEach((name) => cardsContainer.style.removeProperty(name));
@@ -3315,6 +3320,9 @@ const DRAG_VIEWPORT_MARGIN = 8;
 
 // Lets an element be moved with the pointer through --drag-x/--drag-y (applied via CSS `translate`),
 // so it keeps its sticky positioning and open/close animations. A drag never triggers a click.
+const DRAG_RESET_EVENT = "altar:drag-reset";
+const resetDrag = (element) => element?.dispatchEvent(new CustomEvent(DRAG_RESET_EVENT));
+
 function makeDraggable(element, { handle = element, allowTouch = true } = {}) {
   if (!element || !handle) return;
   const offset = { x: 0, y: 0 };
@@ -3367,6 +3375,17 @@ function makeDraggable(element, { handle = element, allowTouch = true } = {}) {
   };
   window.addEventListener("pointerup", endDrag);
   window.addEventListener("pointercancel", endDrag);
+
+  // Automatic moves (opening/closing the fortune card) send the element back to its home spot,
+  // dropping whatever offset the visitor dragged it by; the CSS transition carries it there.
+  element.addEventListener(DRAG_RESET_EVENT, () => {
+    drag = null;
+    offset.x = 0;
+    offset.y = 0;
+    element.classList.remove("is-dragging");
+    element.style.removeProperty("--drag-x");
+    element.style.removeProperty("--drag-y");
+  });
 
   element.addEventListener("click", (event) => {
     if (!suppressClick) return;
@@ -3535,7 +3554,7 @@ function createChannelReveal(stage, { ringsOnly = false } = {}) {
     uSpace: { value: new THREE.Vector3() },
     uGlowColors: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
     uGlowShapes: { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] },
-    uEdgeColor: { value: new THREE.Vector3(...hexToRgbArray("#fffec2")) },
+    uEdgeColor: { value: new THREE.Vector3(...hexToRgbArray("#fff3a9")) },
     uRingsOnly: { value: ringsOnly ? 1 : 0 },
     uBand: { value: 1 },
     uEdgeGain: { value: 1 },
@@ -3688,9 +3707,28 @@ function initHeaderTheme() {
   update();
 }
 
+// Newsletter forms without a destination (the local/Netlify preview) confirm in place;
+// on Tiendanube the form posts to the store's contact endpoint as usual.
+function initNewsletterPreview() {
+  document.querySelectorAll("[data-newsletter-form]:not([action])").forEach((form) => {
+    if (form.dataset.ready) return;
+    form.dataset.ready = "true";
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const note = form.querySelector(".altar-footer__legal");
+      if (note) {
+        note.textContent = "¡Listo! Ya estás en la lista.";
+        note.setAttribute("role", "status");
+      }
+      form.reset();
+    });
+  });
+}
+
 function initSolarExperiences() {
   initHeaderTheme();
   updateLiveDates();
+  initNewsletterPreview();
   document.querySelectorAll("[data-altar-solar]").forEach((root) => {
     if (!root.solarExperience) root.solarExperience = new SolarExperience(root);
   });

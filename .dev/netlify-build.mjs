@@ -16,7 +16,7 @@ rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, "preview"), { recursive: true });
 
 cpSync(join(root, "static"), join(dist, "static"), { recursive: true, filter: (path) => !skip(path) });
-for (const entry of ["preview.html", "storefront.html", "storefront.css", "src", "data"]) {
+for (const entry of ["preview.html", "storefront.html", "storefront-mock.html", "storefront.css", "src", "data"]) {
   const from = join(dev, entry);
   if (existsSync(from)) cpSync(from, join(dist, "preview", entry), { recursive: true, filter: (path) => !skip(path) });
 }

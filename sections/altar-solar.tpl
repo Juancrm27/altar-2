@@ -185,7 +185,7 @@
       </div>
     </div>
   </div>
-  <section class="altar-solar__ground altar-collection" aria-label="Colección ELEMENTAL">
+  <section class="altar-solar__ground altar-collection" id="coleccion" aria-label="Colección ELEMENTAL">
     <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
       <filter id="altar-grain-collection-{{ section.id }}" x="0" y="0" width="100%" height="100%">
         <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>

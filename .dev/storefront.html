@@ -4,38 +4,83 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
-    <title>Altar — prueba comercial</title>
+    <title>Altar — Store · Work in progress</title>
     <link rel="icon" href="../static/images/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="../static/images/favicon-32.png" sizes="32x32" type="image/png">
     <link rel="apple-touch-icon" href="../static/images/apple-touch-icon.png">
-    <link rel="stylesheet" href="./storefront.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/style-critical.css">
+    <style>
+      /* Store placeholder (preview only): same palette, grid and type as the home. */
+      body { background: #601e2a; }
+      .site-header { position: fixed; inset: 0 0 auto; }
+      .altar-wip { position: relative; display: flex; min-height: 100svh; padding: calc(131 * var(--u)) var(--grid-margin) calc(32 * var(--u)); overflow: hidden; flex-direction: column; justify-content: space-between; gap: calc(48 * var(--u)); color: #fff3a9; font-family: Inter, Arial, Helvetica, sans-serif; }
+      .altar-wip__symbol { position: absolute; right: var(--grid-margin); bottom: calc(-180 * var(--u)); width: calc((100% - 2 * var(--grid-margin) - 7 * var(--grid-gutter)) / 8 * 4 + var(--grid-gutter) * 3); height: auto; pointer-events: none; }
+      .altar-wip__head { position: relative; display: flex; width: calc((100% - 7 * var(--grid-gutter)) / 8 * 4 + var(--grid-gutter) * 3); max-width: 100%; flex-direction: column; gap: calc(8 * var(--u)); }
+      .altar-wip__meta { display: flex; justify-content: space-between; font-size: calc(10 * var(--u)); line-height: calc(12 * var(--u)); letter-spacing: calc(.7 * var(--u)); text-transform: uppercase; white-space: nowrap; }
+      .altar-wip h1 { margin: 0; font-size: calc(64 * var(--u)); font-weight: 400; line-height: calc(64 * var(--u)); letter-spacing: calc(-3 * var(--u)); text-transform: uppercase; }
+      .altar-wip__note { position: relative; display: flex; width: calc((100% - 7 * var(--grid-gutter)) / 8 * 2 + var(--grid-gutter)); max-width: 100%; flex-direction: column; gap: calc(8 * var(--u)); }
+      .altar-wip__note span { font-size: calc(10 * var(--u)); line-height: calc(12 * var(--u)); letter-spacing: calc(.7 * var(--u)); text-transform: uppercase; }
+      .altar-wip__note p { margin: 0; font-size: calc(16 * var(--u)); line-height: calc(20 * var(--u)); }
+      .altar-wip__back { display: inline-flex; align-self: flex-start; align-items: center; gap: calc(6 * var(--u)); margin-top: calc(8 * var(--u)); color: inherit; font-size: calc(10 * var(--u)); line-height: calc(12 * var(--u)); letter-spacing: calc(.7 * var(--u)); text-decoration: none; text-transform: uppercase; }
+      .altar-wip__back:hover, .altar-wip__back:focus-visible { text-decoration: underline; text-underline-offset: calc(3 * var(--u)); }
+      .altar-wip__back svg { width: calc(12 * var(--u)); height: calc(12 * var(--u)); }
+      @media (max-width: 749px) {
+        .altar-wip { padding-top: 112px; }
+        .altar-wip__head, .altar-wip__note { width: 100%; }
+        .altar-wip h1 { font-size: 44px; line-height: 44px; letter-spacing: -2px; }
+        .altar-wip__symbol { width: 80vw; bottom: -20vw; }
+      }
+    </style>
   </head>
   <body>
-    <header class="preview-header" data-store="header">
-      <a class="preview-brand" href="./preview.html">Altar</a>
-      <nav class="preview-nav" aria-label="Navegación principal">
-        <a href="./preview.html">Experiencia</a>
-        <a href="./storefront.html">Tienda</a>
-        <button class="cart-trigger" type="button" data-cart-open>Carrito (<span data-cart-count>0</span>)</button>
-      </nav>
+    <header class="site-header">
+      <div class="altar-nav">
+        <div class="altar-nav__rule altar-nav__rule--top" aria-hidden="true"></div>
+        <div class="altar-nav__content">
+          <div class="altar-nav__brand">
+            <a class="altar-nav__logo" href="./preview.html" aria-label="Altar">
+              <img src="../static/images/altar-logo.svg" alt="" width="40" height="39">
+            </a>
+            <span class="altar-nav__divider altar-nav__divider--brand" aria-hidden="true"></span>
+            <div class="altar-nav__wordmark-block">
+              <span class="altar-nav__eyebrow">[  CONCEPT_STORE  ]</span>
+              <a class="altar-nav__wordmark" href="./preview.html"><span>altar</span><sup>©</sup></a>
+            </div>
+            <span class="altar-nav__divider altar-nav__divider--metadata" aria-hidden="true"></span>
+            <div class="altar-nav__metadata"><time data-live-date>SEP/23/26</time><span>C.A.B.A. (ARG)</span></div>
+            <span class="altar-nav__divider altar-nav__divider--navigation" aria-hidden="true"></span>
+          </div>
+          <nav class="altar-nav__menu" aria-label="Navegación principal">
+            <a href="./storefront.html">Shop</a>
+            <a href="./preview.html#about">About</a>
+            <a href="#">Contact</a>
+          </nav>
+          <div class="altar-nav__actions">
+            <span class="altar-nav__divider altar-nav__divider--actions" aria-hidden="true"></span>
+            <div class="altar-nav__action-stack">
+              <a class="altar-nav__cart" href="./storefront.html"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span>(0)</span></a>
+              <a class="altar-nav__search" href="#"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
+      </div>
     </header>
-
-    <main class="preview-main" data-page-content></main>
-
-    <button class="cart-backdrop" type="button" data-cart-close aria-label="Cerrar carrito"></button>
-    <aside class="cart-drawer" data-cart-drawer data-store="cart" aria-hidden="true" aria-label="Carrito">
-      <div class="cart-drawer__header">
-        <h2>Carrito</h2>
-        <button type="button" data-cart-close aria-label="Cerrar">×</button>
+    <main class="altar-wip">
+      <img class="altar-wip__symbol" src="../static/images/altar-symbol-large.svg" alt="" width="698" height="673">
+      <div class="altar-wip__head">
+        <div class="altar-wip__meta"><span>Store</span><span>[ WIP ]</span></div>
+        <h1>Work in<br>progress</h1>
       </div>
-      <div class="cart-items" data-cart-items></div>
-      <div class="cart-summary">
-        <div class="cart-summary__row"><span>Total</span><strong data-cart-total>$0</strong></div>
-        <button class="primary-button" type="button" data-checkout>Iniciar compra</button>
-        <p class="cart-note" data-cart-note>Checkout desactivado en el modo de prueba.</p>
+      <div class="altar-wip__note">
+        <span>Próximamente</span>
+        <p>Estamos armando la tienda, pieza por pieza. Muy pronto vas a poder elegir las que hablan por vos.</p>
+        <a class="altar-wip__back" href="./preview.html"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 8.5h-5v-5M8.5 8.5l-5-5"/></svg>Volver a la experiencia</a>
       </div>
-    </aside>
-
-    <script type="module" src="./src/storefront-preview.js"></script>
+    </main>
+    <script src="../static/js/solar-experience.js"></script>
   </body>
 </html>

@@ -1,4 +1,7 @@
-:root { color-scheme: dark; --u: 1px; }
+:root { color-scheme: dark; --u: 1px;
+  /* Figma layout grid: 8 columns, 12px margin, 20px gutter on the 1440 frame (scales with --u).
+     --col resolves against the width of the element's container, so use it on children of a full-width row. */
+  --grid-margin: calc(12 * var(--u)); --grid-gutter: calc(20 * var(--u)); --col: calc((100% - 7 * var(--grid-gutter)) / 8); }
 @media (min-width: 1441px) { :root { --u: calc(100vw / 1440); } }
 * { box-sizing: border-box; }
 html { background: var(--altar-space, #2d2838); scroll-behavior: smooth; }
@@ -26,35 +29,35 @@ a { color: inherit; }
 .altar-solar__grain { display: block; width: 100%; height: 100%; opacity: var(--grain-opacity, .25); mix-blend-mode: overlay; }
 .altar-solar__earth { position: relative; z-index: 0; width: 100%; height: 100svh; min-height: calc(540 * var(--u)); overflow: visible; pointer-events: none; }
 .altar-solar__ground { position: relative; width: 100%; min-height: max(100svh, calc(540 * var(--u))); background: var(--ground-color, #f4f0e8); }
-.altar-collection { display: flex; min-height: max(100svh, calc(640 * var(--u))); padding: calc(131 * var(--u)) calc(12 * var(--u)) calc(59 * var(--u)); flex-direction: column; justify-content: flex-start; gap: calc(32 * var(--u)); color: rgb(255 254 194 / 78%); background: transparent; font-family: Inter, Arial, Helvetica, sans-serif; font-weight: 400; }
+.altar-collection { display: flex; min-height: max(100svh, calc(640 * var(--u))); padding: calc(131 * var(--u)) calc(12 * var(--u)) calc(59 * var(--u)); flex-direction: column; justify-content: flex-start; gap: calc(32 * var(--u)); color: #fff3a9; background: transparent; font-family: Inter, Arial, Helvetica, sans-serif; font-weight: 400; }
 /* Sections 3 and 4 share one bordó background so the large symbol can bridge them. */
-.altar-solar:has(.altar-closing) { --closing-bg: #2f0b08; }
+.altar-solar:has(.altar-closing) { --closing-bg: #601e2a; }
 .altar-collection, .altar-closing { position: relative; }
-.altar-collection { background: var(--closing-bg, #2f0b08); }
+.altar-collection { background: var(--closing-bg, #601e2a); }
 .altar-collection > *, .altar-closing__content { position: relative; z-index: 2; }
 .altar-collection > .altar-section-grain { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .altar-closing > .altar-section-grain { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .altar-section-grain { opacity: var(--section-grain-opacity, .16); mix-blend-mode: screen; }
-.altar-closing { min-height: max(100svh, calc(540 * var(--u))); padding: calc(131 * var(--u)) calc(12 * var(--u)) calc(45 * var(--u)); color: rgb(255 254 194 / 78%); background: var(--closing-bg, #2f0b08); font-family: Inter, Arial, Helvetica, sans-serif; font-weight: 400; }
+.altar-closing { min-height: max(100svh, calc(540 * var(--u))); padding: calc(131 * var(--u)) calc(12 * var(--u)) calc(45 * var(--u)); color: rgb(255 243 169 / 78%); background: var(--closing-bg, #601e2a); font-family: Inter, Arial, Helvetica, sans-serif; font-weight: 400; }
 .altar-closing__symbol { position: absolute; top: calc(-371 * var(--u)); right: calc(12 * var(--u)); z-index: 0; display: block; width: min(calc(698 * var(--u)), 48.5vw); height: auto; max-width: none; pointer-events: none; }
 .altar-collection__gallery { position: relative; z-index: 2; }
 .altar-closing__content { z-index: 2; display: flex; align-items: flex-start; gap: calc(20 * var(--u)); }
-.altar-closing__note { color: rgb(255 254 194 / 20%); display: flex; width: calc(339 * var(--u)); flex: none; padding-top: calc(83 * var(--u)); flex-direction: column; gap: calc(8 * var(--u)); }
+.altar-closing__note { color: rgb(255 243 169 / 20%); display: flex; width: calc(339 * var(--u)); flex: none; padding-top: calc(83 * var(--u)); flex-direction: column; gap: calc(8 * var(--u)); }
 .altar-closing__note span, .altar-collection__materia span { font-size: calc(10 * var(--u)); line-height: calc(12 * var(--u)); letter-spacing: calc(.7 * var(--u)); text-transform: uppercase; white-space: nowrap; }
 .altar-closing__note p { width: calc(273 * var(--u)); max-width: 100%; margin: 0; font-size: calc(14 * var(--u)); line-height: calc(20 * var(--u)); }
-.altar-collection__materia { color: rgb(255 254 194 / 20%); display: flex; margin-top: auto; width: calc(339 * var(--u)); max-width: 100%; flex-direction: column; gap: calc(8 * var(--u)); }
+.altar-collection__materia { color: rgb(255 243 169 / 20%); display: flex; margin-top: auto; width: calc(339 * var(--u)); max-width: 100%; flex-direction: column; gap: calc(8 * var(--u)); }
 .altar-collection__materia p { margin: 0; font-size: calc(14 * var(--u)); line-height: calc(20 * var(--u)); }
 .altar-closing__identity { display: flex; width: calc(878 * var(--u)); max-width: calc(100% - calc(359 * var(--u))); flex-direction: column; gap: calc(24 * var(--u)); }
 .altar-closing__head { display: flex; flex-direction: column; gap: calc(12 * var(--u)); }
-.altar-closing__wordmark { display: flex; margin: 0; gap: calc(3 * var(--u)); align-items: flex-start; color: #fffec2; font-family: "Gestura Text TRIAL", Georgia, serif; font-size: calc(88.324 * var(--u)); font-weight: 300; line-height: calc(85.4 * var(--u)); letter-spacing: calc(4.6486 * var(--u)); white-space: nowrap; }
+.altar-closing__wordmark { display: flex; margin: 0; gap: calc(3 * var(--u)); align-items: flex-start; color: #fff3a9; font-family: "Gestura Text TRIAL", Georgia, serif; font-size: calc(88.324 * var(--u)); font-weight: 300; line-height: calc(85.4 * var(--u)); letter-spacing: calc(4.6486 * var(--u)); white-space: nowrap; }
 .altar-closing__wordmark sup { font-family: Inter, Arial, sans-serif; font-size: calc(29.98 * var(--u)); font-weight: 300; line-height: calc(85.4 * var(--u)); letter-spacing: calc(4.6486 * var(--u)); vertical-align: baseline; }
-.altar-closing__manifesto { display: flex; flex-direction: column; color: #fffec2; font-family: "Gestura Text TRIAL", Georgia, serif; font-size: calc(17 * var(--u)); font-weight: 400; line-height: calc(20.585 * var(--u)); letter-spacing: calc(-.5146 * var(--u)); }
+.altar-closing__manifesto { display: flex; flex-direction: column; color: #fff3a9; font-family: "Gestura Text TRIAL", Georgia, serif; font-size: calc(17 * var(--u)); font-weight: 400; line-height: calc(20.585 * var(--u)); letter-spacing: calc(-.5146 * var(--u)); }
 .altar-closing__manifesto p { margin: 0; }
 .altar-closing__lead { display: flex; align-items: flex-start; gap: calc(37 * var(--u)); font-size: calc(17.154 * var(--u)); white-space: pre; }
 .altar-closing__body { margin-top: calc(18 * var(--u)) !important; }
 .altar-closing__signature { display: flex; justify-content: flex-end; margin-top: calc(19 * var(--u)) !important; }
 .altar-closing__signature + .altar-closing__body { margin-top: 0 !important; }
-.altar-closing__tag { position: relative; display: inline-block; padding: calc(3 * var(--u)) calc(24 * var(--u)) calc(3 * var(--u)) calc(3 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; font-size: calc(17.154 * var(--u)); line-height: calc(20.585 * var(--u)); white-space: nowrap; background: linear-gradient(rgb(255 254 194 / 8%), rgb(255 254 194 / 8%)) no-repeat 0 0 / calc(100% - calc(21 * var(--u))) 100%; }
+.altar-closing__tag { position: relative; display: inline-block; padding: calc(3 * var(--u)) calc(24 * var(--u)) calc(3 * var(--u)) calc(3 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; font-size: calc(17.154 * var(--u)); line-height: calc(20.585 * var(--u)); white-space: nowrap; background: linear-gradient(rgb(255 243 169 / 8%), rgb(255 243 169 / 8%)) no-repeat 0 0 / calc(100% - calc(21 * var(--u))) 100%; }
 .altar-closing__tag sup { position: absolute; top: calc(3 * var(--u)); right: 0; font-family: Inter, Arial, Helvetica, sans-serif; font-size: calc(11.665 * var(--u)); line-height: calc(12 * var(--u)); letter-spacing: calc(-.5146 * var(--u)); vertical-align: baseline; }
 .altar-collection__heading { display: flex; align-items: flex-end; justify-content: space-between; gap: calc(24 * var(--u)); }
 .altar-collection__identity { display: flex; width: calc(698 * var(--u)); max-width: 60%; flex-direction: column; gap: calc(8 * var(--u)); }
@@ -66,13 +69,13 @@ a { color: inherit; }
 .altar-collection__note span { font-size: calc(10 * var(--u)); line-height: calc(12 * var(--u)); letter-spacing: calc(.7 * var(--u)); text-transform: uppercase; white-space: nowrap; }
 .altar-collection__note p { margin: 0; font-size: calc(16 * var(--u)); line-height: calc(20 * var(--u)); }
 .altar-collection__gallery { display: grid; flex: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(20 * var(--u)); }
-.altar-collection__photo { position: relative; aspect-ratio: 339 / 428; margin: 0; overflow: hidden; background: #fff; }
+.altar-collection__photo { position: relative; aspect-ratio: 339 / 428; margin: 0; overflow: hidden; background: #fff3a9; }
 .altar-collection__photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 500ms ease-out; }
 a.altar-collection__photo { display: block; color: inherit; }
 .altar-collection__photo:hover img { transform: scale(1.05); }
 .altar-cursor-badge { position: fixed; top: 0; left: 0; z-index: 90; display: none; align-items: center; pointer-events: none; will-change: transform; font: 400 calc(12 * var(--u))/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: -.03em; text-transform: uppercase; }
 .altar-cursor-badge.is-enabled { display: flex; }
-.altar-cursor-badge__label, .altar-cursor-badge__arrow { display: grid; height: calc(20 * var(--u)); place-items: center; overflow: hidden; color: #551611; white-space: nowrap; background: #fffec2; border-radius: calc(2 * var(--u)); transition: max-width 120ms ease-in-out, width 120ms ease-in-out, padding 120ms ease-in-out, margin 120ms ease-in-out, opacity 120ms ease-in-out; }
+.altar-cursor-badge__label, .altar-cursor-badge__arrow { display: grid; height: calc(20 * var(--u)); place-items: center; overflow: hidden; color: #601e2a; white-space: nowrap; background: #fff3a9; border-radius: calc(2 * var(--u)); transition: max-width 120ms ease-in-out, width 120ms ease-in-out, padding 120ms ease-in-out, margin 120ms ease-in-out, opacity 120ms ease-in-out; }
 .altar-cursor-badge__label { max-width: 0; padding: calc(4 * var(--u)) 0; margin-right: 0; opacity: 0; }
 .altar-cursor-badge__arrow { width: 0; padding: 0; opacity: 0; }
 .altar-cursor-badge__arrow svg { display: block; width: calc(11 * var(--u)); height: calc(11 * var(--u)); flex: none; }
@@ -93,11 +96,11 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-solar__floor-texture { position: absolute; inset: 0; display: block; opacity: var(--floor-texture, .4); mix-blend-mode: overlay; }
 .altar-solar__gradient { position: absolute; inset: auto 0 0; z-index: 1; height: calc(170 * var(--u)); background: linear-gradient(to bottom, transparent 0, color-mix(in srgb, var(--horizon-color) 48%, transparent) 50%, var(--horizon-color) 51%, var(--horizon-color) 100%); }
 .altar-solar.has-webgl-horizon .altar-solar__horizon, .altar-solar.has-webgl-horizon .altar-solar__gradient { display: none; }
-.altar-solar__marquee { position: sticky; top: calc(100svh - calc(33 * var(--u))); z-index: 5; width: 100%; height: calc(33 * var(--u)); margin-bottom: calc(-33 * var(--u)); overflow: hidden; opacity: .5; color: #0f0f0f; background: rgb(255 254 194 / 50%); backdrop-filter: blur(calc(20 * var(--u))); }
+.altar-solar__marquee { position: sticky; top: calc(100svh - calc(33 * var(--u))); z-index: 5; width: 100%; height: calc(33 * var(--u)); margin-bottom: calc(-33 * var(--u)); overflow: hidden; opacity: .5; color: #601e2a; background: rgb(255 243 169 / 50%); backdrop-filter: blur(calc(20 * var(--u))); }
 .altar-solar__marquee-track { display: flex; width: max-content; min-width: 200%; height: 100%; align-items: center; animation: altar-marquee 38s linear infinite; will-change: transform; }
 .altar-solar__marquee p { flex: none; min-width: 50%; margin: 0; padding: 0 calc(48 * var(--u)) 0 0; font: 400 calc(10 * var(--u))/calc(16 * var(--u)) Inter, Arial, Helvetica, sans-serif; letter-spacing: calc(.1 * var(--u)); white-space: nowrap; }
 @keyframes altar-marquee { to { transform: translateX(-50%); } }
-.altar-solar__manifesto { position: absolute; top: calc(50% + var(--manifesto-y, calc(66 * var(--u)))); right: calc(12 * var(--u)); left: calc(12 * var(--u)); z-index: 3; display: flex; padding-top: calc(16 * var(--u)); align-items: flex-end; justify-content: space-between; gap: calc(24 * var(--u)); color: #fffec2; font-family: Inter, Arial, Helvetica, sans-serif; translate: var(--manifesto-x, 0px) -50%; scale: var(--manifesto-scale, 1); opacity: var(--manifesto-opacity, .78); transform-origin: left center; pointer-events: none; }
+.altar-solar__manifesto { position: absolute; top: calc(50% + var(--manifesto-y, calc(66 * var(--u)))); right: calc(12 * var(--u)); left: calc(12 * var(--u)); z-index: 3; display: flex; padding-top: calc(16 * var(--u)); align-items: flex-end; justify-content: space-between; gap: calc(24 * var(--u)); color: #fff3a9; font-family: Inter, Arial, Helvetica, sans-serif; translate: var(--manifesto-x, 0px) -50%; scale: var(--manifesto-scale, 1); opacity: var(--manifesto-opacity, .78); transform-origin: left center; pointer-events: none; }
 .altar-solar__manifesto-headline { display: flex; width: calc(521 * var(--u)); max-width: 60%; flex-direction: column; gap: calc(8 * var(--u)); translate: var(--manifesto-title-x, 0px) var(--manifesto-title-y, 0px); }
 .altar-solar__manifesto-ids { display: flex; align-items: center; justify-content: space-between; font-size: calc(10 * var(--u)); font-weight: 400; line-height: calc(12 * var(--u)); text-transform: uppercase; white-space: nowrap; }
 .altar-solar__manifesto-ids > :first-child { letter-spacing: calc(.7 * var(--u)); }
@@ -112,11 +115,11 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-solar__fortune-cards { position: sticky; top: calc(100svh - calc(91 * var(--u)) - calc(358 * var(--u))); display: flex; width: calc(236 * var(--u)); margin-left: calc(12 * var(--u)); margin-bottom: calc(var(--controls-end-gap, calc(24 * var(--u))) + calc(46 * var(--u))); perspective: calc(1400 * var(--u)); visibility: hidden; opacity: 0; translate: calc(var(--drag-x, 0px) + var(--pos-x, 0px)) calc(var(--drag-y, 0px) + var(--pos-y, 0px) + calc(32 * var(--u))); scale: .9; pointer-events: none; transition: opacity 450ms ease, translate 650ms cubic-bezier(.2, .7, .2, 1), scale 650ms cubic-bezier(.2, .7, .2, 1), visibility 0s linear 650ms; }
 .altar-solar__fortune-cards.is-open { visibility: visible; opacity: 1; translate: calc(var(--drag-x, 0px) + var(--pos-x, 0px) + var(--focus-x, 0px)) calc(var(--drag-y, 0px) + var(--pos-y, 0px) + var(--focus-y, 0px)); scale: 1; pointer-events: auto; transition: opacity 450ms ease, translate 650ms cubic-bezier(.2, .7, .2, 1), scale 650ms cubic-bezier(.2, .7, .2, 1), visibility 0s; }
 .altar-solar__fortune-flip { position: relative; width: calc(236 * var(--u)); height: calc(358 * var(--u)); flex: none; border-radius: calc(12 * var(--u)); cursor: pointer; perspective: calc(1200 * var(--u)); transform: scale(var(--card-scale, .515)) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transform-origin: left bottom; transform-style: preserve-3d; transition: transform 350ms cubic-bezier(.2, .7, .2, 1); -webkit-tap-highlight-color: transparent; }
-.altar-solar__fortune-flip:focus-visible { outline: calc(1 * var(--u)) solid #fffec2; outline-offset: calc(4 * var(--u)); }
-.altar-solar__fortune-cta-frame { position: absolute; top: calc(calc(358 * var(--u)) - calc(358 * var(--u)) * var(--card-scale, .515) / 2); left: calc(calc(236 * var(--u)) * var(--card-scale, .515) / 2); width: calc(calc(236 * var(--u)) * var(--card-scale, .515) + calc(15 * var(--u))); height: calc(calc(358 * var(--u)) * var(--card-scale, .515) + calc(19 * var(--u))); translate: -50% -50%; border: calc(1 * var(--u)) dashed #fffec2; border-radius: calc(12 * var(--u)); pointer-events: none; transition: opacity 400ms ease; animation: altar-cta-pulse 4s cubic-bezier(.37, 0, .63, 1) infinite; }
+.altar-solar__fortune-flip:focus-visible { outline: calc(1 * var(--u)) solid #fff3a9; outline-offset: calc(4 * var(--u)); }
+.altar-solar__fortune-cta-frame { position: absolute; top: calc(calc(358 * var(--u)) - calc(358 * var(--u)) * var(--card-scale, .515) / 2); left: calc(calc(236 * var(--u)) * var(--card-scale, .515) / 2); width: calc(calc(236 * var(--u)) * var(--card-scale, .515) + calc(8 * var(--u))); height: calc(calc(358 * var(--u)) * var(--card-scale, .515) + calc(8 * var(--u))); translate: -50% -50%; border: calc(1 * var(--u)) dashed #fff3a9; border-radius: calc(10 * var(--u)); pointer-events: none; transition: opacity 400ms ease; animation: altar-cta-pulse 4s cubic-bezier(.37, 0, .63, 1) infinite; }
 .altar-solar__fortune-cards.is-touched .altar-solar__fortune-cta-frame { opacity: 0; animation: none; }
 @keyframes altar-cta-pulse { 0%, 100% { scale: 1; opacity: .65; } 50% { scale: 1.02; opacity: 1; } }
-.altar-solar__fortune-cta-text { position: absolute; bottom: calc(calc(358 * var(--u)) * var(--card-scale, .515) + calc(18 * var(--u))); left: 0; display: flex; height: calc(18 * var(--u)); gap: calc(6 * var(--u)); align-items: center; margin: 0; color: #fffec2; font: 400 calc(8 * var(--u))/1.12 Inter, Arial, Helvetica, sans-serif; text-transform: uppercase; white-space: nowrap; pointer-events: none; transition: opacity 300ms ease; }
+.altar-solar__fortune-cta-text { position: absolute; bottom: calc(calc(358 * var(--u)) * var(--card-scale, .515) + calc(8 * var(--u))); left: 0; display: flex; height: calc(18 * var(--u)); gap: calc(6 * var(--u)); align-items: center; margin: 0; color: #fff3a9; font: 400 calc(8 * var(--u))/1.12 Inter, Arial, Helvetica, sans-serif; text-transform: uppercase; white-space: nowrap; pointer-events: none; transition: opacity 300ms ease; }
 .altar-solar__fortune-cards.is-touched .altar-solar__fortune-cta-text { opacity: 0; }
 .altar-solar__fortune-cta-icon { display: block; width: calc(12 * var(--u)); height: calc(12 * var(--u)); max-width: none; flex: none; rotate: 90deg; }
 .altar-solar__fortune-cards.is-animating-focus, .altar-solar__fortune-cards.is-animating-focus .altar-solar__fortune-flip { transition-duration: 900ms; transition-timing-function: cubic-bezier(.2, .7, .2, 1); }
@@ -139,11 +142,11 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-solar__fortune-symbol { display: block; width: calc(165.686 * var(--u)); height: calc(149.413 * var(--u)); max-width: none; flex: none; }
 .altar-solar__fortune-copy { display: flex; width: 100%; height: calc(65 * var(--u)); flex: none; flex-direction: column; justify-content: space-between; color: #8c8c8c; font-family: Inter, Arial, Helvetica, sans-serif; font-size: calc(12 * var(--u)); font-weight: 400; line-height: 1.1; text-transform: uppercase; }
 .altar-solar__fortune-copy span, .altar-solar__fortune-copy p { margin: 0; }
-.altar-solar__campaign { --campaign-gap: calc(6 * var(--u)); position: absolute; right: calc(96 * var(--u)); translate: calc(var(--drag-x, 0px) + var(--pos-x, 0px) + 106 * var(--u) * var(--campaign-scale, .99) + 96 * var(--u) - 50vw) calc(var(--drag-y, 0px) + var(--pos-y, 0px) + var(--intro-y, 0px)); rotate: var(--intro-rot, 0deg); transform: scale(var(--campaign-scale, .99)); transform-origin: right top; cursor: grab; touch-action: none; user-select: none; pointer-events: auto; top: calc(50svh - calc(142.878 * var(--u)) * var(--campaign-scale, .99)); display: flex; width: calc(212 * var(--u)); height: calc(285.756 * var(--u)); margin: 0; padding: calc(7.067 * var(--u)); flex-direction: column; gap: calc(7.067 * var(--u)); overflow: hidden; color: #fffec2; background: rgb(255 254 194 / 8%); border-radius: 0 0 calc(7.067 * var(--u)) calc(7.067 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; }
+.altar-solar__campaign { --campaign-gap: calc(6 * var(--u)); position: absolute; right: calc(96 * var(--u)); translate: calc(var(--drag-x, 0px) + var(--pos-x, 0px) + 106 * var(--u) * var(--campaign-scale, .99) + 96 * var(--u) - 50vw) calc(var(--drag-y, 0px) + var(--pos-y, 0px) + var(--intro-y, 0px)); rotate: var(--intro-rot, 0deg); transform: scale(var(--campaign-scale, .99)); transform-origin: right top; cursor: grab; touch-action: none; user-select: none; pointer-events: auto; top: calc(50svh - calc(142.878 * var(--u)) * var(--campaign-scale, .99)); display: flex; width: calc(212 * var(--u)); height: calc(285.756 * var(--u)); margin: 0; padding: calc(7.067 * var(--u)); flex-direction: column; gap: calc(7.067 * var(--u)); overflow: hidden; color: #fff3a9; background: rgb(255 243 169 / 8%); border-radius: 0 0 calc(7.067 * var(--u)) calc(7.067 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; }
 .altar-solar__campaign { transition: translate 900ms cubic-bezier(.2, .7, .2, 1); }
 .altar-solar.is-card-open .altar-solar__campaign { translate: calc(var(--drag-x, 0px) + var(--campaign-open-x, calc(80 * var(--u)))) calc(var(--drag-y, 0px) + var(--campaign-open-y, calc(-177 * var(--u)))); }
 .altar-solar__campaign.is-dragging { transition: none; }
-.altar-solar__ground-campaign { --section-2-height: max(100svh, calc(540 * var(--u))); position: absolute; top: calc(var(--section-2-height) * 1.5 - calc(73.83 * var(--u))); right: calc(358 * var(--u)); z-index: 4; display: flex; width: calc(210 * var(--u)); padding: calc(7 * var(--u)); flex-direction: column; gap: calc(7 * var(--u)); color: #fffec2; background: rgb(255 254 194 / 8%); border-radius: 0 0 calc(7 * var(--u)) calc(7 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; translate: calc(var(--ground-campaign-x, calc(-93 * var(--u))) + var(--drag-x, 0px)) calc(-50% + var(--ground-campaign-y, calc(-69 * var(--u))) + var(--drag-y, 0px)); scale: var(--ground-campaign-scale, 1); transform-origin: center; cursor: grab; touch-action: none; user-select: none; }
+.altar-solar__ground-campaign { --section-2-height: max(100svh, calc(540 * var(--u))); position: absolute; top: calc(var(--section-2-height) * 1.5 - calc(73.83 * var(--u))); right: calc(358 * var(--u)); z-index: 4; display: flex; width: calc(210 * var(--u)); padding: calc(7 * var(--u)); flex-direction: column; gap: calc(7 * var(--u)); color: #fff3a9; background: rgb(255 243 169 / 8%); border-radius: 0 0 calc(7 * var(--u)) calc(7 * var(--u)); font-family: Inter, Arial, Helvetica, sans-serif; translate: calc(var(--ground-campaign-x, calc(-93 * var(--u))) + var(--drag-x, 0px)) calc(-50% + var(--ground-campaign-y, calc(-69 * var(--u))) + var(--drag-y, 0px)); scale: var(--ground-campaign-scale, 1); transform-origin: center; cursor: grab; touch-action: none; user-select: none; }
 .altar-solar__ground-campaign img { -webkit-user-drag: none; user-select: none; }
 .altar-solar__ground-campaign { transition: translate 900ms cubic-bezier(.2, .7, .2, 1); }
 .altar-solar.is-card-open .altar-solar__ground-campaign { translate: calc(var(--ground-campaign-open-x, calc(342 * var(--u))) + var(--drag-x, 0px)) calc(-50% + var(--ground-campaign-open-y, calc(-187 * var(--u))) + var(--drag-y, 0px)); }
@@ -160,17 +163,17 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-solar__campaign-crop img { position: absolute; top: 0; left: -100%; width: 199.9%; height: 100%; max-width: none; transition: opacity 350ms ease; }
 .altar-solar__campaign-crop img.is-channel-cover { left: 0; width: 100%; object-fit: cover; }
 
-.altar-solar__bottom-controls { position: sticky; top: calc(100svh - calc(85 * var(--u))); display: grid; width: 100%; height: calc(40 * var(--u)); margin-bottom: var(--controls-end-gap, calc(24 * var(--u))); padding: 0 calc(12 * var(--u)); grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; color: #fffec2; font-family: Inter, Arial, Helvetica, sans-serif; pointer-events: none; }
+.altar-solar__bottom-controls { position: sticky; top: calc(100svh - calc(85 * var(--u))); display: grid; width: 100%; height: calc(40 * var(--u)); margin-bottom: var(--controls-end-gap, calc(24 * var(--u))); padding: 0 calc(12 * var(--u)); grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; color: #fff3a9; font-family: Inter, Arial, Helvetica, sans-serif; pointer-events: none; }
 .altar-solar__scroll-prompt { font-size: calc(10 * var(--u)); font-weight: 400; line-height: calc(16.8 * var(--u)); letter-spacing: calc(-.42 * var(--u)); text-transform: uppercase; white-space: nowrap; }
 .altar-solar__scroll-prompt { justify-self: start; }
 .altar-solar__bottom-controls > .altar-solar__open-player { justify-self: end; pointer-events: auto; }
 .altar-solar__channel-controls { display: flex; width: calc(319 * var(--u)); height: calc(40 * var(--u)); gap: calc(10 * var(--u)); align-items: center; pointer-events: auto; }
-.altar-solar__pagination { display: flex; width: calc(96 * var(--u)); height: calc(40 * var(--u)); padding: calc(12 * var(--u)); flex: 0 0 calc(96 * var(--u)); gap: calc(8 * var(--u)); align-items: center; justify-content: center; background: rgb(255 254 194 / 8%); border-radius: calc(12 * var(--u)); box-shadow: 0 0 calc(8 * var(--u)) rgb(0 0 0 / 8%); }
-.altar-solar__pagination span { display: block; width: calc(8 * var(--u)); height: calc(8 * var(--u)); flex: 0 0 calc(8 * var(--u)); background: #fffec2; border-radius: calc(100 * var(--u)); }
+.altar-solar__pagination { display: flex; width: calc(96 * var(--u)); height: calc(40 * var(--u)); padding: calc(12 * var(--u)); flex: 0 0 calc(96 * var(--u)); gap: calc(8 * var(--u)); align-items: center; justify-content: center; background: rgb(255 243 169 / 8%); border-radius: calc(12 * var(--u)); box-shadow: 0 0 calc(8 * var(--u)) rgb(0 0 0 / 8%); }
+.altar-solar__pagination span { display: block; width: calc(8 * var(--u)); height: calc(8 * var(--u)); flex: 0 0 calc(8 * var(--u)); background: #fff3a9; border-radius: calc(100 * var(--u)); }
 .altar-solar__pagination .is-active { width: calc(24 * var(--u)); flex-basis: calc(24 * var(--u)); }
-.altar-solar__channel-switcher { display: flex; width: calc(163 * var(--u)); height: calc(40 * var(--u)); padding: calc(4 * var(--u)); flex: 0 0 calc(163 * var(--u)); gap: calc(12 * var(--u)); align-items: center; background: rgb(255 254 194 / 8%); border-radius: calc(12 * var(--u)); box-shadow: 0 0 calc(16 * var(--u)) rgb(0 0 0 / 8%); }
+.altar-solar__channel-switcher { display: flex; width: calc(163 * var(--u)); height: calc(40 * var(--u)); padding: calc(4 * var(--u)); flex: 0 0 calc(163 * var(--u)); gap: calc(12 * var(--u)); align-items: center; background: rgb(255 243 169 / 8%); border-radius: calc(12 * var(--u)); box-shadow: 0 0 calc(16 * var(--u)) rgb(0 0 0 / 8%); }
 .altar-solar__channel-arrow, .altar-solar__reveal-card, .altar-solar__open-player { margin: 0; padding: 0; border: 0; color: inherit; font: inherit; cursor: pointer; }
-.altar-solar__channel-arrow { display: grid; width: calc(32 * var(--u)); height: calc(32 * var(--u)); flex: 0 0 calc(32 * var(--u)); place-items: center; overflow: hidden; background: rgb(255 254 194 / 8%); border-radius: calc(12 * var(--u)); }
+.altar-solar__channel-arrow { display: grid; width: calc(32 * var(--u)); height: calc(32 * var(--u)); flex: 0 0 calc(32 * var(--u)); place-items: center; overflow: hidden; background: rgb(255 243 169 / 8%); border-radius: calc(12 * var(--u)); }
 .altar-solar__channel-arrow > span { position: relative; display: block; width: calc(14 * var(--u)); height: calc(14 * var(--u)); }
 .altar-solar__channel-arrow img { position: absolute; top: calc(4 * var(--u)); left: calc(5.506 * var(--u)); display: block; width: calc(3.917 * var(--u)); height: calc(6 * var(--u)); max-width: none; }
 .altar-solar__channel-arrow--previous { transform: scaleX(-1); }
@@ -178,16 +181,17 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-solar__reveal-card { position: relative; width: calc(40 * var(--u)); height: calc(40 * var(--u)); flex: 0 0 calc(40 * var(--u)); }
 .altar-solar__reveal-card { overflow: visible; background: transparent; }
 .altar-solar__reveal-card img { position: absolute; top: calc(-16 * var(--u)); left: calc(-16 * var(--u)); display: block; width: calc(72 * var(--u)); height: calc(72 * var(--u)); max-width: none; }
-.altar-solar__open-player { display: flex; height: calc(40 * var(--u)); padding: calc(4 * var(--u)) calc(4 * var(--u)) calc(4 * var(--u)) calc(12 * var(--u)); gap: calc(6 * var(--u)); align-items: center; background: rgb(255 254 194 / 8%); border-radius: calc(12 * var(--u)); box-shadow: 0 0 calc(16 * var(--u)) rgb(0 0 0 / 8%); }
+.altar-solar__open-player { display: flex; height: calc(40 * var(--u)); padding: calc(4 * var(--u)) calc(4 * var(--u)) calc(4 * var(--u)) calc(12 * var(--u)); gap: calc(6 * var(--u)); align-items: center; background: rgb(255 243 169 / 8%); border-radius: calc(12 * var(--u)); box-shadow: 0 0 calc(16 * var(--u)) rgb(0 0 0 / 8%); }
 .altar-solar__player-label { font-size: calc(10 * var(--u)); font-weight: 400; line-height: calc(16.8 * var(--u)); letter-spacing: calc(-.42 * var(--u)); white-space: pre; }
-.altar-solar__player-icon { display: grid; width: calc(32 * var(--u)); height: calc(32 * var(--u)); flex: 0 0 calc(32 * var(--u)); place-items: center; background: rgb(255 254 194 / 8%); border-radius: calc(12 * var(--u)); }
+.altar-solar__player-icon { display: grid; width: calc(32 * var(--u)); height: calc(32 * var(--u)); flex: 0 0 calc(32 * var(--u)); place-items: center; background: rgb(255 243 169 / 8%); border-radius: calc(12 * var(--u)); }
 .altar-solar__player-icon img { display: block; width: calc(15 * var(--u)); height: calc(15 * var(--u)); max-width: none; }
-.altar-solar__open-player[aria-expanded="true"] { background: rgb(255 254 194 / 18%); }
-.altar-solar__player { position: absolute; right: calc(12 * var(--u)); bottom: calc(100% + calc(12 * var(--u))); width: min(calc(352 * var(--u)), calc(100vw - calc(24 * var(--u)))); padding: calc(4 * var(--u)); visibility: hidden; opacity: 0; translate: var(--drag-x, 0px) calc(var(--drag-y, 0px) + calc(12 * var(--u))); background: rgb(255 254 194 / 8%); border-radius: calc(16 * var(--u)); box-shadow: 0 0 calc(16 * var(--u)) rgb(0 0 0 / 8%); pointer-events: none; -webkit-backdrop-filter: blur(calc(12 * var(--u))); backdrop-filter: blur(calc(12 * var(--u))); transition: opacity 300ms ease, translate 400ms cubic-bezier(.2, .7, .2, 1), visibility 0s linear 400ms; }
+.altar-solar__open-player[aria-expanded="true"] { background: rgb(255 243 169 / 18%); }
+.altar-solar__player { position: absolute; right: calc(12 * var(--u)); bottom: calc(100% + calc(12 * var(--u))); width: min(calc(352 * var(--u)), calc(100vw - calc(24 * var(--u)))); padding: calc(4 * var(--u)); visibility: hidden; opacity: 0; translate: var(--drag-x, 0px) calc(var(--drag-y, 0px) + calc(12 * var(--u))); background: rgb(255 243 169 / 8%); border-radius: calc(16 * var(--u)); box-shadow: 0 0 calc(16 * var(--u)) rgb(0 0 0 / 8%); pointer-events: none; -webkit-backdrop-filter: blur(calc(12 * var(--u))); backdrop-filter: blur(calc(12 * var(--u))); transition: opacity 300ms ease, translate 400ms cubic-bezier(.2, .7, .2, 1), visibility 0s linear 400ms; }
 .altar-solar__player.is-open { visibility: visible; opacity: 1; translate: var(--drag-x, 0px) var(--drag-y, 0px); pointer-events: auto; transition: opacity 300ms ease, translate 400ms cubic-bezier(.2, .7, .2, 1), visibility 0s; }
-.altar-solar__player iframe { display: block; width: 100%; height: calc(152 * var(--u)); border: 0; border-radius: calc(12 * var(--u)); }
+/* Spotify's compact embed is always 152px tall; a taller frame shows its white page underneath. */
+.altar-solar__player iframe { display: block; width: 100%; height: 152px; border: 0; border-radius: 12px; color-scheme: normal; background: transparent; }
 .altar-solar__player-handle { display: grid; height: calc(16 * var(--u)); margin: calc(-2 * var(--u)) 0 calc(2 * var(--u)); place-items: center; cursor: grab; touch-action: none; }
-.altar-solar__player-handle span { display: block; width: calc(32 * var(--u)); height: calc(4 * var(--u)); background: rgb(255 254 194 / 45%); border-radius: calc(100 * var(--u)); }
+.altar-solar__player-handle span { display: block; width: calc(32 * var(--u)); height: calc(4 * var(--u)); background: rgb(255 243 169 / 45%); border-radius: calc(100 * var(--u)); }
 .altar-solar__campaign img, .altar-solar__fortune-cards img { -webkit-user-drag: none; user-select: none; }
 .altar-solar__fortune-cards { user-select: none; }
 .altar-solar__fortune-cards.is-open .altar-solar__fortune-flip { cursor: grab; }
@@ -199,11 +203,11 @@ a.altar-collection__photo { display: block; color: inherit; }
 
 .site-header { position: sticky; top: 0; z-index: 20; }
 .template-home .site-header { position: fixed; inset: 0 0 auto; }
-.altar-nav { display: flex; width: 100%; padding: calc(12 * var(--u)); flex-direction: column; gap: calc(4 * var(--u)); color: var(--altar-nav-color, #fffec2); font-family: Inter, Arial, Helvetica, sans-serif; font-weight: 400; font-kerning: normal; font-synthesis: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.altar-nav { display: flex; width: 100%; padding: calc(12 * var(--u)); flex-direction: column; gap: calc(4 * var(--u)); color: var(--altar-nav-color, #fff3a9); font-family: Inter, Arial, Helvetica, sans-serif; font-weight: 400; font-kerning: normal; font-synthesis: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 .altar-nav a { color: inherit; text-decoration: none; }
 .altar-nav { transition: color 300ms ease; }
 .altar-nav img { transition: filter 300ms ease; }
-.site-header.is-on-light .altar-nav { --altar-nav-color: #0f0f0f; }
+.site-header.is-on-light .altar-nav { --altar-nav-color: #601e2a; }
 .site-header.is-on-light .altar-nav img { filter: brightness(0) opacity(.94); }
 .altar-nav a:hover, .altar-nav a:focus-visible { text-decoration: underline; text-underline-offset: calc(4 * var(--u)); }
 .altar-nav__rule { width: 100%; height: calc(6.338 * var(--u)); border-color: currentColor; border-style: dashed; border-width: calc(.423 * var(--u)) calc(.423 * var(--u)) 0; }
@@ -234,7 +238,7 @@ a.altar-collection__photo { display: block; color: inherit; }
 @keyframes altar-intro-rule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes altar-intro-divider { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes altar-intro-clip { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
-@keyframes altar-intro-frame { from { clip-path: inset(0 0 100% 0 round calc(12 * var(--u))); opacity: .65; } to { clip-path: inset(0 0 0 0 round calc(12 * var(--u))); opacity: .65; } }
+@keyframes altar-intro-frame { from { clip-path: inset(0 0 100% 0 round calc(10 * var(--u))); opacity: .65; } to { clip-path: inset(0 0 0 0 round calc(10 * var(--u))); opacity: .65; } }
 @keyframes altar-intro-rise { from { --intro-y: 20vw; --intro-rot: -20deg; } to { --intro-y: 0px; --intro-rot: 0deg; } }
 .altar-nav__rule { transform-origin: left center; }
 .altar-nav__divider { transform-origin: center top; }
@@ -244,6 +248,20 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-intro:not(.altar-intro--play) .altar-solar__marquee { clip-path: inset(0 100% 0 0); }
 .altar-intro:not(.altar-intro--play) .altar-solar__fortune-cta-frame { opacity: 0; animation: none; }
 .altar-intro__char { white-space: pre; }
+/* Desktop widths as column spans of the 8-col grid (span N = N columns + N-1 gutters). Mobile keeps its own rules. */
+@media (min-width: 750px) {
+  .altar-solar__manifesto-headline { width: calc(var(--col) * 3 + var(--grid-gutter) * 2); max-width: none; }
+  /* The justified headline keeps the Figma proportion (50px over 3 columns at 1440) at any desktop width. */
+  .altar-solar__manifesto h2 { font-size: calc(50vw / 14.4); line-height: calc(50vw / 14.4); letter-spacing: calc(-2vw / 14.4); }
+  .altar-solar__manifesto-note, .altar-collection__note, .altar-collection__materia, .altar-closing__note { width: calc(var(--col) * 2 + var(--grid-gutter)); max-width: none; }
+  .altar-collection__identity { width: calc(var(--col) * 4 + var(--grid-gutter) * 3); max-width: none; }
+  .altar-collection__gallery, .altar-closing__content { gap: var(--grid-gutter); }
+  .altar-closing__identity { width: calc(var(--col) * 5 + var(--grid-gutter) * 4); max-width: none; }
+  /* Absolutely positioned: % is the full section width, so take the side margins out first. */
+  /* Section 4 ends at its own height (Figma: 617 incl. header) and hands over to the footer. */
+  .altar-closing { min-height: 0; padding-bottom: calc(66 * var(--u)); }
+  .altar-closing__symbol { right: var(--grid-margin); width: calc((100% - 2 * var(--grid-margin) - 7 * var(--grid-gutter)) / 8 * 4 + var(--grid-gutter) * 3); }
+}
 @media (max-width: 749px) {
   .altar-solar__fortune-cards { transform: scale(.75); transform-origin: left bottom; }
   .altar-solar__manifesto { flex-direction: column; align-items: flex-start; gap: 20px; }
