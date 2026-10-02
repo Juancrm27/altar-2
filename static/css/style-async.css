@@ -7,6 +7,11 @@
 .altar-footer a:hover, .altar-footer a:focus-visible { text-decoration: underline; }
 .altar-footer__top { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); column-gap: var(--grid-gutter); row-gap: calc(32 * var(--u)); align-items: start; }
 .altar-footer__newsletter { display: flex; grid-column: 1 / 3; flex-direction: column; gap: calc(12 * var(--u)); }
+/* Figma: the social icons sit 32px under the newsletter block (its own 12px gap is already counted). */
+.altar-footer__social { display: flex; margin-top: calc(20 * var(--u)); align-items: center; }
+.altar-footer__social a { display: block; width: calc(24 * var(--u)); height: calc(24 * var(--u)); transition: opacity 200ms ease; }
+.altar-footer__social a:hover, .altar-footer__social a:focus-visible { opacity: .7; }
+.altar-footer__social img { display: block; width: 100%; height: 100%; }
 .altar-footer__group { display: flex; flex-direction: column; align-items: flex-start; gap: calc(12 * var(--u)); font-size: calc(12 * var(--u)); line-height: calc(20 * var(--u)); letter-spacing: calc(.15 * var(--u)); text-transform: uppercase; white-space: nowrap; }
 .altar-footer__group--help { grid-column: 5 / 7; }
 .altar-footer__group--explore { grid-column: 7 / 8; }
@@ -23,6 +28,8 @@
 .altar-footer__field button svg { width: calc(12 * var(--u)); height: calc(12 * var(--u)); transition: translate 200ms ease; }
 .altar-footer__field button:hover svg, .altar-footer__field button:focus-visible svg { translate: calc(2 * var(--u)) calc(-2 * var(--u)); }
 .altar-footer__legal { font-size: calc(10 * var(--u)); line-height: calc(16 * var(--u)); letter-spacing: calc(.2 * var(--u)); }
+.altar-footer__status:empty { display: none; }
+.altar-footer__copyright { color: rgb(96 30 42 / 78%); }
 .altar-footer__descriptor { font-size: calc(14 * var(--u)); font-weight: 500; line-height: calc(20 * var(--u)); letter-spacing: calc(1 * var(--u)); text-align: center; white-space: pre; }
 .altar-footer__bottom { display: flex; padding-top: calc(16 * var(--u)); align-items: center; justify-content: space-between; gap: calc(24 * var(--u)); border-top: 1px solid var(--footer-line); }
 .altar-footer__legal-links { display: flex; flex-wrap: wrap; gap: calc(24 * var(--u)); font-size: calc(10 * var(--u)); line-height: calc(16 * var(--u)); letter-spacing: calc(.15 * var(--u)); text-transform: uppercase; }

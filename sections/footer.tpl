@@ -18,9 +18,15 @@
         {% if contact and contact.type == 'newsletter' %}
           <p class="altar-footer__legal altar-footer__status" role="status">{% if contact.success %}{{ '¡Listo! Ya estás en la lista.' | translate }}{% else %}{{ 'No pudimos suscribirte. Revisá el correo e intentá de nuevo.' | translate }}{% endif %}</p>
         {% else %}
-          <p class="altar-footer__legal">{{ footer_settings.newsletter_consent | default('Al suscribirte aceptás recibir novedades de altar.') }}</p>
+          <p class="altar-footer__legal altar-footer__status" role="status"></p>
         {% endif %}
       </form>
+      {% set instagram_url = footer_settings.instagram_url | default(store.instagram) %}
+      {% if instagram_url %}
+        <nav class="altar-footer__social" aria-label="{{ 'Redes' | translate }}">
+          <a href="{{ instagram_url }}" target="_blank" rel="noopener" aria-label="Instagram"><img src="{{ 'images/altar-instagram.svg' | static_url }}" alt="" width="24" height="24"></a>
+        </nav>
+      {% endif %}
     </div>
     <nav class="altar-footer__group altar-footer__group--help" aria-label="{{ 'Ayuda' | translate }}">
       <p class="altar-footer__label">{{ 'Ayuda' | translate }}</p>
@@ -42,7 +48,7 @@
   </div>
   <p class="altar-footer__descriptor">{{ footer_settings.descriptor | default('CONCEPT STORE  /') }}</p>
   <div class="altar-footer__bottom">
-    <p class="altar-footer__legal">©{{ 'now' | date('Y') }} {{ store.name | lower }}</p>
+    <p class="altar-footer__legal altar-footer__copyright">©{{ 'now' | date('Y') }} {{ store.name | lower }}</p>
     <nav class="altar-footer__legal-links" aria-label="{{ 'Legales' | translate }}">
       <a href="{{ footer_settings.terms_url | default('#') }}">{{ 'Términos y condiciones' | translate }}</a>
       <a href="{{ footer_settings.privacy_url | default('#') }}">{{ 'Política de privacidad' | translate }}</a>
@@ -60,7 +66,7 @@
     { "type": "header", "content": "Newsletter" },
     { "type": "setting", "setting_type": "text", "id": "newsletter_label", "label": "Etiqueta", "default": "[ NEWSLETTER ]" },
     { "type": "setting", "setting_type": "textarea", "id": "newsletter_text", "label": "Texto", "default": "Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar." },
-    { "type": "setting", "setting_type": "text", "id": "newsletter_consent", "label": "Texto legal", "default": "Al suscribirte aceptás recibir novedades de altar." },
+    { "type": "setting", "setting_type": "text", "id": "instagram_url", "label": "Instagram (link)", "description": "Si queda vacío se usa el Instagram configurado en la tienda." },
     { "type": "header", "content": "Links" },
     { "type": "setting", "setting_type": "text", "id": "shipping_url", "label": "Envíos y devoluciones (link)" },
     { "type": "setting", "setting_type": "text", "id": "returns_url", "label": "Solicitud de devolución (link)" },

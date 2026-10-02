@@ -101,7 +101,7 @@
                       <canvas class="altar-solar__foil-canvas" width="236" height="358"></canvas>
                       <img src="../static/images/altar-card-front.png" alt="" width="236" height="358" draggable="false">
                     </div>
-                    <article class="altar-solar__fortune-card altar-solar__fortune-card--message altar-solar__fortune-face altar-solar__fortune-face--back" aria-hidden="true" data-foil-card data-foil-base="../static/images/altar-card-base.png" data-foil-map="../static/images/altar-card-message-map.png" data-channel-map-4="../static/images/altar-card-message-map-4.png" data-channel-message-4="El azar abrirá una puerta que no buscabas. Al cruzarla entenderás por qué estaba esperándote." data-channel-map-3="../static/images/altar-card-message-map-3.png" data-channel-message-3="Alguien de tu pasado volverá a cruzar tu camino. Ahora decidirás si todavía pertenece ahí." data-channel-map-2="../static/images/altar-card-message-map-2.png" data-channel-message-2="Alguien piensa en vos más de lo que imaginás. Muy pronto una señal te lo confirmará.">
+                    <article class="altar-solar__fortune-card altar-solar__fortune-card--message altar-solar__fortune-face altar-solar__fortune-face--back" aria-hidden="true" data-foil-card data-foil-base="../static/images/altar-card-base.png" data-foil-frame="../static/images/altar-card-message-frame.png" data-fortune-font="../static/fonts/gestura-text-regular.otf" data-channel-frame-4="../static/images/altar-card-message-frame-4.png" data-channel-frame-3="../static/images/altar-card-message-frame-3.png" data-channel-frame-2="../static/images/altar-card-message-frame-2.png">
                       <canvas class="altar-solar__foil-canvas" width="236" height="358" aria-hidden="true"></canvas>
                       <div class="altar-solar__fortune-message-fallback">
                         <img class="altar-solar__fortune-symbol" src="../static/images/altar-fortune-symbol.svg" alt="">
@@ -278,8 +278,11 @@
                 <input id="altar-newsletter-email" type="email" name="email" placeholder="Tu correo" autocomplete="email" required>
                 <button type="submit">Suscribirme<svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h5v5M3.5 8.5l5-5"/></svg></button>
               </div>
-              <p class="altar-footer__legal">Al suscribirte aceptás recibir novedades de altar.</p>
+              <p class="altar-footer__legal altar-footer__status" role="status"></p>
             </form>
+            <nav class="altar-footer__social" aria-label="Redes">
+              <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><img src="../static/images/altar-instagram.svg" alt="" width="24" height="24"></a>
+            </nav>
           </div>
           <nav class="altar-footer__group altar-footer__group--help" aria-label="Ayuda">
             <p class="altar-footer__label">Ayuda</p>
@@ -301,7 +304,7 @@
         </div>
         <p class="altar-footer__descriptor">CONCEPT STORE  /</p>
         <div class="altar-footer__bottom">
-          <p class="altar-footer__legal">©2026 altar</p>
+          <p class="altar-footer__legal altar-footer__copyright">©2026 altar</p>
           <nav class="altar-footer__legal-links" aria-label="Legales">
             <a href="#">Términos y condiciones</a>
             <a href="#">Política de privacidad</a>

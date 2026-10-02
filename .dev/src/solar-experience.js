@@ -2565,9 +2565,9 @@ ${stonePositionsMarkup(4)}
       const canvas = card.querySelector(".altar-solar__foil-canvas");
       const baseUrl = card.dataset.foilBase;
       const foilUrl = card.dataset.foilMap;
-      if (!canvas || !baseUrl || !foilUrl) return;
+      if (!canvas || !baseUrl || !(foilUrl || card.dataset.foilFrame)) return;
 
-      Promise.all([this.loadFoilTexture(baseUrl), this.loadFoilTexture(foilUrl)])
+      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, 0, foilUrl)])
         .then(([baseMap, foilMap]) => {
           const renderer = new THREE.WebGLRenderer({
             canvas,
@@ -2608,7 +2608,7 @@ ${stonePositionsMarkup(4)}
           const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
           scene.add(mesh);
 
-          const effect = { card, renderer, scene, camera, material, baseUrl, foilUrl, maskSize: new THREE.Vector2(foilMap.image.width, foilMap.image.height) };
+          const effect = { card, renderer, scene, camera, material, baseUrl, foilUrl: messageFrameUrl(card, 0) || foilUrl, maskSize: new THREE.Vector2(foilMap.image.width, foilMap.image.height) };
           this.foilCards.push(effect);
           renderer.render(scene, camera);
           card.classList.add("is-foil-rendered");
@@ -3077,6 +3077,11 @@ ${stonePositionsMarkup(4)}
 
     const setFlipped = (flipped) => {
       clearTimeout(this.fortuneReturnTimer);
+      // Once the card is face down again, the next phrase is drawn while nobody can see it.
+      if (!flipped && flip.classList.contains("is-flipped")) {
+        const flipMs = parseFloat(getComputedStyle(flip).getPropertyValue("--card-flip-duration")) || 1150;
+        this.prepareNextFortunePhrase(flipMs + 100);
+      }
       setFocused(flipped);
       flip.classList.toggle("is-flipped", flipped);
       flip.setAttribute("aria-pressed", String(flipped));
@@ -3097,7 +3102,10 @@ ${stonePositionsMarkup(4)}
       flip.closest(".altar-solar__fortune-cards")?.classList.add("is-touched");
       const opening = !flip.classList.contains("is-flipped");
       // Revealing the message sends a pulse of light out from the card.
-      if (opening) this.playCardWave?.(flip);
+      if (opening) {
+        this.revealFortunePhrase();
+        this.playCardWave?.(flip);
+      }
       setFlipped(opening);
     };
 
@@ -3143,27 +3151,108 @@ ${stonePositionsMarkup(4)}
   // Swaps both card faces to a channel's artwork; faces without a channel variant keep channel 1.
   setCardChannel(index) {
     const suffix = index + 1;
+    this.cardChannelIndex = index;
     this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
       const baseUrl = card.getAttribute(`data-channel-base-${suffix}`) || card.dataset.foilBase;
       const foilUrl = card.getAttribute(`data-channel-map-${suffix}`) || card.dataset.foilMap;
       const fallbackImage = card.querySelector(":scope > img");
       if (fallbackImage && baseUrl) fallbackImage.src = baseUrl;
+      const frameUrl = messageFrameUrl(card, index);
       const message = card.querySelector(".altar-solar__fortune-copy p");
       if (message) {
         message.dataset.defaultMessage ??= message.textContent;
-        message.textContent = card.getAttribute(`data-channel-message-${suffix}`) || message.dataset.defaultMessage;
+        message.textContent = frameUrl && this.messageMap
+          ? this.messageMap.phrase
+          : card.getAttribute(`data-channel-message-${suffix}`) || message.dataset.defaultMessage;
       }
       const effect = this.foilCards?.find((item) => item.card === card);
-      if (!effect || (effect.baseUrl === baseUrl && effect.foilUrl === foilUrl)) return;
+      // A message face drawn over a frame is keyed by the frame; the phrase changes inside the same texture.
+      const mapKey = frameUrl || foilUrl;
+      if (!effect || (effect.baseUrl === baseUrl && effect.foilUrl === mapKey)) return;
       effect.baseUrl = baseUrl;
-      effect.foilUrl = foilUrl;
-      Promise.all([this.loadFoilTexture(baseUrl), this.loadFoilTexture(foilUrl)]).then(([baseMap, foilMap]) => {
-        if (effect.baseUrl !== baseUrl || effect.foilUrl !== foilUrl) return;
+      effect.foilUrl = mapKey;
+      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, index, foilUrl)]).then(([baseMap, foilMap]) => {
+        if (effect.baseUrl !== baseUrl || effect.foilUrl !== mapKey) return;
         effect.material.uniforms.uBaseMap.value = baseMap;
         effect.material.uniforms.uFoilMap.value = foilMap;
         effect.maskSize.set(foilMap.image.width, foilMap.image.height);
       });
     });
+  }
+
+  // Message faces with a textless frame get their relief map drawn here (frame + a random phrase),
+  // so adding phrases needs no new artwork; every other face loads its map image as before.
+  loadCardMap(card, index, foilUrl) {
+    const frameUrl = messageFrameUrl(card, index);
+    if (!frameUrl) return this.loadFoilTexture(foilUrl);
+    const map = (this.messageMap ??= this.createMessageMap(card));
+    map.requested = frameUrl;
+    return Promise.all([map.fontReady, loadImage(frameUrl)]).then(([, frame]) => {
+      // A quicker switch already asked for another channel's frame.
+      if (map.requested !== frameUrl) return map.texture;
+      map.frame = frame;
+      map.top = MESSAGE_TOPS[index] ?? MESSAGE_TOPS[0];
+      this.drawMessageMap();
+      return map.texture;
+    });
+  }
+
+  createMessageMap(card) {
+    const canvas = document.createElement("canvas");
+    canvas.width = MESSAGE_MAP_WIDTH;
+    canvas.height = MESSAGE_MAP_HEIGHT;
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.NoColorSpace;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = true;
+    const fontUrl = card.dataset.fortuneFont;
+    const fontReady = fontUrl && window.FontFace
+      ? new FontFace(MESSAGE_FONT_FAMILY, `url("${fontUrl}")`).load().then((font) => document.fonts.add(font)).catch(() => {})
+      : Promise.resolve();
+    const message = card.querySelector(".altar-solar__fortune-copy p");
+    const map = { canvas, texture, fontReady, frame: null, message, phrase: pickFortunePhrase() };
+    if (message) message.textContent = map.phrase;
+    return map;
+  }
+
+  drawMessageMap() {
+    const map = this.messageMap;
+    if (!map?.frame) return;
+    drawFortuneMap(map.canvas, map.frame, map.phrase, map.top);
+    map.texture.needsUpdate = true;
+  }
+
+  // Every opening reveals a different phrase. It is normally drawn ahead of time (see
+  // prepareNextFortunePhrase), so opening doesn't redraw and re-upload the map mid-animation.
+  revealFortunePhrase() {
+    const map = this.messageMap;
+    if (!map) return;
+    clearTimeout(this.fortunePhraseTimer);
+    // Reopened before the next phrase was ready: pick it now.
+    if (map.revealed && !map.prepared) this.setFortunePhrase(pickFortunePhrase(map.phrase));
+    map.revealed = true;
+    map.prepared = false;
+    markFortuneSeen(map.phrase);
+  }
+
+  prepareNextFortunePhrase(delay) {
+    const map = this.messageMap;
+    clearTimeout(this.fortunePhraseTimer);
+    if (!map?.revealed) return;
+    this.fortunePhraseTimer = setTimeout(() => {
+      this.setFortunePhrase(pickFortunePhrase(map.phrase));
+      map.prepared = true;
+    }, delay);
+  }
+
+  setFortunePhrase(phrase) {
+    const map = this.messageMap;
+    map.phrase = phrase;
+    if (map.message && messageFrameUrl(map.message.closest("[data-foil-card]"), this.cardChannelIndex ?? 0)) {
+      map.message.textContent = phrase;
+    }
+    this.drawMessageMap();
   }
 
   // Fetches a channel's card textures early so the first switch to it doesn't wait on the network.
@@ -3173,6 +3262,9 @@ ${stonePositionsMarkup(4)}
       [card.getAttribute(`data-channel-base-${suffix}`), card.getAttribute(`data-channel-map-${suffix}`)]
         .filter(Boolean)
         .forEach((url) => this.loadFoilTexture(url).catch(() => {}));
+      // Message frames are drawn into the shared canvas later; warming the image cache is enough.
+      const frameUrl = messageFrameUrl(card, index);
+      if (frameUrl) loadImage(frameUrl).catch(() => {});
     });
   }
 
@@ -3465,6 +3557,147 @@ const CHANNELS = [
 const CHANNEL_REVEAL_MS = 2100;
 const CHANNEL_ZOOM_MS = 2200;
 const CARD_WAVE_COLOR = "#f6e9a5";
+
+// Fortune card message: the relief map is the channel's textless frame plus one of these phrases,
+// drawn at 3× the 236 × 358 card. Layout follows Figma's "Fortune message" text block.
+const FORTUNE_PHRASES = [
+  "Alguien que creías lejano volverá a acercarse. Esta vez lo mirarás diferente.",
+  "Una conversación inesperada cambiará la forma en que mirás a alguien cercano.",
+  "Alguien piensa en vos más de lo que imaginás. Pronto encontrarás una señal.",
+  "Un encuentro que parece casual llegará justo cuando habías dejado de buscarlo.",
+  "Una persona nueva aparecerá sin aviso. Lo extraño será sentir que ya la conocías.",
+  "Algo que no dijiste todavía sigue esperando su momento. Pronto vas a encontrarlo.",
+  "Alguien de tu pasado volverá a cruzar tu camino. Vos decidirás cuánto se queda.",
+  "Una mirada va a durar apenas un instante. Sus consecuencias, bastante más.",
+  "El amor llegará disfrazado de otra cosa. Vas a reconocerlo cuando ya sea tarde.",
+  "Una coincidencia repetida dejará de parecer casual. Prestá atención a quién aparece.",
+  "La suerte cambiará de dirección cuando dejes de buscar exactamente lo esperado.",
+  "Una pequeña casualidad abrirá una puerta que hasta ahora parecía no existir.",
+  "Algo perdido regresará de otra forma. Tal vez entonces entiendas por qué se fue.",
+  "El azar pondrá algo frente a vos. Reconocerlo a tiempo será la verdadera suerte.",
+  "Una coincidencia llegará dos veces. La segunda vez ya no podrás llamarla azar.",
+  "La fortuna se moverá a tu favor después de una decisión que parece insignificante.",
+  "Algo que hoy parece un error terminará acercándote exactamente adonde querías ir.",
+  "Tu próxima decisión tendrá más suerte de la que ahora podés calcular.",
+  "Una puerta se cerrará sin explicación. Poco después entenderás qué estaba protegiendo.",
+  "La suerte aparecerá donde menos sentido tenga buscarla. No preguntes demasiado.",
+  "Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar.",
+  "Algo está terminando sin que todavía lo notes. Lo próximo ya empezó a acercarse.",
+  "Lo que parecía detenido volverá a moverse. Esta vez en una dirección inesperada.",
+  "Una versión antigua de vos está por quedarse atrás. No necesitarás despedirte.",
+  "Antes de que termine este ciclo, algo que parecía imposible empezará a ordenarse.",
+  "El camino que evitaste volverá a aparecer. Esta vez vas a entender por qué.",
+  "Algo que esperaste durante mucho tiempo llegará cuando ya no lo necesites igual.",
+  "Pronto cambiarás de idea sobre algo que hoy parece completamente decidido.",
+  "Una respuesta llegará después de que hayas dejado de hacerte la pregunta.",
+  "Lo que viene no se parecerá a lo que imaginaste. Tal vez por eso funcione.",
+  "Una oportunidad pequeña traerá consecuencias mucho mayores de las que imaginás.",
+  "Algo que empezaste casi por accidente puede convertirse en una fuente de abundancia.",
+  "Una propuesta llegará de un lugar inesperado. Escuchala antes de decidir.",
+  "El dinero llegará por un camino distinto al que hoy estás intentando controlar.",
+  "Una decisión postergada puede abrir el período de estabilidad que estabas buscando.",
+  "Aquello que hoy hacés en silencio pronto encontrará a las personas correctas.",
+  "Un planeta cambia de posición. Algo pequeño dentro de vos también empieza a moverse.",
+  "El universo repetirá una señal hasta que dejes de confundirla con coincidencia.",
+  "Algo que todavía no tiene nombre ya está orbitando cerca de tu vida.",
+  "Las cartas no revelan el futuro. Señalan el instante exacto en que empieza a cambiar.",
+];
+const MESSAGE_MAP_WIDTH = 708;
+const MESSAGE_MAP_HEIGHT = 1074;
+const MESSAGE_FONT_FAMILY = "Altar Fortune";
+// Figma's text block starts a little higher on each channel's card, following its symbol.
+const MESSAGE_TOPS = [196.894, 192.517, 185.983, 185.357];
+const MESSAGE_LAYOUT = { x: 21.752, width: 192.496, fontSize: 14, lineHeight: 1.1, minFontSize: 11, maxLines: 5, color: "#8c8c8c", baselineNudge: -5 / 3 };
+const FORTUNE_SEEN_KEY = "altar-fortune-seen";
+
+// Channel 1 reads data-foil-frame, the others data-channel-frame-N; no frame means a fixed map image.
+function messageFrameUrl(card, index) {
+  if (!card) return null;
+  return index === 0 ? card.dataset.foilFrame : card.getAttribute(`data-channel-frame-${index + 1}`);
+}
+
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    // Like THREE.TextureLoader: a CDN-hosted image (Tiendanube) would otherwise taint the canvas for WebGL.
+    image.crossOrigin = "anonymous";
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = url;
+  });
+}
+
+// Random, but every phrase is revealed once before any repeats (per browser session).
+function readFortuneSeen() {
+  try {
+    const seen = JSON.parse(sessionStorage.getItem(FORTUNE_SEEN_KEY) || "[]");
+    return Array.isArray(seen) ? seen : [];
+  } catch {
+    return [];
+  }
+}
+
+function pickFortunePhrase(previous) {
+  const seen = readFortuneSeen();
+  let pool = FORTUNE_PHRASES.filter((phrase) => !seen.includes(phrase) && phrase !== previous);
+  if (!pool.length) pool = FORTUNE_PHRASES.filter((phrase) => phrase !== previous);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function markFortuneSeen(phrase) {
+  let seen = readFortuneSeen();
+  // A full round has been revealed: start a new one.
+  if (FORTUNE_PHRASES.every((item) => seen.includes(item))) seen = [];
+  if (!seen.includes(phrase)) seen.push(phrase);
+  try {
+    sessionStorage.setItem(FORTUNE_SEEN_KEY, JSON.stringify(seen));
+  } catch {}
+}
+
+function wrapWords(context, text, width) {
+  const lines = [];
+  text.split(/\s+/).forEach((word) => {
+    const line = lines.length ? `${lines[lines.length - 1]} ${word}` : word;
+    if (lines.length && context.measureText(line).width <= width) lines[lines.length - 1] = line;
+    else lines.push(word);
+  });
+  return lines;
+}
+
+// White background, gray strokes: the foil shader reads gray as relief, exactly like the PNG maps.
+function drawFortuneMap(canvas, frame, phrase, top = MESSAGE_TOPS[0]) {
+  const context = canvas.getContext("2d");
+  const unit = canvas.width / 236;
+  const layout = MESSAGE_LAYOUT;
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(frame, 0, 0, canvas.width, canvas.height);
+
+  // Same size as Figma; only a phrase that would need more lines than the block allows gets smaller.
+  const text = phrase.toLocaleUpperCase("es");
+  let fontSize = layout.fontSize;
+  let lines;
+  for (;;) {
+    context.font = `400 ${fontSize * unit}px "${MESSAGE_FONT_FAMILY}", Georgia, serif`;
+    lines = wrapWords(context, text, layout.width * unit);
+    if (lines.length <= layout.maxLines || fontSize <= layout.minFontSize) break;
+    fontSize -= 0.25;
+  }
+
+  // Figma centers each line's font box (ascent + descent) inside its line height; the browser reads
+  // slightly different font metrics, so a small nudge (measured against the exported PNG) lines them up.
+  const metrics = context.measureText("*");
+  const ascent = metrics.fontBoundingBoxAscent ?? fontSize * unit * 0.8;
+  const descent = metrics.fontBoundingBoxDescent ?? fontSize * unit * 0.2;
+  const lineHeight = fontSize * layout.lineHeight * unit;
+  const right = (layout.x + layout.width) * unit;
+  context.fillStyle = layout.color;
+  context.textAlign = "right";
+  context.textBaseline = "alphabetic";
+  ["*", ...lines].forEach((line, index) => {
+    const lineTop = (top + layout.baselineNudge) * unit + index * lineHeight;
+    context.fillText(line, right, lineTop + (lineHeight - ascent - descent) / 2 + ascent);
+  });
+}
 const SYSTEM_POSE_KEYS = ["X", "Y", "Z", "RotX", "RotY", "RotZ", "Scale"];
 
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);

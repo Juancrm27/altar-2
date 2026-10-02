@@ -64,13 +64,11 @@
               aria-hidden="true"
               data-foil-card
               data-foil-base="{{ 'images/altar-card-base.png' | static_url }}"
-              data-foil-map="{{ 'images/altar-card-message-map.png' | static_url }}"
-              data-channel-map-2="{{ 'images/altar-card-message-map-2.png' | static_url }}"
-              data-channel-map-3="{{ 'images/altar-card-message-map-3.png' | static_url }}"
-              data-channel-map-4="{{ 'images/altar-card-message-map-4.png' | static_url }}"
-              data-channel-message-4="El azar abrirá una puerta que no buscabas. Al cruzarla entenderás por qué estaba esperándote."
-              data-channel-message-3="Alguien de tu pasado volverá a cruzar tu camino. Ahora decidirás si todavía pertenece ahí."
-              data-channel-message-2="Alguien piensa en vos más de lo que imaginás. Muy pronto una señal te lo confirmará."
+              data-foil-frame="{{ 'images/altar-card-message-frame.png' | static_url }}"
+              data-fortune-font="{{ 'fonts/gestura-text-regular.otf' | static_url }}"
+              data-channel-frame-2="{{ 'images/altar-card-message-frame-2.png' | static_url }}"
+              data-channel-frame-3="{{ 'images/altar-card-message-frame-3.png' | static_url }}"
+              data-channel-frame-4="{{ 'images/altar-card-message-frame-4.png' | static_url }}"
             >
               <canvas class="altar-solar__foil-canvas" width="236" height="358" aria-hidden="true"></canvas>
               <div class="altar-solar__fortune-message-fallback">
