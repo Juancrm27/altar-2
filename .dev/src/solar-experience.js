@@ -1255,6 +1255,7 @@ class SolarExperience {
     this.visible = true;
     this.setupFoilCards();
     this.setupFortuneFlip();
+    this.setupFortuneShare();
     this.setupSpotifyPlayer();
     this.setupDraggables();
     this.setupCursorBadge();
@@ -3054,6 +3055,7 @@ ${stonePositionsMarkup(4)}
         this.root.classList.remove("is-card-open");
         ["--focus-x", "--focus-y", "--card-scale"].forEach((name) => cardsContainer.style.removeProperty(name));
         this.fortuneFocusScale = 0;
+        this.hideFortuneShare?.();
         return;
       }
       const settings = this.effectSettings ?? DEFAULT_LIGHTING;
@@ -3073,6 +3075,7 @@ ${stonePositionsMarkup(4)}
       // The sky campaign card steps aside while the fortune card is open.
       this.root.classList.add("is-card-open");
       this.fortuneFocusScale = target;
+      this.showFortuneShare?.();
     };
 
     const setFlipped = (flipped) => {
@@ -3146,6 +3149,159 @@ ${stonePositionsMarkup(4)}
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && this.fortuneOpen) setOpen(false);
     });
+  }
+
+  // "Compartir" next to the open card: a 1080 × 1920 story of the live sky behind it, the card and the handle.
+  // The image is composed as soon as the card has landed, so the tap can open the share sheet right away
+  // (Safari only allows it straight from the tap). Phones get the share sheet, desktops a download.
+  setupFortuneShare() {
+    const panel = this.root.querySelector("[data-fortune-share]");
+    const button = panel?.querySelector("[data-fortune-share-button]");
+    const cards = panel?.closest(".altar-solar__fortune-cards");
+    if (!panel || !button || !cards) return;
+    let pending = null;
+
+    const reset = () => {
+      clearTimeout(this.fortuneShareTimer);
+      pending = null;
+      this.fortuneShareBlob = null;
+    };
+    const capture = () => (pending ??= this.composeFortuneShare(panel.dataset.shareHandle || "")
+      .then((blob) => (this.fortuneShareBlob = blob))
+      .catch(() => null));
+
+    this.showFortuneShare = () => {
+      reset();
+      cards.classList.remove("is-share-dismissed");
+      panel.setAttribute("aria-hidden", "false");
+      button.tabIndex = 0;
+      // After the flip, once the card shows its phrase and nothing is moving.
+      const flip = cards.querySelector("[data-fortune-flip]");
+      const flipMs = parseFloat(getComputedStyle(flip).getPropertyValue("--card-flip-duration")) || 1150;
+      this.fortuneShareTimer = setTimeout(capture, flipMs + 150);
+    };
+    this.hideFortuneShare = () => {
+      reset();
+      panel.setAttribute("aria-hidden", "true");
+      button.tabIndex = -1;
+    };
+    // Dragging the open card dismisses the message for this opening.
+    cards.addEventListener(DRAG_START_EVENT, () => {
+      if (!cards.classList.contains("is-focused")) return;
+      cards.classList.add("is-share-dismissed");
+      panel.setAttribute("aria-hidden", "true");
+      button.tabIndex = -1;
+    });
+    // The panel sits inside the draggable card container; its taps are not drags.
+    panel.addEventListener("pointerdown", (event) => event.stopPropagation());
+
+    button.addEventListener("click", async () => {
+      button.setAttribute("aria-busy", "true");
+      const blob = this.fortuneShareBlob ?? (await capture());
+      button.removeAttribute("aria-busy");
+      if (!blob) return;
+      const file = new File([blob], SHARE_FILE_NAME, { type: blob.type });
+      if (window.matchMedia("(pointer: coarse)").matches && navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+          return;
+        } catch (error) {
+          if (error?.name === "AbortError") return;
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const link = Object.assign(document.createElement("a"), { href: url, download: SHARE_FILE_NAME });
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+  }
+
+  // Rebuilds the screen behind the open card in a 9:16 crop centered on it: CSS sky color and glows,
+  // the live 3D layer (planets wherever they are now), the film grain, then the card in high resolution.
+  async composeFortuneShare(handle) {
+    const effect = this.foilCards?.find((item) => item.card.classList.contains("altar-solar__fortune-face--back"));
+    if (!effect || !this.renderer) return null;
+    await document.fonts?.load(`300 ${SHARE_HANDLE_SIZE}px Inter`).catch(() => {});
+
+    const output = document.createElement("canvas");
+    output.width = SHARE_WIDTH;
+    output.height = SHARE_HEIGHT;
+    const context = output.getContext("2d");
+
+    // The open card sits in the middle of the viewport; take the tallest 9:16 window around it.
+    const viewWidth = window.innerWidth;
+    const viewHeight = window.innerHeight;
+    let cropHeight = viewHeight;
+    let cropWidth = (cropHeight * SHARE_WIDTH) / SHARE_HEIGHT;
+    if (cropWidth > viewWidth) {
+      cropWidth = viewWidth;
+      cropHeight = (cropWidth * SHARE_HEIGHT) / SHARE_WIDTH;
+    }
+    const cropX = (viewWidth - cropWidth) / 2;
+    const cropY = (viewHeight - cropHeight) / 2;
+    const scale = SHARE_WIDTH / cropWidth;
+    const rootStyle = getComputedStyle(this.root);
+
+    context.save();
+    context.setTransform(scale, 0, 0, scale, -cropX * scale, -cropY * scale);
+    // Same backdrop blur the hero applies over sky and planets (filter radii are in output pixels).
+    const blur = parseFloat(rootStyle.getPropertyValue("--effect-blur")) || 0;
+    if (blur > 0 && "filter" in context) context.filter = `blur(${blur * scale}px)`;
+    const bleed = blur * 3;
+    context.fillStyle = rootStyle.backgroundColor;
+    context.fillRect(cropX - bleed, cropY - bleed, cropWidth + bleed * 2, cropHeight + bleed * 2);
+    this.root.querySelectorAll(".altar-solar__glow").forEach((glow) => {
+      const bounds = glow.getBoundingClientRect();
+      const style = getComputedStyle(glow);
+      const [r, g, b] = hexToRgbArray(style.getPropertyValue("--c").trim()).map((channel) => Math.round(channel * 255));
+      const radius = bounds.width / 2;
+      const x = bounds.left + radius;
+      const y = bounds.top + bounds.height / 2;
+      const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+      SKY_GLOW_STOPS.forEach(([offset, alpha]) => gradient.addColorStop(offset, `rgb(${r} ${g} ${b} / ${alpha})`));
+      context.globalAlpha = Number(style.opacity) || 0;
+      context.fillStyle = gradient;
+      context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    });
+    context.globalAlpha = 1;
+    // A WebGL canvas can only be read in the same task it was drawn, so draw a fresh frame first.
+    this.drawScene();
+    const canvasBounds = this.canvas.getBoundingClientRect();
+    context.drawImage(this.canvas, canvasBounds.left, canvasBounds.top, canvasBounds.width, canvasBounds.height);
+    context.restore();
+
+    // Film grain, like the hero's SVG overlay.
+    context.save();
+    context.globalCompositeOperation = "overlay";
+    context.globalAlpha = parseFloat(rootStyle.getPropertyValue("--grain-opacity")) || DEFAULT_LIGHTING.grainOpacity;
+    context.fillStyle = context.createPattern(grainTile(), "repeat");
+    context.fillRect(0, 0, SHARE_WIDTH, SHARE_HEIGHT);
+    context.restore();
+
+    // The card, re-rendered at the story size with its current phrase, channel and light.
+    const { renderer, scene, camera } = effect;
+    const pixelRatio = renderer.getPixelRatio();
+    const cardHeight = (SHARE_CARD_WIDTH * 358) / 236;
+    renderer.setPixelRatio(SHARE_CARD_WIDTH / 236);
+    renderer.setSize(236, 358, false);
+    renderer.render(scene, camera);
+    context.drawImage(renderer.domElement, (SHARE_WIDTH - SHARE_CARD_WIDTH) / 2, (SHARE_HEIGHT - cardHeight) / 2, SHARE_CARD_WIDTH, cardHeight);
+    renderer.setPixelRatio(pixelRatio);
+    renderer.setSize(236, 358, false);
+    renderer.render(scene, camera);
+
+    if (handle) {
+      context.font = `300 ${SHARE_HANDLE_SIZE}px Inter, Arial, Helvetica, sans-serif`;
+      if ("letterSpacing" in context) context.letterSpacing = "-0.33px";
+      context.fillStyle = "#fff3a9";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(handle.toLocaleUpperCase("es"), SHARE_WIDTH / 2, SHARE_HANDLE_Y);
+    }
+
+    return new Promise((resolve) => output.toBlob(resolve, "image/jpeg", 0.92));
   }
 
   // Swaps both card faces to a channel's artwork; faces without a channel variant keep channel 1.
@@ -3420,6 +3576,12 @@ ${stonePositionsMarkup(4)}
         }
       });
     }
+    this.drawScene();
+  };
+
+  // One full frame of the 3D layer (sky scene, horizon, ground stones). Also called right before the
+  // share image reads the canvas, which is only valid in the same task as the draw.
+  drawScene() {
     this.camera.layers.set(0);
     this.renderer.autoClear = true;
     this.renderer.render(this.scene, this.camera);
@@ -3446,7 +3608,7 @@ ${stonePositionsMarkup(4)}
       this.renderer.setScissorTest(false);
     }
     this.renderer.autoClear = true;
-  };
+  }
 }
 
 const DRAG_THRESHOLD = 4;
@@ -3455,6 +3617,7 @@ const DRAG_VIEWPORT_MARGIN = 8;
 // Lets an element be moved with the pointer through --drag-x/--drag-y (applied via CSS `translate`),
 // so it keeps its sticky positioning and open/close animations. A drag never triggers a click.
 const DRAG_RESET_EVENT = "altar:drag-reset";
+const DRAG_START_EVENT = "altar:drag-start";
 const resetDrag = (element) => element?.dispatchEvent(new CustomEvent(DRAG_RESET_EVENT));
 
 function makeDraggable(element, { handle = element, allowTouch = true } = {}) {
@@ -3491,6 +3654,7 @@ function makeDraggable(element, { handle = element, allowTouch = true } = {}) {
       if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
       drag.moved = true;
       element.classList.add("is-dragging");
+      element.dispatchEvent(new CustomEvent(DRAG_START_EVENT));
       handle.setPointerCapture?.(event.pointerId);
     }
     offset.x = drag.originX + THREE.MathUtils.clamp(dx, drag.minX, drag.maxX);
@@ -3609,6 +3773,32 @@ const MESSAGE_FONT_FAMILY = "Altar Fortune";
 const MESSAGE_TOPS = [196.894, 192.517, 185.983, 185.357];
 const MESSAGE_LAYOUT = { x: 21.752, width: 192.496, fontSize: 14, lineHeight: 1.1, minFontSize: 11, maxLines: 5, color: "#8c8c8c", baselineNudge: -5 / 3 };
 const FORTUNE_SEEN_KEY = "altar-fortune-seen";
+
+// Share story (Figma "Share"): 1080 × 1920, card 840 wide centered, handle centered 1660.5px from the top.
+const SHARE_WIDTH = 1080;
+const SHARE_HEIGHT = 1920;
+const SHARE_CARD_WIDTH = 840;
+const SHARE_HANDLE_SIZE = 30;
+const SHARE_HANDLE_Y = 1660.5;
+const SHARE_FILE_NAME = "altar-carta.jpg";
+// The CSS glow gradient (.altar-solar__glow): offset → share of the color still opaque.
+const SKY_GLOW_STOPS = [[0, 1], [0.167, 0.88], [0.333, 0.61], [0.5, 0.32], [0.667, 0.135], [0.833, 0.044], [1, 0]];
+
+// Mid-gray noise; blended as overlay it reads like the hero's fractal grain.
+function grainTile() {
+  if (grainTile.canvas) return grainTile.canvas;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 256;
+  const context = canvas.getContext("2d");
+  const image = context.createImageData(256, 256);
+  for (let index = 0; index < image.data.length; index += 4) {
+    const value = 128 + (Math.random() - 0.5) * 160;
+    image.data[index] = image.data[index + 1] = image.data[index + 2] = value;
+    image.data[index + 3] = 255;
+  }
+  context.putImageData(image, 0, 0);
+  return (grainTile.canvas = canvas);
+}
 
 // Channel 1 reads data-foil-frame, the others data-channel-frame-N; no frame means a fixed map image.
 function messageFrameUrl(card, index) {

@@ -85,6 +85,11 @@
             </article>
           </div>
         </div>
+        <aside class="altar-solar__fortune-share" data-fortune-share data-share-handle="@altarmundi" aria-hidden="true">
+          <img class="altar-solar__fortune-share-dot" src="{{ 'images/altar-status-dot.svg' | static_url }}" alt="" width="7" height="7">
+          <p>Consulta<br>tu suerte cada vez que lo necesites</p>
+          <button type="button" data-fortune-share-button tabindex="-1"><img src="{{ 'images/altar-share.svg' | static_url }}" alt="" width="12" height="12">Compartir</button>
+        </aside>
       </div>
     </div>
     <div class="altar-solar__sticky-track altar-solar__sticky-track--content">
