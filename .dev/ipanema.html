@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Altar — simulación Ipanema</title>
+    <link rel="icon" href="../static/images/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Zalando+Sans:wght@400;700&family=Zalando+Sans+Expanded:wght@400;700&display=swap">
+    <!-- Same CSS order as layouts/layout.tpl: Ipanema first, Altar on top. Tokens come from config/settings_data.json (see src/ipanema-sim.js). -->
+    <link rel="stylesheet" href="../static/css/style-critical.css">
+    <link rel="stylesheet" href="../static/css/style-utilities.css">
+    <link rel="stylesheet" href="../static/css/style-async.css">
+    <link rel="stylesheet" href="../static/css/altar.css">
+    <link rel="stylesheet" href="./ipanema-sim.css">
+  </head>
+  <body class="template-category" data-sim>
+    <div data-sim-icons></div>
+
+    <!-- Header Altar: same markup as sections/altar-header.tpl renders -->
+    <header class="js-header header site-header">
+      <div class="altar-nav">
+        <div class="altar-nav__rule altar-nav__rule--top" aria-hidden="true"></div>
+        <div class="altar-nav__content">
+          <div class="altar-nav__brand">
+            <a class="altar-nav__logo" href="./preview.html" aria-label="Altar">
+              <img src="../static/images/altar-logo.svg" alt="" width="40" height="39">
+            </a>
+            <span class="altar-nav__divider altar-nav__divider--brand" aria-hidden="true"></span>
+            <div class="altar-nav__wordmark-block">
+              <span class="altar-nav__eyebrow">[  CONCEPT_STORE  ]</span>
+              <a class="altar-nav__wordmark" href="./preview.html"><span>altar</span><sup>©</sup></a>
+            </div>
+            <span class="altar-nav__divider altar-nav__divider--metadata" aria-hidden="true"></span>
+            <div class="altar-nav__metadata"><time data-live-date>OCT/03/26</time><span>C.A.B.A. (ARG)</span></div>
+            <span class="altar-nav__divider altar-nav__divider--navigation" aria-hidden="true"></span>
+          </div>
+          <nav class="altar-nav__menu" aria-label="Navegación principal">
+            <a href="#/tienda">Shop</a>
+            <a href="./preview.html">About</a>
+            <a href="#/contacto">Contact</a>
+          </nav>
+          <div class="altar-nav__actions">
+            <a class="altar-nav__account" href="#/cuenta/login" data-sim-account>
+              <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Login</span>
+            </a>
+            <span class="altar-nav__divider altar-nav__divider--actions" aria-hidden="true"></span>
+            <div class="altar-nav__action-stack">
+              <span id="ajax-cart" class="js-cart-container altar-nav__action" data-component="cart-button">
+                <button type="button" class="js-modal-open-private altar-nav__cart" data-target="#modal-cart" aria-label="Carrito de compras">
+                  <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span>
+                </button>
+              </span>
+              <div class="js-search-container altar-nav__action altar-nav__search-container">
+                <button type="button" class="js-search-trigger altar-nav__search" aria-label="Buscar" aria-expanded="false">
+                  <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span>
+                </button>
+                <div class="js-search-expand-form search-floating-container altar-nav__search-panel" aria-hidden="true" data-sim-search-slot></div>
+              </div>
+            </div>
+            <button type="button" class="js-modal-open-private altar-nav__menu-toggle" data-target="#nav-hamburger" aria-label="Abrir menú"><span>Menu</span></button>
+          </div>
+        </div>
+        <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
+      </div>
+    </header>
+
+    <!-- Add to cart notification (snippets/notification.tpl type add_to_cart) -->
+    <div class="js-alert-add-to-cart-private js-notification-cart notification-cart-container notification-hidden" style="display: none;" data-sim-notification></div>
+
+    <main id="MainContent" class="main-content main-container" role="main" data-sim-view></main>
+
+    <footer class="site-footer">
+      <div class="altar-footer" data-header-theme="light">
+        <div class="altar-footer__top">
+          <div class="altar-footer__newsletter">
+            <p class="altar-footer__label">[ NEWSLETTER ]</p>
+            <p class="altar-footer__body">Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.</p>
+            <form class="altar-footer__form" data-newsletter-form>
+              <div class="altar-footer__field">
+                <label class="visually-hidden" for="altar-newsletter-email">Tu correo</label>
+                <input id="altar-newsletter-email" type="email" name="email" placeholder="Tu correo" autocomplete="email" required>
+                <button type="submit">Suscribirme<svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h5v5M3.5 8.5l5-5"/></svg></button>
+              </div>
+              <p class="altar-footer__legal altar-footer__status" role="status"></p>
+            </form>
+          </div>
+          <nav class="altar-footer__group altar-footer__group--help" aria-label="Ayuda">
+            <p class="altar-footer__label">Ayuda</p>
+            <a href="#/pagina/envios">Envíos y devoluciones</a>
+            <a href="#/contacto">Solicitud de devolución</a>
+            <a class="altar-footer__keep-case" href="#/pagina/faqs">FAQs</a>
+          </nav>
+          <nav class="altar-footer__group altar-footer__group--explore" aria-label="Explorar">
+            <p class="altar-footer__label">Explorar</p>
+            <a href="#/tienda">Store</a>
+            <a href="./preview.html">About</a>
+            <a href="#/pagina/makers">Makers</a>
+          </nav>
+          <div class="altar-footer__group altar-footer__group--address">
+            <p class="altar-footer__label">Dirección</p>
+            <a href="#/contacto">1120 Bulnes</a>
+          </div>
+        </div>
+        <p class="altar-footer__descriptor">CONCEPT STORE  /</p>
+        <div class="altar-footer__bottom">
+          <p class="altar-footer__legal altar-footer__copyright">©2026 altar</p>
+          <nav class="altar-footer__legal-links" aria-label="Legales">
+            <a href="#/pagina/terminos">Términos y condiciones</a>
+            <a href="#/pagina/privacidad">Política de privacidad</a>
+          </nav>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Modals (snippets/modals/modal.tpl): cart, mobile menu, mobile search. Filled by src/ipanema-sim.js -->
+    <div data-sim-modals></div>
+
+    <!-- Simulation map: not part of the theme -->
+    <aside class="sim-map" data-sim-map></aside>
+
+    <script src="../static/js/solar-experience.js" defer></script>
+    <script type="module" src="./src/ipanema-sim.js"></script>
+  </body>
+</html>

@@ -412,3 +412,24 @@ a.altar-collection__photo { display: block; color: inherit; }
   .altar-solar__stage { min-height: 960px; margin-bottom: min(-100svh, -480px); }
   .altar-solar__earth { min-height: 480px; }
 }
+
+/* — Header Altar conectado a Ipanema: carrito, buscador, cuenta y menú móvil — */
+.altar-nav button { padding: 0; color: inherit; border: 0; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.altar-nav__count { display: inline !important; }
+.altar-nav__count::before { content: "("; }
+.altar-nav__count::after { content: ")"; }
+.altar-nav__account { display: flex; align-self: flex-start; gap: calc(3 * var(--u)); align-items: center; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-decoration: none; text-transform: uppercase; white-space: nowrap; }
+.altar-nav__menu-toggle { display: none; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
+/* The actions column clips (intro animation), so the search panel is fixed under the header. */
+.altar-nav__search-panel.search-floating-container { position: fixed; top: calc(98 * var(--u)); right: var(--grid-margin); left: auto; z-index: 30; width: calc(var(--col, 160px) * 2 + var(--grid-gutter)); min-width: 280px; padding: calc(12 * var(--u)); color: var(--main-foreground, #000); background: var(--main-background, #fff); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity .2s ease, transform .2s ease, visibility .2s; }
+.altar-nav__search-panel.search-floating-container.visible { opacity: 1; visibility: visible; transform: none; }
+/* Commercial pages sit on Ipanema's light background: dark nav colour and a solid bar. */
+body:not(.template-home) .site-header { background: var(--main-background, #fff); }
+body:not(.template-home) .altar-nav { --altar-nav-color: #601e2a; }
+body:not(.template-home) .altar-nav img { filter: brightness(0) opacity(.94); }
+@media (max-width: 749px) {
+  .altar-nav__account, .altar-nav__divider--actions { display: none; }
+  .altar-nav__menu-toggle { display: block; }
+}
+/* Below 768px store.js opens the search modal instead of the floating panel. */
+@media (max-width: 767px) { .altar-nav__search-panel.search-floating-container { display: none; } }

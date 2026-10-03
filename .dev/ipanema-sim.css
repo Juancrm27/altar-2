@@ -1,0 +1,101 @@
+/* Simulation only (.dev/ipanema.html). Everything else comes from Ipanema's CSS + altar.css.
+   These rules fill the gaps where the simulation uses simplified markup, plus the "simulation map" panel. */
+body[data-sim], body[class^="template-"] { margin: 0; color: var(--main-foreground); background: var(--main-background); font-family: var(--body-font); font-size: var(--font-base); }
+.sim-section { padding-top: 32px; padding-bottom: 64px; }
+.sim-page-header { margin-bottom: 24px; }
+.sim-page-header h1 { margin: 0; font-family: var(--heading-font); font-size: var(--h3); }
+.sim-breadcrumbs { margin-bottom: 12px; font-size: var(--font-smallest); opacity: .7; }
+.sim-breadcrumbs a { color: inherit; }
+.sim-h3 { margin: 48px 0 16px; font-family: var(--heading-font); font-size: var(--h5); }
+.sim-muted { opacity: .65; }
+.sim-small { font-size: var(--font-smallest); }
+.sim-strong { font-weight: 700; }
+.sim-note { padding: 8px 12px; font-size: var(--font-smallest); background: var(--main-foreground-opacity-05); }
+.sim-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sim-inline-form { display: flex; gap: 8px; }
+.sim-inline-form .form-control { flex: 1; min-width: 0; }
+
+/* Catalog */
+.sim-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+.sim-sort { display: flex; align-items: center; gap: 6px; }
+.sim-grid { --grid-gap: 16px; gap: 16px; }
+.sim-product-image { position: relative; display: block; overflow: hidden; aspect-ratio: 440 / 600; background: var(--main-foreground-opacity-05); }
+.sim-product-image img { width: 100%; height: 100%; object-fit: cover; transition: opacity .3s ease; }
+.sim-product-image-hover { position: absolute; inset: 0; opacity: 0; }
+.sim-product-image:hover .sim-product-image-hover { opacity: 1; }
+.sim-labels { position: absolute; bottom: 8px; left: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.sim-label-nostock { color: var(--main-background); background: var(--main-foreground); }
+.product-item-information { padding-top: 8px; }
+.product-item-price-compare { margin-right: 6px; text-decoration: line-through; opacity: .6; }
+.sim-pagination { margin-top: 32px; text-align: center; }
+.sim-filter-list { margin: 0 0 24px; }
+.sim-filter-list li { padding: 6px 0; }
+.sim-filter-list a { color: inherit; }
+
+/* Product */
+.sim-product { display: grid; gap: 32px; }
+@media (min-width: 768px) { .sim-product { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
+.sim-gallery { display: grid; gap: 8px; }
+.sim-gallery img { display: block; width: 100%; max-width: none; aspect-ratio: 440 / 600; object-fit: cover; }
+.sim-product-info { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sim-product-info .sim-labels { position: static; }
+.sim-product-info h1 { margin: 0; font-family: var(--heading-font); font-size: var(--h4); }
+.product-price { display: flex; gap: 8px; align-items: baseline; font-size: var(--font-big); }
+.product-price-compare { text-decoration: line-through; opacity: .6; }
+.sim-variant-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.sim-variant-buttons .btn-variant.selected { outline: 2px solid var(--main-foreground); }
+.sim-stock { min-height: 1em; color: var(--danger); }
+.sim-actions { display: grid; grid-template-columns: 132px 1fr; gap: 8px; align-items: stretch; }
+.sim-actions .btn { width: 100%; }
+.sim-quantity { display: grid; grid-template-columns: 40px 1fr 40px; height: 100%; align-items: center; border: 1px solid var(--main-foreground-opacity-20); }
+.sim-quantity .form-control { border: 0; }
+.sim-qty-input { text-align: center; -moz-appearance: textfield; }
+.sim-qty-input::-webkit-inner-spin-button { display: none; }
+.sim-shipping { display: grid; gap: 8px; }
+.sim-shipping-list li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--main-foreground-opacity-10); }
+
+/* Search suggestions */
+.altar-nav__search-panel .search-form-wrap { text-transform: none; letter-spacing: 0; }
+.sim-search-suggestions { margin-top: 8px; }
+.sim-search-suggestions .sim-suggestion { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; color: inherit; font-size: var(--font-small); text-align: left; text-decoration: none; }
+.sim-suggestion-thumb { width: 40px; height: 54px; background: var(--main-foreground-opacity-05) center / cover; }
+.sim-search-suggestions .sim-suggestion-all { display: block; margin-top: 8px; font-size: var(--font-small); text-align: left; }
+.sim-suggestion-empty { margin: 8px 0 0; opacity: .7; }
+
+/* Cart */
+.cart-item { display: grid; grid-template-columns: 72px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--main-foreground-opacity-10); }
+.cart-item-image { width: 72px; aspect-ratio: 440 / 600; object-fit: cover; }
+.cart-item-product-info, .cart-item-totals-container { display: flex; justify-content: space-between; gap: 8px; }
+.cart-item-totals-container { align-items: center; margin-top: 8px; }
+.cart-item-name { color: inherit; font-weight: 700; }
+.cart-item-variant { display: block; opacity: .65; }
+.sim-qty { min-width: 28px; text-align: center; }
+.cart-totals-row { display: flex; justify-content: space-between; padding: 6px 0; }
+.cart-totals-total { font-size: var(--font-big); font-weight: 700; }
+.cart-row { padding-top: 16px; }
+.cart-row > div > *, .cart-page-summary > div > * { margin-bottom: 12px; }
+.sim-free-shipping { padding: 12px; background: var(--main-foreground-opacity-05); }
+.sim-progress { height: 4px; margin-top: 8px; background: var(--main-foreground-opacity-10); }
+.sim-progress span { display: block; height: 100%; background: var(--success); }
+.sim-cart-page { display: grid; gap: 32px; }
+@media (min-width: 768px) { .sim-cart-page { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }
+
+/* Forms and content */
+.sim-form-wrap { display: grid; max-width: 520px; gap: 24px; }
+.sim-form { display: grid; gap: 4px; }
+.sim-links a { color: inherit; }
+.sim-content { max-width: 720px; }
+.sim-404 { padding: 48px 0; text-align: center; }
+
+/* Notification over the Altar header */
+.notification-cart-container { z-index: 25000; }
+
+/* Simulation map */
+.sim-map { position: fixed; bottom: 12px; left: 12px; z-index: 30000; max-width: calc(100vw - 24px); font: 12px/1.4 Inter, Arial, sans-serif; }
+.sim-map__toggle { padding: 8px 12px; color: #fff3a9; border: 0; background: #601e2a; cursor: pointer; font: inherit; text-transform: uppercase; letter-spacing: .05em; }
+.sim-map__body { display: grid; width: 260px; max-height: 70vh; margin-bottom: 4px; padding: 12px; overflow-y: auto; color: #601e2a; background: #fff3a9; box-shadow: 0 4px 20px rgb(0 0 0 / 20%); order: -1; }
+.sim-map { display: flex; flex-direction: column-reverse; align-items: flex-start; }
+.sim-map__body a, .sim-map__body button { padding: 4px 0; color: inherit; border: 0; background: none; font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.sim-map__body a:hover, .sim-map__body button:hover, .sim-map__body .is-active { text-decoration: underline; }
+.sim-map__label { margin: 10px 0 2px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+.sim-map__note { margin: 10px 0 0; font-size: 11px; opacity: .8; }

@@ -28,19 +28,43 @@
       {% for item in navigation %}<a href="{{ item.url }}">{{ item.name }}</a>{% endfor %}
     </nav>
     <div class="altar-nav__actions">
+      <a class="altar-nav__account" href="{{ customer ? store.customer_home_url : store.customer_login_url }}">
+        <img class="altar-nav__action-icon" src="{{ 'images/altar-arrow-up-right.svg' | static_url }}" alt="" width="12" height="12"><span>{{ customer ? 'Account' : 'Login' }}</span>
+      </a>
       <span class="altar-nav__divider altar-nav__divider--actions" aria-hidden="true"></span>
+      {# Altar look, Ipanema behaviour: the js-* hooks are the ones store.js wires (cart modal, badge, search, menu). #}
+      {% set altar_action_icon %}<img class="altar-nav__action-icon" src="{{ 'images/altar-arrow-up-right.svg' | static_url }}" alt="" width="12" height="12">{% endset %}
       <div class="altar-nav__action-stack">
-        <a class="altar-nav__cart" href="{{ store.cart_url }}" data-store="cart-link">
-          <img class="altar-nav__action-icon" src="{{ 'images/altar-arrow-up-right.svg' | static_url }}" alt="" width="12" height="12"><span>Cart</span><span>({{ cart.items_count | default(0) }})</span>
-        </a>
-        <a class="altar-nav__search" href="{{ store.url }}/search/">
-          <img class="altar-nav__action-icon" src="{{ 'images/altar-arrow-up-right.svg' | static_url }}" alt="" width="12" height="12"><span>Search</span>
-        </a>
+        <span id="ajax-cart" class="js-cart-container altar-nav__action" data-component="cart-button">
+          {% if settings.ajax_cart and template != 'cart' %}
+            <button type="button" class="js-modal-open-private altar-nav__cart" data-target="#modal-cart" data-store="cart-link" aria-label="{{ 'general.shopping_cart' | t }}">
+          {% else %}
+            <a class="altar-nav__cart" href="{{ store.cart_url }}" data-store="cart-link" aria-label="{{ 'general.shopping_cart' | t }}">
+          {% endif %}
+              {{ altar_action_icon }}<span>Cart</span><span class="js-cart-widget-amount altar-nav__count">{{ cart.items_count | default(0) }}</span>
+          {% if settings.ajax_cart and template != 'cart' %}</button>{% else %}</a>{% endif %}
+        </span>
+        <div class="js-search-container altar-nav__action altar-nav__search-container">
+          <button type="button" class="js-search-trigger altar-nav__search" aria-label="{{ 'search.placeholder' | t }}" aria-expanded="false">
+            {{ altar_action_icon }}<span>Search</span>
+          </button>
+          <div class="js-search-expand-form search-floating-container altar-nav__search-panel" aria-hidden="true">
+            {% include 'snippets/header/search-form.tpl' %}
+          </div>
+        </div>
       </div>
+      <button type="button" class="js-modal-open-private altar-nav__menu-toggle" data-target="#nav-hamburger" data-modal-url="#nav-hamburger" aria-label="{{ 'accessibility.open_menu' | t }}">
+        <span>Menu</span>
+      </button>
     </div>
   </div>
   <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
 </div>
+
+{# Ipanema pieces the header relies on: mobile menu and search modals, cookies notice. #}
+{% set navigation_block = null %}
+{% include 'snippets/header/header-nav-mobile.tpl' %}
+{% include 'snippets/notification.tpl' with { type: 'cookies' } %}
 {% schema %}
 {
   "name": "Header Altar",

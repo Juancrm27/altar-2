@@ -37,6 +37,7 @@ npm run preview
 
 - Experiencia 3D: `http://127.0.0.1:4173/.dev/preview.html`
 - Flujo comercial simulado: `http://127.0.0.1:4173/.dev/storefront.html`
+- **Simulación Ipanema:** `http://127.0.0.1:4173/.dev/ipanema.html`. Tiene el header de Altar y las piezas mínimas de Ipanema: carrito lateral, buscador con sugerencias, menú móvil, categoría con filtros y orden, producto con variantes y stock, carrito, contacto, login/registro, páginas de contenido y 404. El botón "Mapa de la simulación" lista todas las páginas y los estados. Usa el CSS real de Ipanema y lee `config/settings_data.json` (colores, tipografías, botones) y `translations/es_AR.json`, así que refleja los cambios en esos archivos. `?open=cart|search|menu|filters` abre ese panel al cargar. Es una maqueta: el HTML real lo renderiza Tiendanube.
 
 El flujo comercial permite probar catálogo, ficha de producto, variantes y carrito sin una cuenta activa. Está aislado en `.dev/` y nunca debe publicarse como backend real. Ver `INTEGRATION.md` para el mapa de migración.
 
