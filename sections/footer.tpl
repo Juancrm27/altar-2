@@ -1,83 +1,228 @@
-{% set footer_settings = section.settings %}
-<div class="altar-footer" data-section-id="{{ section.id }}" data-header-theme="light">
-  <div class="altar-footer__top">
-    <div class="altar-footer__newsletter">
-      <p class="altar-footer__label">{{ footer_settings.newsletter_label | default('[ NEWSLETTER ]') }}</p>
-      <p class="altar-footer__body">{{ footer_settings.newsletter_text | default('Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.') }}</p>
-      {# Tiendanube newsletter: posts to the contact endpoint with type=newsletter; "winnie-pooh" is the store's anti-spam trap. #}
-      <form class="altar-footer__form" method="post" action="{{ store.contact_url }}" data-newsletter-form>
-        <input type="hidden" name="name" value="{{ 'Sin nombre' | translate }}">
-        <input type="hidden" name="message" value="{{ 'Pedido de inscripción a newsletter' | translate }}">
-        <input type="hidden" name="type" value="newsletter">
-        <div class="winnie-pooh" aria-hidden="true"><label>{{ 'No completar' | translate }}<input type="text" name="winnie-pooh" tabindex="-1" autocomplete="off"></label></div>
-        <div class="altar-footer__field">
-          <label class="visually-hidden" for="altar-newsletter-email">{{ 'Tu correo' | translate }}</label>
-          <input id="altar-newsletter-email" type="email" name="email" placeholder="{{ 'Tu correo' | translate }}" autocomplete="email" required>
-          <button type="submit">{{ 'Suscribirme' | translate }}<svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h5v5M3.5 8.5l5-5"/></svg></button>
-        </div>
-        {% if contact and contact.type == 'newsletter' %}
-          <p class="altar-footer__legal altar-footer__status" role="status">{% if contact.success %}{{ '¡Listo! Ya estás en la lista.' | translate }}{% else %}{{ 'No pudimos suscribirte. Revisá el correo e intentá de nuevo.' | translate }}{% endif %}</p>
-        {% else %}
-          <p class="altar-footer__legal altar-footer__status" role="status"></p>
-        {% endif %}
-      </form>
-      {% set instagram_url = footer_settings.instagram_url | default(store.instagram) %}
-      {% if instagram_url %}
-        <nav class="altar-footer__social" aria-label="{{ 'Redes' | translate }}">
-          <a href="{{ instagram_url }}" target="_blank" rel="noopener" aria-label="Instagram"><img src="{{ 'images/altar-instagram.svg' | static_url }}" alt="" width="24" height="24"></a>
-        </nav>
-      {% endif %}
-    </div>
-    <nav class="altar-footer__group altar-footer__group--help" aria-label="{{ 'Ayuda' | translate }}">
-      <p class="altar-footer__label">{{ 'Ayuda' | translate }}</p>
-      <a href="{{ footer_settings.shipping_url | default('#') }}">{{ 'Envíos y devoluciones' | translate }}</a>
-      <a href="{{ footer_settings.returns_url | default('#') }}">{{ 'Solicitud de devolución' | translate }}</a>
-      <a class="altar-footer__keep-case" href="{{ footer_settings.faq_url | default('#') }}">FAQs</a>
-    </nav>
-    <nav class="altar-footer__group altar-footer__group--explore" aria-label="{{ 'Explorar' | translate }}">
-      <p class="altar-footer__label">{{ 'Explorar' | translate }}</p>
-      <a href="{{ store.products_url }}">Store</a>
-      <a href="{{ store.url }}/#about">About</a>
-      <a href="{{ footer_settings.makers_url | default('#') }}">Makers</a>
-    </nav>
-    <div class="altar-footer__group altar-footer__group--address">
-      <p class="altar-footer__label">{{ 'Dirección' | translate }}</p>
-      <a href="{{ footer_settings.address_url | default('https://maps.google.com/?q=Bulnes+1120,+Buenos+Aires') }}" target="_blank" rel="noopener">{{ footer_settings.address | default('1120 Bulnes') }}</a>
-      <a href="{{ store.url }}/#coleccion">{{ footer_settings.campaign_label | default('Campaña SS27') }}</a>
-    </div>
-  </div>
-  <p class="altar-footer__descriptor">{{ footer_settings.descriptor | default('CONCEPT STORE  /') }}</p>
-  <div class="altar-footer__bottom">
-    <p class="altar-footer__legal altar-footer__copyright">©{{ 'now' | date('Y') }} {{ store.name | lower }}</p>
-    <nav class="altar-footer__legal-links" aria-label="{{ 'Legales' | translate }}">
-      <a href="{{ footer_settings.terms_url | default('#') }}">{{ 'Términos y condiciones' | translate }}</a>
-      <a href="{{ footer_settings.privacy_url | default('#') }}">{{ 'Política de privacidad' | translate }}</a>
-    </nav>
-  </div>
+{# Footer Section - Composable blocks: institutional, menus, newsletter #}
+
+{% set full_width = section.settings.section_width == 'full' %}
+{% set page_width = section.settings.section_width == 'page' %}
+{% set vertical_padding = section.settings.vertical_padding %}
+{% set horizontal_padding = full_width ? section.settings.horizontal_padding : 0 %}
+{% set background_color = section.settings.background_color %}
+{% set text_color = section.settings.text_color %}
+{% set password_page = template == 'password' %}
+
+{# Footer color styles using CSS custom properties for opacity variants #}
+{% set footer_styles %}
+	{% if vertical_padding %}padding-top: {{ vertical_padding }}px; padding-bottom: {{ vertical_padding }}px;{% endif %}
+	{% if horizontal_padding %}padding-left: {{ horizontal_padding }}px; padding-right: {{ horizontal_padding }}px;{% endif %}
+	{% if background_color %}--footer-background: {{ background_color }}; background-color: {{ background_color }};{% endif %}
+	{% if text_color %}--footer-foreground: {{ text_color }}; color: {{ text_color }}; --footer-foreground-opacity-10: {{ text_color }}1A; --footer-foreground-opacity-20: {{ text_color }}33; --footer-foreground-opacity-40: {{ text_color }}66; --footer-foreground-opacity-60: {{ text_color }}99;{% endif %}
+{% endset %}
+
+{# Count blocks for grid layout #}
+{% set menu_block_count = 0 %}
+{% for block in section.blocks %}
+	{% if block.type == 'footer-menu' %}
+		{% set menu_block_count = menu_block_count + 1 %}
+	{% endif %}
+{% endfor %}
+{% set has_menus = menu_block_count > 0 %}
+
+{# Check for institutional block #}
+{% set has_institutional = false %}
+{% for block in section.blocks %}
+	{% if block.type == 'footer-institutional' %}
+		{% set has_institutional = true %}
+	{% endif %}
+{% endfor %}
+
+{# Check for newsletter block #}
+{% set has_newsletter = false %}
+{% for block in section.blocks %}
+	{% if block.type == 'footer-newsletter' %}
+		{% set has_newsletter = true %}
+	{% endif %}
+{% endfor %}
+
+{# Footer layout classes #}
+{% set footer_main_toggle_classes = section.settings.menus_toggle ? 'footer-main-info-toggle' %}
+{% set footer_mobile_toggle_title = has_menus and section.settings.menus_toggle %}
+{{ component('nubesdk-slot', { type: "before_footer" }) }}
+
+<div
+	class="js-hide-footer-while-scrolling {% if full_width %}footer-content section-full-width{% endif %}"
+	data-store="footer"
+	data-section-id="{{ section.id }}"
+	{% if footer_styles | trim %}style="{{ footer_styles | trim }}"{% endif %}
+>
+	{% if page_width %}
+		<div class="footer-content container">
+	{% endif %}
+			{% if not password_page %}
+				<div class="footer-main-info {{ footer_main_toggle_classes }}">
+					{% for block in section.blocks %}
+						{% include 'blocks/' ~ block.type ~ '.tpl' with { block: block } %}
+					{% endfor %}
+				</div>
+
+				{% include 'snippets/footer/footer-country-selector.tpl' %}
+			{% endif %}
+
+			{# Secondary footer info (payments, shipping, legal) #}
+			<div class="footer-secondary-info">
+				{% include 'snippets/footer/footer-legal.tpl' with { password_page: password_page } %}
+			</div>
+	{% if page_width %}
+		</div>
+	{% endif %}
 </div>
+
+{{ component('nubesdk-slot', { type: "after_footer" }) }}
+
 {% schema %}
 {
-  "name": "Footer",
+  "name": "t:names.footer",
+  "icon": "FooterIcon",
   "wrapper": "footer",
-  "class": "site-footer",
+  "class": "section-footer",
   "static": true,
-  "enabled_on": { "layout_templates": ["footer"] },
+  "limit": 1,
+  "blocks": [
+    {
+      "type": "footer-menu",
+      "limit": 3
+    }
+  ],
   "settings": [
-    { "type": "header", "content": "Newsletter" },
-    { "type": "setting", "setting_type": "text", "id": "newsletter_label", "label": "Etiqueta", "default": "[ NEWSLETTER ]" },
-    { "type": "setting", "setting_type": "textarea", "id": "newsletter_text", "label": "Texto", "default": "Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar." },
-    { "type": "setting", "setting_type": "text", "id": "instagram_url", "label": "Instagram (link)", "description": "Si queda vacío se usa el Instagram configurado en la tienda." },
-    { "type": "header", "content": "Links" },
-    { "type": "setting", "setting_type": "text", "id": "shipping_url", "label": "Envíos y devoluciones (link)" },
-    { "type": "setting", "setting_type": "text", "id": "returns_url", "label": "Solicitud de devolución (link)" },
-    { "type": "setting", "setting_type": "text", "id": "faq_url", "label": "FAQs (link)" },
-    { "type": "setting", "setting_type": "text", "id": "makers_url", "label": "Makers (link)" },
-    { "type": "setting", "setting_type": "text", "id": "address", "label": "Dirección", "default": "1120 Bulnes" },
-    { "type": "setting", "setting_type": "text", "id": "address_url", "label": "Dirección (link de mapa)" },
-    { "type": "setting", "setting_type": "text", "id": "campaign_label", "label": "Campaña", "default": "Campaña SS27" },
-    { "type": "setting", "setting_type": "text", "id": "descriptor", "label": "Descriptor central", "default": "CONCEPT STORE  /" },
-    { "type": "setting", "setting_type": "text", "id": "terms_url", "label": "Términos y condiciones (link)" },
-    { "type": "setting", "setting_type": "text", "id": "privacy_url", "label": "Política de privacidad (link)" }
-  ]
+    {
+      "type": "header",
+      "content": "t:names.colors"
+    },
+    {
+      "type": "setting",
+      "setting_type": "color",
+      "id": "background_color",
+      "label": "t:settings.background",
+      "default_setting": "text_color"
+    },
+    {
+      "type": "setting",
+      "setting_type": "color",
+      "id": "text_color",
+      "label": "t:settings.text",
+      "default_setting": "background_color"
+    },
+    {
+      "type": "header",
+      "content": "t:names.design"
+    },
+    {
+      "type": "setting",
+      "setting_type": "radio",
+      "id": "section_width",
+      "label": "t:settings.section_width",
+      "options": [
+        { "value": "page", "label": "t:options.page" },
+        { "value": "full", "label": "t:options.full" }
+      ],
+      "default": "page"
+    },
+    {
+      "type": "setting",
+      "setting_type": "range",
+      "id": "vertical_padding",
+      "label": "t:settings.vertical_padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 32,
+      "icon": "vertical_padding"
+    },
+    {
+      "type": "setting",
+      "setting_type": "range",
+      "id": "horizontal_padding",
+      "label": "t:settings.horizontal_padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 32,
+      "icon": "horizontal_padding",
+      "disabled_if": "{{ section.settings.section_width == 'page' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.menus"
+    },
+    {
+      "type": "setting",
+      "setting_type": "toggle",
+      "id": "menus_toggle",
+      "label": "t:settings.menus_toggle",
+      "info": "t:info.menus_toggle",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.shipping_and_payments"
+    },
+    {
+      "type": "setting",
+      "setting_type": "toggle",
+      "id": "footer_payments_show",
+      "label": "t:settings.footer_payments_show",
+      "default": true
+    },
+    {
+      "type": "setting",
+      "setting_type": "toggle",
+      "id": "footer_shipping_show",
+      "label": "t:settings.footer_shipping_show",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.custom_seals"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "footer_seal_img",
+      "label": "t:settings.footer_seal_img"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "footer_seal_url",
+      "label": "t:settings.footer_seal_url",
+      "visible_if": "{{ section.settings.footer_seal_img }}"
+    },
+    {
+      "type": "setting",
+      "setting_type": "custom_code",
+      "id": "footer_custom_seal_code",
+      "label": "t:settings.footer_custom_seal_code"
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "footer-menu",
+        "settings": {
+          "title": "t:defaults.footer.menu_1_title",
+          "menu": "navigation"
+        }
+      },
+      {
+        "type": "footer-menu",
+        "settings": {
+          "title": "t:defaults.footer.menu_2_title",
+          "menu": "navigation"
+        }
+      }
+    ]
+  },
+  "enabled_on": {
+    "layout_templates": ["footer"]
+  }
 }
 {% endschema %}

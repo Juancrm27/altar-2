@@ -4,3 +4,5 @@ node_modules/
 .dev/node_modules/
 
 dist/
+*.log
+manifest.json

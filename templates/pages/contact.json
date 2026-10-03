@@ -1,1 +1,15 @@
-{"sections":{"main":{"type":"main-placeholder","settings":{}}},"order":["main"]}
+{
+  "sections": {
+    "heading": {
+      "type": "page-header"
+    },
+    "contact_form": {
+      "type": "main-contact",
+      "settings": {}
+    }
+  },
+  "order": [
+    "heading",
+    "contact_form"
+  ]
+}

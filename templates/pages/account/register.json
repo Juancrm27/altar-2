@@ -1,1 +1,15 @@
-{"sections":{"main":{"type":"main-placeholder","settings":{}}},"order":["main"]}
+{
+  "sections": {
+    "heading": {
+      "type": "page-header"
+    },
+    "register_form": {
+      "type": "main-register",
+      "settings": {}
+    }
+  },
+  "order": [
+    "heading",
+    "register_form"
+  ]
+}

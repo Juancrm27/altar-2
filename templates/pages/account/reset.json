@@ -1,1 +1,15 @@
-{"sections":{"main":{"type":"main-placeholder","settings":{}}},"order":["main"]}
+{
+  "sections": {
+    "heading": {
+      "type": "page-header"
+    },
+    "reset_form": {
+      "type": "main-reset",
+      "settings": {}
+    }
+  },
+  "order": [
+    "heading",
+    "reset_form"
+  ]
+}

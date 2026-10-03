@@ -1,1 +1,15 @@
-{"sections":{"main":{"type":"main-placeholder","settings":{}}},"order":["main"]}
+{
+  "sections": {
+    "heading": {
+      "type": "page-header"
+    },
+    "newpass_form": {
+      "type": "main-newpass",
+      "settings": {}
+    }
+  },
+  "order": [
+    "heading",
+    "newpass_form"
+  ]
+}
