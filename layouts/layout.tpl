@@ -35,6 +35,22 @@
       </style>
     {% endif %}
 
+    {# Altar: intro animation, icons, Inter and the brand layer (loaded after Ipanema so it can override it) #}
+    <script>(function(d){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("altar-intro");setTimeout(function(){d.classList.remove("altar-intro")},4000)})(document.documentElement)</script>
+    <link rel="icon" href="{{ 'images/favicon.svg' | static_url }}" type="image/svg+xml">
+    <link rel="icon" href="{{ 'images/favicon-32.png' | static_url }}" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="{{ 'images/apple-touch-icon.png' | static_url }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap">
+    <style id="altar-theme-tokens">
+      :root {
+        --altar-space: {{ settings.altar_space_color | default('#2d2838') }};
+        --altar-horizon: {{ settings.altar_horizon_color | default('#ff9a70') }};
+        --altar-sky: {{ settings.altar_sky_color | default('#aebfc0') }};
+        --altar-text: {{ settings.altar_text_color | default('#f7f2ec') }};
+      }
+    </style>
+    {{ 'css/altar.css' | static_url | static_inline }}
+
     {% set async_js = true %}
 
     {# Platform head content #}
@@ -68,7 +84,7 @@
 
     {# Header layout template - not shown on password page #}
     {% if template != 'password' %}
-      <header class="js-header header">
+      <header class="js-header header site-header">
         {% layout_template 'header' %}
       </header>
       {{ component('nubesdk-slot', { type: "after_header" }) }}
@@ -86,8 +102,10 @@
       {{ page_template_content }}
     </main>
 
-    {# Footer layout template - adapts automatically for password page #}
-    {% layout_template 'footer' %}
+    {# Footer layout template - the Altar home closes with its own section, so no footer there #}
+    {% if template != 'home' %}
+      {% layout_template 'footer' %}
+    {% endif %}
 
     {% if template != 'password' %}
       {# Quick shop modal #}
@@ -127,6 +145,9 @@
         document.body.appendChild(script);
       });
     </script>
+
+    {# Altar: 3D home, header and footer behaviour #}
+    <script src="{{ 'js/solar-experience.js' | static_url }}" defer></script>
 
     {% platform_body_content %}
   </body>

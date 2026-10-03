@@ -11,10 +11,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../static/css/style-critical.css">
+    <link rel="stylesheet" href="../static/css/altar.css">
     <style>
       /* Store placeholder (preview only): same palette, grid and type as the home. */
-      body { background: #601e2a; }
+      *, *::before, *::after { box-sizing: border-box; }
+      body { margin: 0; background: #601e2a; }
       .site-header { position: fixed; inset: 0 0 auto; }
       .altar-wip { position: relative; display: flex; min-height: 100svh; padding: calc(131 * var(--u)) var(--grid-margin) calc(32 * var(--u)); overflow: hidden; flex-direction: column; justify-content: space-between; gap: calc(48 * var(--u)); color: #fff3a9; font-family: Inter, Arial, Helvetica, sans-serif; }
       .altar-wip__symbol { position: absolute; right: var(--grid-margin); bottom: calc(-180 * var(--u)); width: calc((100% - 2 * var(--grid-margin) - 7 * var(--grid-gutter)) / 8 * 4 + var(--grid-gutter) * 3); height: auto; pointer-events: none; }

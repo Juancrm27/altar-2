@@ -4,14 +4,21 @@ Prototipo de portada inmersiva construido como **tema seccionable** de Tiendanub
 
 ## Estructura
 
-- `layouts/`: shell HTML/Twig de Tiendanube.
-- `sections/altar-solar.tpl`: sección 3D editable desde el administrador.
-- `templates/pages/home.json`: composición de la portada.
-- `static/models/solar-system.glb`: modelo exportado desde Blender.
-- `static/models/planet-stones.glb`: nueve piedras exportadas desde Blender, una por planeta, para la composición terrestre espejada.
-- `static/css/`: estilos del storefront.
-- `static/js/solar-experience.js`: bundle listo para publicar.
-- `.dev/`: fuente JavaScript y herramientas locales; Tiendanube CLI ignora carpetas ocultas.
+El tema parte del **Ipanema oficial** de Tiendanube (copia de referencia sin modificar en `../Ipanema-Original`). Altar se suma como una capa propia, sin reescribir los archivos comerciales de Ipanema.
+
+**Capa Altar (lo nuestro):**
+
+- `sections/altar-solar.tpl`: portada 3D editable desde el administrador.
+- `sections/altar-header.tpl` / `sections/altar-footer.tpl`: header y footer de Altar, usados por `templates/layout/header.json` y `footer.json`.
+- `static/css/altar.css`: todos los estilos de Altar. Las reglas globales están limitadas a la portada o a `.altar-*` para no alterar las páginas de Ipanema.
+- `static/js/solar-experience.js`: bundle listo para publicar (fuente en `.dev/src/`).
+- `static/models/`, `static/images/altar-*`, `static/fonts/`: modelos de Blender, imágenes y tipografía.
+- `layouts/layout.tpl`: es el de Ipanema con un bloque marcado "Altar" (tokens, `altar.css`, intro y script) y sin footer en la portada.
+- Ajustes globales: grupo "Identidad de Altar" en `config/settings_schema.json` (ids con prefijo `altar_`).
+
+**Ipanema (no tocar salvo para estilizar):** producto, categoría, búsqueda, carrito, cuenta, contacto, blog, 404 y contraseña, con sus `sections/`, `blocks/`, `snippets/`, `static/css/style-*.css` y `static/js/store.js`. Para adaptar su estética, preferir los ajustes globales del tema y reglas en `altar.css`.
+
+`.dev/` contiene la fuente JavaScript y herramientas locales; Tiendanube CLI ignora carpetas ocultas.
 
 ## Desarrollo en VS Code
 

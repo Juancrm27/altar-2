@@ -1,5 +1,40 @@
 [
   {
+    "name": "Identidad de Altar",
+    "icon": "ColorPaletteIcon",
+    "group": "t:names.brand",
+    "settings": [
+      {
+        "type": "setting",
+        "setting_type": "color",
+        "id": "altar_space_color",
+        "label": "Color del espacio",
+        "default": "#2d2838"
+      },
+      {
+        "type": "setting",
+        "setting_type": "color",
+        "id": "altar_horizon_color",
+        "label": "Color del horizonte",
+        "default": "#ff9a70"
+      },
+      {
+        "type": "setting",
+        "setting_type": "color",
+        "id": "altar_sky_color",
+        "label": "Color del cielo",
+        "default": "#aebfc0"
+      },
+      {
+        "type": "setting",
+        "setting_type": "color",
+        "id": "altar_text_color",
+        "label": "Color de texto (portada)",
+        "default": "#f7f2ec"
+      }
+    ]
+  },
+  {
     "name": "t:names.colors",
     "icon": "ColorPaletteIcon",
     "group": "t:names.brand",
