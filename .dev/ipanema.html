@@ -40,7 +40,7 @@
           <nav class="altar-nav__menu" aria-label="Navegación principal">
             <a href="./preview.html">Home</a>
             <a href="#/tienda">Shop</a>
-            <a href="#/contacto">Contact</a>
+            <a href="#/contacto">Contacto</a>
           </nav>
           <div class="altar-nav__actions">
             <div class="js-search-container altar-nav__action altar-nav__search-container">
@@ -58,7 +58,20 @@
                 </button>
               </span>
             </div>
-            <button type="button" class="js-modal-open-private altar-nav__menu-toggle" data-target="#nav-hamburger" aria-label="Abrir menú"><span>Menu</span></button>
+            <button type="button" class="altar-nav__menu-toggle" data-altar-menu-toggle aria-expanded="false" aria-controls="altar-nav-panel" data-label-open="Menu" data-label-close="Close"><span data-altar-menu-label>Menu</span></button>
+          </div>
+        </div>
+        <div class="altar-nav__panel" id="altar-nav-panel" data-altar-menu-panel hidden>
+          <nav class="altar-nav__panel-menu" aria-label="Navegación principal">
+            <a href="./preview.html">Home</a>
+            <a href="#/tienda">Shop</a>
+            <a href="#/contacto">Contacto</a>
+          </nav>
+          <div class="altar-nav__panel-rule" aria-hidden="true"></div>
+          <div class="altar-nav__panel-utilities">
+            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span></button>
+            <a class="altar-nav__panel-item" href="#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Login</span></a>
+            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span></button>
           </div>
         </div>
         <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
@@ -119,6 +132,7 @@
     <!-- Simulation map: not part of the theme -->
     <aside class="sim-map" data-sim-map></aside>
 
+    <script src="../static/js/altar-header.js" defer></script>
     <script src="../static/js/solar-experience.js" defer></script>
     <script type="module" src="./src/ipanema-sim.js"></script>
   </body>

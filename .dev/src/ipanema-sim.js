@@ -208,7 +208,7 @@ function initSearch() {
 /* ---------- Header modals: cart, mobile menu, mobile search ---------- */
 
 function renderModals() {
-  const navLinks = [["./preview.html", "Home"], [`${BASE}#/tienda`, "Shop"], ...store.categories.map((c) => [`${BASE}#/categoria/${c.slug}`, c.name]), [`${BASE}#/contacto`, "Contact"]];
+  const navLinks = [["./preview.html", "Home"], [`${BASE}#/tienda`, "Shop"], ...store.categories.map((c) => [`${BASE}#/categoria/${c.slug}`, c.name]), [`${BASE}#/contacto`, "Contacto"]];
   $("[data-sim-modals]").innerHTML =
     modal({ id: "modal-cart", title: t("cart.title", "Carrito de compras"), from: "right", dockRight: true, widthDesktop: "small", body: `<div data-sim-cart-panel></div>` }) +
     modal({ id: "nav-hamburger", from: "left", classes: "modal-nav-hamburger modal-nav-main",
@@ -565,7 +565,7 @@ function renderMap(active) {
       <p class="sim-map__label">Interacciones del header</p>
       <button type="button" data-sim-open="#modal-cart">Abrir carrito lateral</button>
       <button type="button" data-sim-search-open>Abrir buscador</button>
-      <button type="button" data-sim-open="#nav-hamburger">Abrir menú móvil</button>
+      <button type="button" data-sim-menu>Abrir menú (tablet / celular)</button>
       <p class="sim-map__label">Estado</p>
       <button type="button" data-sim-fill>Llenar carrito</button>
       <button type="button" data-sim-empty>Vaciar carrito</button>
@@ -608,6 +608,7 @@ function initEvents() {
 
     if (target.closest("[data-sim-map-toggle]")) { const map = $("[data-sim-map]"); map.dataset.open = map.dataset.open === "true" ? "false" : "true"; renderMap(currentRoute().name); }
     if (target.closest("[data-sim-search-open]")) { event.stopPropagation(); hideNotification(); $(".js-search-trigger").click(); }
+    if (target.closest("[data-sim-menu]")) { event.stopPropagation(); $("[data-altar-menu-toggle]").click(); }
     if (target.closest("[data-sim-fill]")) writeCart([{ slug: "orbita", variant: "Natural", qty: 1 }, { slug: "fuego", variant: "", qty: 2 }]);
     if (target.closest("[data-sim-empty]")) writeCart([]);
   });
@@ -670,4 +671,5 @@ if (HAS_VIEW) renderRoute();
 // ?open=cart | menu | search | filters opens that panel on load (handy for screenshots and sharing a state).
 const openOnLoad = new URLSearchParams(location.search).get("open");
 if (openOnLoad === "search") $(".js-search-trigger").click();
+else if (openOnLoad === "menu") $("[data-altar-menu-toggle]").click();
 else if (openOnLoad) openModal({ cart: "#modal-cart", menu: "#nav-hamburger", filters: "#modal-filters" }[openOnLoad] || `#${openOnLoad}`);

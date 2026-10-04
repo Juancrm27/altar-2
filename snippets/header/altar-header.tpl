@@ -124,10 +124,35 @@
 				{% endif %}
 			</div>
 
-			<button type="button" class="js-modal-open-private altar-nav__menu-toggle" data-target="#nav-hamburger" data-modal-url="#nav-hamburger" aria-label="{{ 'accessibility.open_menu' | t }}">
-				<span>{{ altar_menu_label }}</span>
+			{# Tablet / mobile: the menu unfolds inside the header (static/js/altar-header.js). #}
+			<button type="button" class="altar-nav__menu-toggle" data-altar-menu-toggle aria-expanded="false" aria-controls="altar-nav-panel-{{ section.id }}" data-label-open="{{ altar_menu_label }}" data-label-close="{{ 'Close' }}">
+				<span data-altar-menu-label>{{ altar_menu_label }}</span>
 			</button>
+		</div>
+	</div>
+	<div class="altar-nav__panel" id="altar-nav-panel-{{ section.id }}" data-altar-menu-panel hidden>
+		<nav class="altar-nav__panel-menu" aria-label="{{ 'Navegación principal' | translate }}">
+			{% for item in navigation %}
+				<a href="{{ item.url }}" {% if item.url | is_external %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
+			{% endfor %}
+		</nav>
+		<div class="altar-nav__panel-rule" aria-hidden="true"></div>
+		<div class="altar-nav__panel-utilities">
+			{% if altar_show_search %}
+				<button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search" data-modal-url="#modal-search">{{ altar_action_icon }}<span>{{ altar_search_label }}</span></button>
+			{% endif %}
+			{% if altar_show_account %}
+				<a class="altar-nav__panel-item" href="{{ customer ? store.customer_home_url : store.customer_login_url }}">{{ altar_action_icon }}<span>{{ customer ? altar_account_label : altar_login_label }}</span></a>
+			{% endif %}
+			{% if altar_show_cart %}
+				{% if use_ajax_cart %}
+					<button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart">{{ altar_action_icon }}<span>{{ altar_cart_label }}</span><span class="altar-nav__count">{{ cart.items_count | default(0) }}</span></button>
+				{% else %}
+					<a class="altar-nav__panel-item" href="{{ store.cart_url }}">{{ altar_action_icon }}<span>{{ altar_cart_label }}</span><span class="altar-nav__count">{{ cart.items_count | default(0) }}</span></a>
+				{% endif %}
+			{% endif %}
 		</div>
 	</div>
 	<div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
 </div>
+<script src="{{ 'js/altar-header.js' | static_url }}" defer></script>

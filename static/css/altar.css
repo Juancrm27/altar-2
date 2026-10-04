@@ -312,18 +312,10 @@ a.altar-collection__photo { display: block; color: inherit; }
   .altar-solar__scroll-prompt { display: none; }
   .altar-solar__open-player { padding-left: 4px; }
   .altar-solar__player-label { display: none; }
-  .altar-nav__content { grid-template-columns: minmax(0, 1fr) auto; padding: 0 8px; }
-  .altar-nav__menu { display: none; }
-  .altar-nav__metadata, .altar-nav__divider--metadata, .altar-nav__divider--navigation { display: none; }
-  .altar-nav__actions { gap: 18px; }
 }
 @media (max-width: 399px) {
   .altar-solar__fortune-cards { transform: scale(.65); }
   .altar-solar__channel-controls { transform: scale(.92); }
-  .altar-nav { padding-right: 8px; padding-left: 8px; }
-  .altar-nav__brand { gap: 9px; }
-  .altar-nav__wordmark-block { width: 96px; flex-basis: 96px; }
-  .altar-nav__actions { gap: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .altar-solar__fortune-cta-frame { animation: none; } html { scroll-behavior: auto; } .altar-solar__marquee-track { animation-play-state: paused; } }
 
@@ -441,9 +433,27 @@ body:not(.template-home) .site-header,
 body:not(.template-home) .head-main--altar { background: var(--main-background, #fff) !important; }
 body:not(.template-home) .altar-nav { --altar-nav-color: #601e2a; }
 body:not(.template-home) .altar-nav img { filter: brightness(0) opacity(.94); }
-@media (max-width: 749px) {
-  .altar-nav__divider--actions { display: none; }
+
+/* — Header / Site (Figma 265:168): tablet and mobile show brand + Menu; the menu unfolds inside the header — */
+.altar-nav__panel { display: none; }
+@media (max-width: 1023px) {
+  .altar-nav__content { grid-template-columns: minmax(0, 1fr) auto; }
+  .altar-nav__brand { gap: 9px; }
+  .altar-nav__menu, .altar-nav__metadata, .altar-nav__divider, .altar-nav__search-container, .altar-nav__action-stack { display: none; }
   .altar-nav .altar-nav__menu-toggle { display: block; }
+  .altar-nav__panel { flex-direction: column; gap: 16px; padding: 20px 12px; }
+  .altar-nav.is-menu-open .altar-nav__panel { display: flex; }
+  .altar-nav__panel-menu, .altar-nav__panel-utilities { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .altar-nav__panel-menu a { font-size: 12px; line-height: 24px; text-transform: uppercase; }
+  .altar-nav__panel-rule { width: 100%; height: 6.338px; border: .423px dashed currentColor; border-top: 0; }
+  .altar-nav .altar-nav__panel-item { display: flex; gap: 3px; align-items: center; font-size: 10px; line-height: 24px; text-transform: uppercase; white-space: nowrap; }
+  /* Over the 3D sky the open panel needs its own ground to stay legible. */
+  .template-home .altar-nav.is-menu-open { background: var(--altar-space, #2d2838); }
+}
+@media (max-width: 749px) {
+  .altar-nav { padding: 12px 8px; }
+  .altar-nav__content { padding: 0 8px; }
+  .altar-nav__panel { padding: 20px 8px; }
 }
 /* Below 768px store.js opens the search modal instead of the floating panel. */
 @media (max-width: 767px) { .altar-nav__search-panel.search-floating-container { display: none; } }
