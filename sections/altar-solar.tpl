@@ -13,6 +13,11 @@
       <p aria-hidden="true">{{ solar_settings.paragraph_text }}</p>
     </div>
   </div>
+  <div class="visually-hidden" aria-hidden="true">
+    {% for block in section.blocks %}
+      {% include 'blocks/altar-channel.tpl' with { block: block } %}
+    {% endfor %}
+  </div>
   <div class="altar-solar__stage" data-solar-stage>
     <div class="altar-solar__sky" aria-hidden="true">
       <i class="altar-solar__glow altar-solar__glow--rose"></i>
@@ -100,7 +105,24 @@
         </div>
         <div class="altar-solar__campaign-image" data-cursor-label="{{ 'Arrastrar' | translate }}" data-cursor-icon="move">
           <div class="altar-solar__campaign-crop">
-            <img src="{{ 'images/altar-elemental-fw27.png' | static_url }}" alt="" width="1952" height="1080" data-channel-image-2="{{ 'images/altar-channel-2.jpg' | static_url }}" data-channel-image-3="{{ 'images/altar-channel-3.jpg' | static_url }}" data-channel-image-4="{{ 'images/altar-channel-4.jpg' | static_url }}">
+            <img
+              {% if section.blocks | length %}
+                {% for block in section.blocks %}
+                  {% set floating_fallback = loop.index == 1 ? ('images/altar-elemental-fw27.png' | static_url) : (loop.index == 2 ? ('images/altar-channel-2.jpg' | static_url) : (loop.index == 3 ? ('images/altar-channel-3.jpg' | static_url) : ('images/altar-channel-4.jpg' | static_url))) %}
+                  {% set floating_media = block.settings.floating_image and block.settings.floating_image starts with '@media-lib:' ? (block.settings.floating_image | resolve_media) : null %}
+                  {% set floating_url = floating_media ? floating_media.sourceUrl : floating_fallback %}
+                  {% if loop.first %}src="{{ floating_url }}"{% else %}data-channel-image-{{ loop.index }}="{{ floating_url }}"{% endif %}
+                {% endfor %}
+              {% else %}
+                src="{{ 'images/altar-elemental-fw27.png' | static_url }}"
+                data-channel-image-2="{{ 'images/altar-channel-2.jpg' | static_url }}"
+                data-channel-image-3="{{ 'images/altar-channel-3.jpg' | static_url }}"
+                data-channel-image-4="{{ 'images/altar-channel-4.jpg' | static_url }}"
+              {% endif %}
+              alt=""
+              width="1952"
+              height="1080"
+            >
           </div>
         </div>
       </aside>
@@ -154,7 +176,25 @@
   </div>
   <aside class="altar-solar__ground-campaign" data-ground-campaign aria-label="{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}">
     <div class="altar-solar__ground-campaign-media" data-cursor-label="{{ 'Arrastrar' | translate }}" data-cursor-icon="move">
-      <img src="{{ 'images/altar-elemental-tierra.jpg' | static_url }}" alt="" width="221" height="263" loading="lazy" data-channel-image-2="{{ 'images/altar-elemental-tierra-2.jpg' | static_url }}" data-channel-image-3="{{ 'images/altar-elemental-tierra-3.jpg' | static_url }}" data-channel-image-4="{{ 'images/altar-elemental-tierra-4.jpg' | static_url }}">
+      <img
+        {% if section.blocks | length %}
+          {% for block in section.blocks %}
+            {% set ground_fallback = loop.index == 1 ? ('images/altar-elemental-tierra.jpg' | static_url) : (loop.index == 2 ? ('images/altar-elemental-tierra-2.jpg' | static_url) : (loop.index == 3 ? ('images/altar-elemental-tierra-3.jpg' | static_url) : ('images/altar-elemental-tierra-4.jpg' | static_url))) %}
+            {% set ground_media = block.settings.ground_image and block.settings.ground_image starts with '@media-lib:' ? (block.settings.ground_image | resolve_media) : null %}
+            {% set ground_url = ground_media ? ground_media.sourceUrl : ground_fallback %}
+            {% if loop.first %}src="{{ ground_url }}"{% else %}data-channel-image-{{ loop.index }}="{{ ground_url }}"{% endif %}
+          {% endfor %}
+        {% else %}
+          src="{{ 'images/altar-elemental-tierra.jpg' | static_url }}"
+          data-channel-image-2="{{ 'images/altar-elemental-tierra-2.jpg' | static_url }}"
+          data-channel-image-3="{{ 'images/altar-elemental-tierra-3.jpg' | static_url }}"
+          data-channel-image-4="{{ 'images/altar-elemental-tierra-4.jpg' | static_url }}"
+        {% endif %}
+        alt=""
+        width="221"
+        height="263"
+        loading="lazy"
+      >
     </div>
     <div class="altar-solar__ground-campaign-heading" data-cursor-label="{{ 'Ver colección' | translate }}" data-scroll-to=".altar-collection">
       <img src="{{ 'images/altar-status-dot.svg' | static_url }}" alt="" width="7" height="7">
@@ -263,6 +303,10 @@
   "class": "section-altar-solar",
   "limit": 1,
   "enabled_on": { "page_templates": ["home"] },
+  "locked_blocks": true,
+  "blocks": [
+    { "type": "altar-channel", "limit": 4 }
+  ],
   "settings": [
     { "type": "header", "content": "Contenido" },
     { "type": "setting", "setting_type": "text", "id": "scroll_label", "label": "Texto de desplazamiento", "default": "" },
@@ -306,7 +350,16 @@
     { "type": "setting", "setting_type": "color", "id": "ground_color", "label": "Sección 3 · Off white", "default": "#f4f0e8" }
   ],
   "presets": [
-    { "name": "Experiencia solar 3D", "category": "Marca" }
+    {
+      "name": "Experiencia solar 3D",
+      "category": "Marca",
+      "blocks": [
+        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 01" } },
+        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 02" } },
+        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 03" } },
+        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 04" } }
+      ]
+    }
   ]
 }
 {% endschema %}

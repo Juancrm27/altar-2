@@ -9,7 +9,26 @@
         "space_color": "#2d2838",
         "horizon_color": "#ff9c71",
         "sky_color": "#aebfc0"
-      }
+      },
+      "blocks": {
+        "channel_1": {
+          "type": "altar-channel",
+          "settings": { "internal_name": "CHANNEL 01" }
+        },
+        "channel_2": {
+          "type": "altar-channel",
+          "settings": { "internal_name": "CHANNEL 02" }
+        },
+        "channel_3": {
+          "type": "altar-channel",
+          "settings": { "internal_name": "CHANNEL 03" }
+        },
+        "channel_4": {
+          "type": "altar-channel",
+          "settings": { "internal_name": "CHANNEL 04" }
+        }
+      },
+      "block_order": ["channel_1", "channel_2", "channel_3", "channel_4"]
     }
   },
   "order": ["altar_solar"]
