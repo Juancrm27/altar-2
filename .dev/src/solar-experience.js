@@ -4295,7 +4295,7 @@ function playIntro() {
   introAnimate(ctaFrame, "altar-intro-frame 600ms ease-out 1250ms both");
   ctaFrame?.addEventListener("animationend", () => { ctaFrame.style.animation = ""; }, { once: true });
   introAnimate($(".altar-nav__divider--navigation"), "altar-intro-divider 350ms ease-out 1200ms both");
-  introAnimate($(".altar-nav__divider--actions"), "altar-intro-divider 350ms ease-out 1350ms both");
+  introAnimate($(".altar-nav__divider--actions"), "altar-intro-divider 350ms ease-out 600ms both");
 
   // 1.2 s · the ELEMENTAL card rises rotated and settles (the single spatial move), its title lighting up as it turns.
   const campaign = $(".altar-solar__campaign");
@@ -4320,9 +4320,10 @@ function playIntro() {
   // Only the actions on screen take a turn. On tablet / mobile the bar shows just the brand and Menu, so Menu types in
   // right after the wordmark instead of waiting behind the hidden Cart, Search and Login.
   const isShown = (element) => element && getComputedStyle(element).display !== "none" && element.getClientRects().length > 0;
-  [".altar-nav__cart", ".altar-nav__search", ".altar-nav__account"].map((selector) => $(selector)).filter(isShown).forEach((link, index) => {
-    introAnimate(link.querySelector(".altar-nav__action-icon"), fade(200, 1400 + index * 150));
-    link.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 1450 + index * 150 + partIndex * 140, stagger: 35 }));
+  // Desktop actions follow the screen order (Search, then Login over Cart) as soon as the frame has drawn.
+  [".altar-nav__search", ".altar-nav__account", ".altar-nav__cart"].map((selector) => $(selector)).filter(isShown).forEach((link, index) => {
+    introAnimate(link.querySelector(".altar-nav__action-icon"), fade(200, 650 + index * 120));
+    link.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 700 + index * 120 + partIndex * 140, stagger: 35 }));
   });
   const menuToggle = $(".altar-nav__menu-toggle");
   if (isShown(menuToggle)) menuToggle.querySelectorAll(":scope > span").forEach((part) => splitChars(part, { base: 600, stagger: 35 }));
