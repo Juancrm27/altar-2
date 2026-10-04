@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { gsap } from "gsap";
 
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
+const COMPACT_LAYOUT = window.matchMedia("(max-width: 749px)");
 const clampDpr = () => Math.min(window.devicePixelRatio || 1, 1.75);
 const LIGHTING_STORAGE_KEY = "altar-lighting-v1";
 // GUI changes are only remembered across reloads when "Recordar cambios" is checked.
@@ -3065,7 +3066,14 @@ ${stonePositionsMarkup(4)}
       const bounds = flip.getBoundingClientRect();
       const visibleScale = bounds.width / 236;
       const cssScale = visibleScale / Number(settings.cardScale);
-      const target = Math.min(Number(settings.cardFocusScale), (window.innerHeight - 160) / 358, (window.innerWidth - 24) / 236);
+      // Phones (Figma "iPhone 13 & 14 - Compartir"): 275 × 417 on 390 × 667, leaving room for the close button
+      // at its side and the share bar under it.
+      const compact = COMPACT_LAYOUT.matches;
+      const target = Math.min(
+        Number(settings.cardFocusScale),
+        (window.innerHeight - (compact ? 250 : 160)) / 358,
+        (window.innerWidth - (compact ? 115 : 24)) / 236,
+      );
       const width = 236 * target;
       const height = 358 * target;
       cardsContainer.style.setProperty("--focus-x", `${window.innerWidth / 2 - width / 2 - bounds.left}px`);
@@ -3166,6 +3174,7 @@ ${stonePositionsMarkup(4)}
       pending = null;
       this.fortuneShareBlob = null;
     };
+    const close = cards.querySelector("[data-fortune-close]");
     const capture = () => (pending ??= this.composeFortuneShare(panel.dataset.shareHandle || "")
       .then((blob) => (this.fortuneShareBlob = blob))
       .catch(() => null));
@@ -3175,6 +3184,7 @@ ${stonePositionsMarkup(4)}
       cards.classList.remove("is-share-dismissed");
       panel.setAttribute("aria-hidden", "false");
       button.tabIndex = 0;
+      if (close) close.tabIndex = 0;
       // After the flip, once the card shows its phrase and nothing is moving.
       const flip = cards.querySelector("[data-fortune-flip]");
       const flipMs = parseFloat(getComputedStyle(flip).getPropertyValue("--card-flip-duration")) || 1150;
@@ -3184,6 +3194,7 @@ ${stonePositionsMarkup(4)}
       reset();
       panel.setAttribute("aria-hidden", "true");
       button.tabIndex = -1;
+      if (close) close.tabIndex = -1;
     };
     // Dragging the open card dismisses the message for this opening.
     cards.addEventListener(DRAG_START_EVENT, () => {
@@ -3194,6 +3205,9 @@ ${stonePositionsMarkup(4)}
     });
     // The panel sits inside the draggable card container; its taps are not drags.
     panel.addEventListener("pointerdown", (event) => event.stopPropagation());
+    // Phones get a close button beside the open card (the card itself still flips back on tap).
+    close?.addEventListener("pointerdown", (event) => event.stopPropagation());
+    close?.addEventListener("click", () => this.closeFortuneCard?.());
 
     button.addEventListener("click", async () => {
       button.setAttribute("aria-busy", "true");

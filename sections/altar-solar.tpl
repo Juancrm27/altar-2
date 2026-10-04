@@ -95,6 +95,7 @@
           <p>Consulta<br>tu suerte cada vez que lo necesites</p>
           <button type="button" data-fortune-share-button tabindex="-1"><img src="{{ 'images/altar-share.svg' | static_url }}" alt="" width="12" height="12">Compartir</button>
         </aside>
+        <button type="button" class="altar-solar__fortune-close" data-fortune-close tabindex="-1" aria-label="{{ 'Cerrar carta' | translate }}"><img src="{{ 'images/altar-close.svg' | static_url }}" alt="" width="14" height="14"></button>
       </div>
     </div>
     <div class="altar-solar__sticky-track altar-solar__sticky-track--content">

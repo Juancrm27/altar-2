@@ -282,10 +282,6 @@ a.altar-collection__photo { display: block; color: inherit; }
   .altar-closing__symbol { right: var(--grid-margin); width: calc((100% - 2 * var(--grid-margin) - 7 * var(--grid-gutter)) / 8 * 4 + var(--grid-gutter) * 3); }
 }
 @media (max-width: 749px) {
-  .altar-solar__fortune-cards { transform: scale(.75); transform-origin: left bottom; }
-  .altar-solar__fortune-share { top: calc(100% + 8px); right: auto; left: 0; flex-direction: row; align-items: center; justify-content: flex-end; width: calc(236 * var(--u) * var(--card-scale, .515)); padding: 8px; box-sizing: border-box; }
-  .altar-solar__fortune-share-dot { display: none; }
-  .altar-solar__fortune-share p { flex: 1; width: auto; }
   .altar-solar__manifesto { flex-direction: column; align-items: flex-start; gap: 20px; }
   .altar-solar__manifesto-headline { width: 100%; max-width: none; }
   .altar-solar__manifesto h2 { font-size: 36px; line-height: 38px; letter-spacing: -1.5px; }
@@ -306,18 +302,35 @@ a.altar-collection__photo { display: block; color: inherit; }
   .altar-collection__gallery { flex: none; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; gap: 12px; }
   .altar-collection__photo { height: auto; aspect-ratio: 339 / 472; }
   .altar-solar__ground-campaign { right: 12px; scale: calc(var(--ground-campaign-scale, 1) * .6); transform-origin: right center; }
-  .altar-solar__campaign { right: 12px; translate: var(--drag-x, 0px) var(--drag-y, 0px); transform: scale(calc(var(--campaign-scale, .99) * .6)); }
-  .altar-solar__bottom-controls { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
-  .altar-solar__channel-controls { justify-self: center; }
   .altar-solar__scroll-prompt { display: none; }
-  .altar-solar__open-player { padding-left: 4px; }
-  .altar-solar__player-label { display: none; }
-}
-@media (max-width: 399px) {
-  .altar-solar__fortune-cards { transform: scale(.65); }
-  .altar-solar__channel-controls { transform: scale(.92); }
 }
 @media (prefers-reduced-motion: reduce) { .altar-solar__fortune-cta-frame { animation: none; } html { scroll-behavior: auto; } .altar-solar__marquee-track { animation-play-state: paused; } }
+
+/* — Hero en celular (Figma "iPhone 13 & 14 - 1" y "- Compartir", 390 × 667) — */
+.altar-solar__fortune-close { display: none; }
+@media (max-width: 749px) {
+  /* Closed: ELEMENTAL centred 27px above the middle, the fortune card as a small teaser bottom left. */
+  .altar-solar__campaign { right: auto; left: calc(50vw - 106px * var(--campaign-scale, .99)); top: calc(50svh - 27px - 142.878px * var(--campaign-scale, .99)); translate: var(--drag-x, 0px) var(--drag-y, 0px); transform: scale(var(--campaign-scale, .99)); transform-origin: left top; transition: translate 900ms cubic-bezier(.2, .7, .2, 1), opacity 300ms ease, visibility 0s linear 0s; }
+  .altar-solar__fortune-cards { --m: .7076; top: calc(100svh - 45px - 358px); transform: scale(var(--m)); transform-origin: left bottom; }
+  .altar-solar__fortune-cta-text, .altar-solar__fortune-cta-frame { display: none; }
+  /* Only the channel switcher stays, on the right. */
+  .altar-solar__bottom-controls { grid-template-columns: minmax(0, 1fr) auto; transition: opacity 300ms ease, visibility 0s linear 0s; }
+  .altar-solar__channel-controls { grid-column: 2; width: auto; justify-self: end; }
+  .altar-solar__pagination, .altar-solar__reveal-card, .altar-solar__bottom-controls > .altar-solar__open-player { display: none; }
+
+  /* Open: the card takes the stage; ELEMENTAL and the controls step out. */
+  .altar-solar.is-card-open .altar-solar__campaign { translate: var(--drag-x, 0px) var(--drag-y, 0px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 300ms ease, visibility 0s linear 300ms; }
+  .altar-solar.is-card-open .altar-solar__bottom-controls { opacity: 0; visibility: hidden; transition: opacity 300ms ease, visibility 0s linear 300ms; }
+  /* Share bar and close button live inside the scaled card container: undo its scale (--m) and place them in
+     screen pixels from the card's edges (card bottom +29px, centred, 300px wide; close 10px right, 19px down). */
+  .altar-solar__fortune-share { top: calc(100% + 29px / var(--m)); right: auto; left: calc(236 * var(--u) * var(--card-scale, .515) / 2 - 150px / var(--m)); display: grid; width: 300px; padding: 8px 12px 12px; grid-template-columns: 6px 87px 1fr; column-gap: 8px; align-items: center; background: rgb(255 243 169 / 8%); border-radius: 12px; scale: calc(1 / var(--m)); transform-origin: 0 0; }
+  .altar-solar__fortune-share-dot { display: block; width: 6px; height: 6px; translate: 0 -11px; }
+  .altar-solar__fortune-share p { width: 87px; font-size: 8px; line-height: normal; text-align: left; }
+  .altar-solar__fortune-share button { justify-self: end; }
+  .altar-solar__fortune-close { position: absolute; top: calc(358 * var(--u) * (1 - var(--card-scale, .515)) + 19px / var(--m)); left: calc(236 * var(--u) * var(--card-scale, .515) + 10px / var(--m)); display: flex; width: 32px; height: 32px; padding: 0; align-items: center; justify-content: center; border: 0; border-radius: 12px; background: rgb(255 243 169 / 24%); cursor: pointer; scale: calc(1 / var(--m)); transform-origin: 0 0; opacity: 0; visibility: hidden; pointer-events: none; }
+  .altar-solar__fortune-close img { display: block; width: 14px; height: 14px; }
+  .altar-solar__fortune-cards.is-focused .altar-solar__fortune-close { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 450ms ease 900ms, visibility 0s linear 900ms; }
+}
 
 /* — antes style-async.css — */
 /* Footer / Desktop / Airy newsletter (Figma 218:171): light, airy, on the 8-column grid —
