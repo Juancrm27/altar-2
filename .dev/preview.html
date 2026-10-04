@@ -320,6 +320,15 @@
       if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) {
         document.querySelectorAll('a[href="./storefront.html"]').forEach(function (a) { a.href = "./ipanema.html#/tienda"; });
         document.querySelector(".altar-nav__cart")?.setAttribute("href", "./ipanema.html?open=cart#/tienda");
+        var simPages = {
+          "Contact": "#/contacto", "Search": "?open=search#/tienda",
+          "Envíos y devoluciones": "#/pagina/envios", "Solicitud de devolución": "#/contacto", "FAQs": "#/pagina/faqs",
+          "Makers": "#/pagina/makers", "Términos y condiciones": "#/pagina/terminos", "Política de privacidad": "#/pagina/privacidad"
+        };
+        document.querySelectorAll('a[href="#"]').forEach(function (a) {
+          var page = simPages[a.textContent.trim()];
+          if (page) a.href = "./ipanema.html" + page;
+        });
       }
     </script>
     <script src="../static/js/solar-experience.js"></script>
