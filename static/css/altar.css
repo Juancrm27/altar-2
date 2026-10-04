@@ -20,7 +20,7 @@ body.template-home { margin: 0; color: var(--altar-text, #f7f2ec); background: v
 :where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) a { color: inherit; }
 .template-home .main-content { min-height: 100svh; }
 .visually-hidden { position: absolute !important; width: calc(1 * var(--u)); height: calc(1 * var(--u)); padding: 0; margin: calc(-1 * var(--u)); overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.altar-solar { position: relative; min-height: 300svh; overflow: clip; background: var(--space-color, #2d2838); isolation: isolate; }
+.altar-solar { position: relative; min-height: 200svh; overflow: clip; background: var(--space-color, #2d2838); isolation: isolate; }
 .altar-page-section { position: relative; isolation: isolate; }
 .section-altar-campaign, .section-altar-manifesto { position: relative; overflow: visible; background: #601e2a; }
 .altar-solar__stage { position: relative; width: 100%; height: 200svh; min-height: calc(1080 * var(--u)); margin-bottom: min(-100svh, calc(-540 * var(--u))); overflow: clip; background: transparent; }
