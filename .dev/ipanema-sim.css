@@ -1,6 +1,6 @@
 /* Simulation only (.dev/ipanema.html). Everything else comes from Ipanema's CSS + altar.css.
    These rules fill the gaps where the simulation uses simplified markup, plus the "simulation map" panel. */
-body[data-sim], body[class^="template-"] { margin: 0; color: var(--main-foreground); background: var(--main-background); font-family: var(--body-font); font-size: var(--font-base); }
+body[data-sim] { margin: 0; color: var(--main-foreground); background: var(--main-background); font-family: var(--body-font); font-size: var(--font-base); }
 .sim-section { padding-top: 32px; padding-bottom: 64px; }
 .sim-page-header { margin-bottom: 24px; }
 .sim-page-header h1 { margin: 0; font-family: var(--heading-font); font-size: var(--h3); }
@@ -86,6 +86,9 @@ body[data-sim], body[class^="template-"] { margin: 0; color: var(--main-foregrou
 .sim-links a { color: inherit; }
 .sim-content { max-width: 720px; }
 .sim-404 { padding: 48px 0; text-align: center; }
+
+/* Ipanema gives modal and overlay the same z-index; in this simulation the overlay comes later in the DOM, so keep it underneath. */
+.modal-overlay { z-index: 19999; }
 
 /* Notification over the Altar header */
 .notification-cart-container { z-index: 25000; }

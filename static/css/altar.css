@@ -6,6 +6,14 @@
   --grid-margin: calc(12 * var(--u)); --grid-gutter: calc(20 * var(--u)); --col: calc((100% - 7 * var(--grid-gutter)) / 8); }
 @media (min-width: 1441px) { :root { --u: calc(100vw / 1440); } }
 :where(.altar-nav, .altar-footer, .altar-solar), :where(.altar-nav, .altar-footer, .altar-solar) * { box-sizing: border-box; }
+/* Ipanema styles bare elements site-wide (body 14px, h1–h6, p, a, button). Inside Altar's own blocks put the
+   browser defaults back, which is what the Altar design was built on; Altar's class rules still apply on top. */
+:where(.altar-nav, .altar-footer, .altar-solar) { font-size: medium; }
+:where(.altar-nav, .altar-footer, .altar-solar) :is(h1, h2, h3, h4, h5, h6) { margin: revert; font-family: inherit; font-size: revert; font-weight: revert; line-height: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar) p { margin: revert; font-size: revert; line-height: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar) a { text-decoration: revert; transition: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar) a:is(:hover, :focus) { opacity: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar) button { color: inherit; }
 html:has(body.template-home) { background: var(--altar-space, #2d2838); scroll-behavior: smooth; }
 body.template-home { margin: 0; color: var(--altar-text, #f7f2ec); background: var(--altar-space, #2d2838); font-family: Arial, Helvetica, sans-serif; }
 :where(.altar-nav, .altar-footer, .altar-solar) img { display: block; max-width: 100%; }
@@ -240,7 +248,7 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-nav__metadata > :first-child { letter-spacing: calc(.7 * var(--u)); }
 .altar-nav__menu { display: flex; flex: none; align-items: center; justify-content: center; gap: calc(40 * var(--u)); font-size: calc(12 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
 .altar-nav__action-stack { display: flex; height: calc(54 * var(--u)); flex-direction: column; align-items: flex-end; justify-content: space-between; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-align: right; text-transform: uppercase; }
-.altar-nav__cart, .altar-nav__search { display: flex; gap: calc(3 * var(--u)); align-items: center; justify-content: flex-end; white-space: nowrap; }
+.altar-nav__cart, .altar-nav__search, .altar-nav__account { display: flex; gap: calc(3 * var(--u)); align-items: center; justify-content: flex-end; white-space: nowrap; }
 .altar-nav__action-icon { display: block; width: calc(12 * var(--u)); height: calc(12 * var(--u)); max-width: none; flex: 0 0 calc(12 * var(--u)); }
 /* Opening sequence (see playIntro in solar-experience.js). <html class="altar-intro"> is set in <head>. */
 @keyframes altar-intro-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -250,7 +258,7 @@ a.altar-collection__photo { display: block; color: inherit; }
 @keyframes altar-intro-frame { from { clip-path: inset(0 0 100% 0 round calc(10 * var(--u))); opacity: .65; } to { clip-path: inset(0 0 0 0 round calc(10 * var(--u))); opacity: .65; } }
 .altar-nav__rule { transform-origin: left center; }
 .altar-nav__divider { transform-origin: center top; }
-.altar-intro:not(.altar-intro--play) :is(.altar-nav__logo, .altar-nav__wordmark, .altar-nav__menu, .altar-nav__cart, .altar-nav__search, .altar-solar__manifesto-ids, .altar-nav__eyebrow, .altar-nav__metadata, .altar-solar__scroll-prompt, .altar-solar__campaign, [data-fortune-flip], .altar-solar__fortune-cta-text, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player) { opacity: 0; }
+.altar-intro:not(.altar-intro--play) :is(.altar-nav__logo, .altar-nav__wordmark, .altar-nav__menu, .altar-nav__cart, .altar-nav__search, .altar-nav__account, .altar-nav__menu-toggle, .altar-solar__manifesto-ids, .altar-nav__eyebrow, .altar-nav__metadata, .altar-solar__scroll-prompt, .altar-solar__campaign, [data-fortune-flip], .altar-solar__fortune-cta-text, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player) { opacity: 0; }
 .altar-intro:not(.altar-intro--play) .altar-nav__rule { transform: scaleX(0); }
 .altar-intro:not(.altar-intro--play) .altar-nav__divider { transform: scaleY(0); }
 .altar-intro:not(.altar-intro--play) .altar-solar__marquee { clip-path: inset(0 100% 0 0); }
@@ -418,8 +426,10 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-nav__count { display: inline !important; }
 .altar-nav__count::before { content: "("; }
 .altar-nav__count::after { content: ")"; }
-.altar-nav__account { display: flex; align-self: flex-start; gap: calc(3 * var(--u)); align-items: center; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-decoration: none; text-transform: uppercase; white-space: nowrap; }
-.altar-nav__menu-toggle { display: none; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
+.altar-nav__account { text-decoration: none; }
+/* Search stands alone left of the divider, on the top line like the first item of the stack. */
+.altar-nav__actions > .altar-nav__search-container { align-self: flex-start; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
+.altar-nav .altar-nav__menu-toggle { display: none; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
 /* The actions column clips (intro animation), so the search panel is fixed under the header. */
 .altar-nav__search-panel.search-floating-container { position: fixed; top: calc(98 * var(--u)); right: var(--grid-margin); left: auto; z-index: 30; width: calc(var(--col, 160px) * 2 + var(--grid-gutter)); min-width: 280px; padding: calc(12 * var(--u)); color: var(--main-foreground, #000); background: var(--main-background, #fff); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity .2s ease, transform .2s ease, visibility .2s; }
 .altar-nav__search-panel.search-floating-container.visible { opacity: 1; visibility: visible; transform: none; }
@@ -428,8 +438,8 @@ body:not(.template-home) .site-header { background: var(--main-background, #fff)
 body:not(.template-home) .altar-nav { --altar-nav-color: #601e2a; }
 body:not(.template-home) .altar-nav img { filter: brightness(0) opacity(.94); }
 @media (max-width: 749px) {
-  .altar-nav__account, .altar-nav__divider--actions { display: none; }
-  .altar-nav__menu-toggle { display: block; }
+  .altar-nav__divider--actions { display: none; }
+  .altar-nav .altar-nav__menu-toggle { display: block; }
 }
 /* Below 768px store.js opens the search modal instead of the floating panel. */
 @media (max-width: 767px) { .altar-nav__search-panel.search-floating-container { display: none; } }

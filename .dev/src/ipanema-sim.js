@@ -5,6 +5,9 @@
 import { store, products, stockFor } from "../data/ipanema-mock.js";
 
 const ROOT = "..";
+// Pages without their own view (the home preview) only get the header: links then point to the simulation page.
+const BASE = document.body.dataset.simBase || "";
+const HAS_VIEW = Boolean(document.querySelector("[data-sim-view]"));
 const CART_KEY = "altar-ipanema-sim-cart";
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -161,13 +164,13 @@ function wireSearchForm(root) {
     if (query.trim().length < 2) { box.style.display = "none"; return; }
     box.style.display = "block";
     box.innerHTML = found.length
-      ? `<ul class="search-suggestions-list list-unstyled">${found.map((p) => `<li><a class="sim-suggestion" href="#/producto/${p.slug}"><span class="sim-suggestion-thumb" style="background-image:url(${p.images[0]})"></span><span>${esc(p.name)}</span><strong>${money(p.price)}</strong></a></li>`).join("")}</ul>
-         <a class="btn-link sim-suggestion-all" href="#/buscar?q=${encodeURIComponent(query)}">${esc(t("search.view_all_results", "Ver todos los resultados"))}</a>`
+      ? `<ul class="search-suggestions-list list-unstyled">${found.map((p) => `<li><a class="sim-suggestion" href="${BASE}#/producto/${p.slug}"><span class="sim-suggestion-thumb" style="background-image:url(${p.images[0]})"></span><span>${esc(p.name)}</span><strong>${money(p.price)}</strong></a></li>`).join("")}</ul>
+         <a class="btn-link sim-suggestion-all" href="${BASE}#/buscar?q=${encodeURIComponent(query)}">${esc(t("search.view_all_results", "Ver todos los resultados"))}</a>`
       : `<p class="sim-suggestion-empty">${esc(t("search.no_results_for", "No encontramos nada para"))} “${esc(query)}”</p>`;
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    location.hash = `#/buscar?q=${encodeURIComponent(input.value.trim())}`;
+    location.href = `${BASE}#/buscar?q=${encodeURIComponent(input.value.trim())}`;
   });
 }
 
@@ -205,13 +208,13 @@ function initSearch() {
 /* ---------- Header modals: cart, mobile menu, mobile search ---------- */
 
 function renderModals() {
-  const navLinks = [["#/tienda", "Shop"], ...store.categories.map((c) => [`#/categoria/${c.slug}`, c.name]), ["./preview.html", "About"], ["#/contacto", "Contact"]];
+  const navLinks = [["./preview.html", "Home"], [`${BASE}#/tienda`, "Shop"], ...store.categories.map((c) => [`${BASE}#/categoria/${c.slug}`, c.name]), [`${BASE}#/contacto`, "Contact"]];
   $("[data-sim-modals]").innerHTML =
     modal({ id: "modal-cart", title: t("cart.title", "Carrito de compras"), from: "right", dockRight: true, widthDesktop: "small", body: `<div data-sim-cart-panel></div>` }) +
     modal({ id: "nav-hamburger", from: "left", classes: "modal-nav-hamburger modal-nav-main",
       body: `<ul class="nav-list list-unstyled">${navLinks.map(([href, label]) => `<li><a class="nav-list-link" href="${href}">${esc(label)}</a></li>`).join("")}</ul>`,
-      foot: `<div class="nav-secondary"><a class="secondary-menu-link" href="#/cuenta/login">${icon("user", "utility-icon icon-inline")} ${esc(t("general.login", "Entrá"))}</a>
-             <a class="secondary-menu-link" href="#/cuenta/registro">${esc(t("general.create_account", "Crear cuenta"))}</a></div>` }) +
+      foot: `<div class="nav-secondary"><a class="secondary-menu-link" href="${BASE}#/cuenta/login">${icon("user", "utility-icon icon-inline")} ${esc(t("general.login", "Entrá"))}</a>
+             <a class="secondary-menu-link" href="${BASE}#/cuenta/registro">${esc(t("general.create_account", "Crear cuenta"))}</a></div>` }) +
     modal({ id: "modal-search", title: t("search.placeholder", "Buscar"), from: "left", classes: "modal-nav-search", body: `<div class="modal-nav-search-body">${searchForm()}</div>` });
   wireSearchForm($("#modal-search"));
 }
@@ -219,11 +222,11 @@ function renderModals() {
 function cartLinesMarkup(page = false) {
   return cartLines().map(({ product, variant, qty }) => `
     <div class="js-cart-item cart-item ${page ? "cart-page-item" : ""}" data-slug="${product.slug}" data-variant="${esc(variant)}">
-      <div class="cart-item-image-container"><a href="#/producto/${product.slug}"><img class="img-fluid cart-item-image" src="${product.images[0]}" alt="${esc(product.name)}"></a></div>
+      <div class="cart-item-image-container"><a href="${BASE}#/producto/${product.slug}"><img class="img-fluid cart-item-image" src="${product.images[0]}" alt="${esc(product.name)}"></a></div>
       <div class="cart-item-info-container">
         <div class="cart-item-product-info">
           <div class="cart-item-name-container">
-            <a class="cart-item-name" href="#/producto/${product.slug}">${esc(product.name)}</a>
+            <a class="cart-item-name" href="${BASE}#/producto/${product.slug}">${esc(product.name)}</a>
             ${variant ? `<span class="cart-item-variant">(${esc(variant)})</span>` : ""}
           </div>
           <div class="cart-item-delete"><button type="button" class="btn btn-link cart-item-delete-button" data-sim-remove>${esc(t("general.remove", "Borrar"))}</button></div>
@@ -274,7 +277,7 @@ function cartSummary(page = false) {
       <div class="cart-totals-row cart-totals-total"><span>${esc(t("general.total", "Total"))}:</span><span>${money(cartTotal())}</span></div>
       <p class="cart-totals-installments sim-muted">${store.installments} cuotas sin interés de ${money(Math.round(cartTotal() / store.installments))}</p>
       <button type="button" class="btn btn-primary btn-big btn-block" data-sim-checkout>${esc(t("cart.start_checkout", "Iniciar compra"))}</button>
-      <div class="cart-continue-shopping"><a class="${page ? "" : "js-modal-close-private"} btn btn-link" ${page ? 'href="#/tienda"' : 'href="#/tienda" data-target="#modal-cart"'}>${esc(t("cart.view_more_products", "Ver más productos"))}</a></div>
+      <div class="cart-continue-shopping"><a class="${page ? "" : "js-modal-close-private"} btn btn-link" ${page ? `href="${BASE}#/tienda"` : `href="${BASE}#/tienda" data-target="#modal-cart"`}>${esc(t("cart.view_more_products", "Ver más productos"))}</a></div>
     </div>`;
 }
 
@@ -285,10 +288,10 @@ function renderCart() {
   if (panel) {
     panel.innerHTML = `<div class="js-ajax-cart-list">${cartLinesMarkup()}</div>
       <div class="js-empty-ajax-cart" ${count ? 'style="display:none;"' : ""}><div class="alert alert-info">${esc(t("cart.empty", "Tu carrito está vacío"))}</div>
-        <a class="btn btn-secondary btn-block js-modal-close-private" data-target="#modal-cart" href="#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a></div>
+        <a class="btn btn-secondary btn-block js-modal-close-private" data-target="#modal-cart" href="${BASE}#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a></div>
       <div class="cart-row">${cartSummary()}</div>`;
   }
-  if (currentRoute().name === "cart") renderRoute();
+  if (HAS_VIEW && currentRoute().name === "cart") renderRoute();
 }
 
 /* ---------- Add to cart notification (snippets/notification.tpl) ---------- */
@@ -335,13 +338,13 @@ function productLabels(product) {
 
 function productItem(product) {
   return `<div class="js-product-item-private product-item">
-      <a class="product-item-link sim-product-image" href="#/producto/${product.slug}">
+      <a class="product-item-link sim-product-image" href="${BASE}#/producto/${product.slug}">
         <img src="${product.images[0]}" alt="${esc(product.name)}" loading="lazy">
         ${product.images[1] ? `<img class="sim-product-image-hover" src="${product.images[1]}" alt="" loading="lazy">` : ""}
         ${productLabels(product)}
       </a>
       <div class="product-item-information">
-        <a class="product-item-link" href="#/producto/${product.slug}"><div class="js-item-name product-item-name">${esc(product.name)}</div></a>
+        <a class="product-item-link" href="${BASE}#/producto/${product.slug}"><div class="js-item-name product-item-name">${esc(product.name)}</div></a>
         <div class="product-item-price-container">
           ${product.comparePrice ? `<span class="product-item-price-compare">${money(product.comparePrice)}</span>` : ""}
           <span class="js-price-display product-item-price">${money(product.price)}</span>
@@ -371,7 +374,7 @@ function categoryPage({ slug, query }) {
     return container(pageHeader(t("search.search_results", "Resultados de búsqueda")) + heading + productGrid(list.length ? list : products.slice(0, 4)));
   }
 
-  const breadcrumbs = `<nav class="breadcrumbs sim-breadcrumbs"><a href="#/tienda">Inicio</a> / ${category ? `<a href="#/tienda">Tienda</a> / <span>${esc(category.name)}</span>` : "<span>Tienda</span>"}</nav>`;
+  const breadcrumbs = `<nav class="breadcrumbs sim-breadcrumbs"><a href="${BASE}#/tienda">Inicio</a> / ${category ? `<a href="${BASE}#/tienda">Tienda</a> / <span>${esc(category.name)}</span>` : "<span>Tienda</span>"}</nav>`;
   const controls = `<div class="filters-controls-content sim-controls">
       <button type="button" class="btn btn-secondary btn-small" data-sim-open="#modal-filters">${icon("filter")} Filtrar</button>
       <span class="sim-muted">${list.length} ${esc(t("general.products_label", "productos"))}</span>
@@ -381,7 +384,7 @@ function categoryPage({ slug, query }) {
     </div>`;
   const filters = modal({ id: "modal-filters", title: "Filtrar", from: "left", widthDesktop: "small",
     body: `<p class="form-label">${esc(t("filters.categories_title", "Categorías"))}</p>
-      <ul class="list-unstyled sim-filter-list"><li><a href="#/tienda">Todas</a></li>${store.categories.map((c) => `<li><a href="#/categoria/${c.slug}" ${c.slug === slug ? 'class="sim-strong"' : ""}>${esc(c.name)}</a></li>`).join("")}</ul>
+      <ul class="list-unstyled sim-filter-list"><li><a href="${BASE}#/tienda">Todas</a></li>${store.categories.map((c) => `<li><a href="${BASE}#/categoria/${c.slug}" ${c.slug === slug ? 'class="sim-strong"' : ""}>${esc(c.name)}</a></li>`).join("")}</ul>
       <p class="form-label">${esc(t("filters.price.label", "Precio"))}</p>
       <div class="sim-inline-form"><input class="form-control" placeholder="${esc(t("filters.price.from", "Desde"))}"><input class="form-control" placeholder="${esc(t("filters.price.to", "Hasta"))}"><button type="button" class="btn btn-secondary">${esc(t("filters.price.apply", "Aplicar"))}</button></div>
       <p class="sim-note">Simulación: el filtro de precio no se aplica.</p>` });
@@ -403,7 +406,7 @@ function productPage({ slug }) {
       <div class="sim-variant-buttons">${values.map((value, i) => `<button type="button" class="js-variant-button btn btn-variant ${i === 0 ? "selected" : ""}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content">${esc(value)}</span></button>`).join("")}</div>
     </div>`).join("");
   return container(`
-    <nav class="breadcrumbs sim-breadcrumbs"><a href="#/tienda">Inicio</a> / <a href="#/categoria/${category.slug}">${esc(category.name)}</a> / <span>${esc(product.name)}</span></nav>
+    <nav class="breadcrumbs sim-breadcrumbs"><a href="${BASE}#/tienda">Inicio</a> / <a href="${BASE}#/categoria/${category.slug}">${esc(category.name)}</a> / <span>${esc(product.name)}</span></nav>
     <div class="js-product-detail js-product-container sim-product" data-sim-product="${product.slug}">
       <div class="js-product-images sim-gallery">${product.images.map((src) => `<img src="${src}" alt="${esc(product.name)}">`).join("")}</div>
       <div class="js-product-info sim-product-info">
@@ -444,7 +447,7 @@ function cartPage() {
   return container(pageHeader(t("cart.title", "Carrito de compras")) + (count
     ? `<div class="cart-page-content sim-cart-page"><div class="cart-page-products"><div class="js-ajax-cart-list cart-page-items-list">${cartLinesMarkup(true)}</div></div>
        <div class="cart-page-summary">${freeShippingBar()}${cartSummary(true)}</div></div>`
-    : `<div class="alert alert-info">${esc(t("cart.empty", "Tu carrito está vacío"))}</div><a class="btn btn-primary" href="#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a>`));
+    : `<div class="alert alert-info">${esc(t("cart.empty", "Tu carrito está vacío"))}</div><a class="btn btn-primary" href="${BASE}#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a>`));
 }
 
 const field = (id, label, type = "text", placeholder = "", required = true) => `<div class="form-group"><label class="form-label" for="${id}">${esc(label)}</label>${type === "textarea"
@@ -467,12 +470,12 @@ const contactPage = () => formPage(t("general.contact", "Contacto"),
 const loginPage = () => formPage(t("general.login_page", "Iniciar sesión"),
   field("l-email", t("account.email", "Email"), "email") + field("l-pass", "Contraseña", "password"),
   t("general.login", "Entrá"), "Simulación: en la tienda real te lleva a Mi cuenta.",
-  `<p class="sim-links"><a class="btn-link" href="#/cuenta/recuperar">${esc(t("general.recover_password", "Recuperar contraseña"))}</a> · <a class="btn-link" href="#/cuenta/registro">${esc(t("general.create_account", "Crear cuenta"))}</a></p>`);
+  `<p class="sim-links"><a class="btn-link" href="${BASE}#/cuenta/recuperar">${esc(t("general.recover_password", "Recuperar contraseña"))}</a> · <a class="btn-link" href="${BASE}#/cuenta/registro">${esc(t("general.create_account", "Crear cuenta"))}</a></p>`);
 
 const registerPage = () => formPage(t("general.create_account", "Crear cuenta"),
   field("r-name", t("account.name", "Nombre")) + field("r-email", t("account.email", "Email"), "email") + field("r-phone", t("account.phone", "Teléfono"), "tel", "", false) + field("r-pass", "Contraseña", "password") + field("r-pass2", "Confirmar contraseña", "password"),
   t("general.create_account", "Crear cuenta"), "Simulación: la cuenta se crearía y llegaría un email de activación.",
-  `<p class="sim-links"><a class="btn-link" href="#/cuenta/login">¿Ya tenés cuenta? ${esc(t("general.login", "Entrá"))}</a></p>`);
+  `<p class="sim-links"><a class="btn-link" href="${BASE}#/cuenta/login">¿Ya tenés cuenta? ${esc(t("general.login", "Entrá"))}</a></p>`);
 
 const resetPage = () => formPage(t("general.recover_password", "Recuperar contraseña"), field("x-email", t("account.email", "Email"), "email"),
   t("general.send", "Enviar"), "Simulación: llegaría un email para cambiar la contraseña.");
@@ -492,7 +495,7 @@ function contentPage({ slug }) {
 
 function notFoundPage() {
   return container(`<div class="error-page-container sim-404"><p class="error-page-subtitle">404</p><h1 class="error-page-title">${esc(t("general.page_not_found", "La página que estás buscando no existe."))}</h1>
-    <a class="btn btn-primary" href="#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a></div>
+    <a class="btn btn-primary" href="${BASE}#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a></div>
     <h2 class="products-section-title sim-h3">Productos destacados</h2>${productGrid(products.slice(0, 4))}`);
 }
 
@@ -554,6 +557,7 @@ function renderMap(active) {
     ["cart", "#/carrito", "Página de carrito"], ["contact", "#/contacto", "Contacto"], ["login", "#/cuenta/login", "Login"], ["register", "#/cuenta/registro", "Registro"],
     ["page", "#/pagina/terminos", "Página de contenido"], ["404", "#/no-existe", "404"]];
   const map = $("[data-sim-map]");
+  if (!map) return;
   const open = map.dataset.open === "true";
   map.innerHTML = `<button type="button" class="sim-map__toggle" data-sim-map-toggle>${open ? "Cerrar" : "Mapa de la simulación"}</button>
     ${open ? `<div class="sim-map__body">
@@ -653,7 +657,7 @@ function initEvents() {
     closeSearch();
     $$(".modal.modal-visible").forEach((m) => closeModal(`#${m.id}`));
   });
-  window.addEventListener("hashchange", () => { renderRoute(); scrollTo(0, 0); });
+  if (HAS_VIEW) window.addEventListener("hashchange", () => { renderRoute(); scrollTo(0, 0); });
 }
 
 await loadThemeFiles();
@@ -661,7 +665,7 @@ renderModals();
 initSearch();
 initEvents();
 renderCart();
-renderRoute();
+if (HAS_VIEW) renderRoute();
 
 // ?open=cart | menu | search | filters opens that panel on load (handy for screenshots and sharing a state).
 const openOnLoad = new URLSearchParams(location.search).get("open");

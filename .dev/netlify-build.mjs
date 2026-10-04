@@ -16,10 +16,14 @@ rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, "preview"), { recursive: true });
 
 cpSync(join(root, "static"), join(dist, "static"), { recursive: true, filter: (path) => !skip(path) });
-for (const entry of ["preview.html", "storefront.html", "storefront-mock.html", "storefront.css", "src", "data"]) {
+for (const entry of ["preview.html", "storefront.html", "storefront-mock.html", "storefront.css", "ipanema.html", "ipanema-sim.css", "src", "data"]) {
   const from = join(dev, entry);
   if (existsSync(from)) cpSync(from, join(dist, "preview", entry), { recursive: true, filter: (path) => !skip(path) });
 }
+// The header (src/ipanema-sim.js) reads the theme's settings, copy and icon sprite.
+cpSync(join(root, "config", "settings_data.json"), join(dist, "config", "settings_data.json"));
+cpSync(join(root, "translations", "es_AR.json"), join(dist, "translations", "es_AR.json"));
+cpSync(join(root, "layouts", "resources", "icons-sprite.tpl"), join(dist, "layouts", "resources", "icons-sprite.tpl"));
 // /preview/ opens the experience directly.
 cpSync(join(dev, "preview.html"), join(dist, "preview", "index.html"));
 // Fallback for hosts without netlify.toml redirects.

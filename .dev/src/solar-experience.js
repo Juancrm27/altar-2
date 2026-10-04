@@ -4317,7 +4317,7 @@ function playIntro() {
   introAnimate($(".altar-solar__fortune-cta-icon"), fade(200, 1440));
   // Menu and actions type in left to right, each arrow icon just ahead of its label.
   document.querySelectorAll(".altar-nav__menu a").forEach((link, index) => splitChars(link, { base: 1000 + index * 120, stagger: 35 }));
-  [".altar-nav__cart", ".altar-nav__search"].forEach((selector, index) => {
+  [".altar-nav__cart", ".altar-nav__search", ".altar-nav__account", ".altar-nav__menu-toggle"].forEach((selector, index) => {
     const link = $(selector);
     introAnimate(link?.querySelector(".altar-nav__action-icon"), fade(200, 1400 + index * 150));
     link?.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 1450 + index * 150 + partIndex * 140, stagger: 35 }));
