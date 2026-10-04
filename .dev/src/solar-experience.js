@@ -647,6 +647,12 @@ const DEFAULT_LIGHTING = {
   lightingPresetVersion: LIGHTING_PRESET_VERSION,
 };
 
+// Phones start from a few values of their own (tuned in the lighting panel at 390 px); everything else is shared.
+const COMPACT_LIGHTING = {
+  manifestoY: 120,
+};
+const lightingDefaults = () => ({ ...DEFAULT_LIGHTING, ...(COMPACT_LAYOUT.matches ? COMPACT_LIGHTING : {}) });
+
 const PLANET_LAYOUT = {
   sun:      { position: [-2.3, -0.7, -1.5], radius: 1.15 },
   mercury:  { position: [-5.4,  1.9,  0.3], radius: 0.16, orbit: 2.3 },
@@ -1486,7 +1492,7 @@ class SolarExperience {
         });
         this.stonesGroup.add(scene, ...contacts);
         this.stonesReady = true;
-        this.applyLightingSettings(this.effectSettings ?? { ...DEFAULT_LIGHTING });
+        this.applyLightingSettings(this.effectSettings ?? lightingDefaults());
         this.root.classList.add("is-stones-ready");
       },
       undefined,
@@ -1571,14 +1577,14 @@ class SolarExperience {
     this.persistLighting = readStorage(LIGHTING_PERSIST_KEY) === "1";
     if (!this.persistLighting) {
       writeStorage(LIGHTING_STORAGE_KEY, null);
-      return { ...DEFAULT_LIGHTING };
+      return lightingDefaults();
     }
     try {
       const stored = JSON.parse(readStorage(LIGHTING_STORAGE_KEY)) || {};
-      if (stored.lightingPresetVersion !== LIGHTING_PRESET_VERSION) return { ...DEFAULT_LIGHTING };
-      return { ...DEFAULT_LIGHTING, ...stored };
+      if (stored.lightingPresetVersion !== LIGHTING_PRESET_VERSION) return lightingDefaults();
+      return { ...lightingDefaults(), ...stored };
     } catch {
-      return { ...DEFAULT_LIGHTING };
+      return lightingDefaults();
     }
   }
 
@@ -2218,7 +2224,7 @@ ${stonePositionsMarkup(4)}
       if (!this.shootingStars.length) this.spawnShootingStar(settings);
     });
     panel.querySelector("[data-lighting-reset]").addEventListener("click", () => {
-      Object.assign(settings, DEFAULT_LIGHTING);
+      Object.assign(settings, lightingDefaults());
       this.saveLightingSettings(settings);
       panel.querySelectorAll("[data-lighting]").forEach((input) => {
         setInputValue(input, settings[input.dataset.lighting]);

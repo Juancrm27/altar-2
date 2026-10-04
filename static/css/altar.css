@@ -313,6 +313,8 @@ a.altar-collection__photo { display: block; color: inherit; }
   .altar-solar__campaign { right: auto; left: calc(50vw - 106px * var(--campaign-scale, .99)); top: calc(50svh - 27px - 142.878px * var(--campaign-scale, .99)); translate: var(--drag-x, 0px) var(--drag-y, 0px); transform: scale(var(--campaign-scale, .99)); transform-origin: left top; transition: translate 900ms cubic-bezier(.2, .7, .2, 1), opacity 300ms ease, visibility 0s linear 0s; }
   .altar-solar__fortune-cards { --m: .7076; top: calc(100svh - 45px - 358px); transform: scale(var(--m)); transform-origin: left bottom; }
   .altar-solar__fortune-cta-text, .altar-solar__fortune-cta-frame { display: none; }
+  /* Same as COMPACT_LIGHTING.manifestoY in solar-experience.js, until the script applies its settings. */
+  .altar-solar__manifesto { top: calc(50% + var(--manifesto-y, 120px)); }
   /* Only the channel switcher stays, on the right. */
   .altar-solar__bottom-controls { grid-template-columns: minmax(0, 1fr) auto; transition: opacity 300ms ease, visibility 0s linear 0s; }
   .altar-solar__channel-controls { grid-column: 2; width: auto; justify-self: end; }
