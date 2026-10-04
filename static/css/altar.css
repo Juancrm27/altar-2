@@ -443,17 +443,18 @@ body:not(.template-home) .altar-nav img { filter: brightness(0) opacity(.94); }
   .altar-nav .altar-nav__menu-toggle { display: block; }
   .altar-nav__panel { flex-direction: column; gap: 16px; padding: 20px 12px; }
   .altar-nav.is-menu-open .altar-nav__panel { display: flex; }
-  .altar-nav__panel-menu, .altar-nav__panel-utilities { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .altar-nav__panel-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+  .altar-nav__panel-utilities { display: flex; align-items: flex-start; justify-content: space-between; }
   .altar-nav__panel-menu a { font-size: 12px; line-height: 24px; text-transform: uppercase; }
-  .altar-nav__panel-rule { width: 100%; height: 6.338px; border: .423px dashed currentColor; border-top: 0; }
+  .altar-nav__panel-rule { width: 100%; height: 6.338px; border-bottom: .423px dashed currentColor; }
   .altar-nav .altar-nav__panel-item { display: flex; gap: 3px; align-items: center; font-size: 10px; line-height: 24px; text-transform: uppercase; white-space: nowrap; }
-  /* Over the 3D sky the open panel needs its own ground to stay legible. */
-  .template-home .altar-nav.is-menu-open { background: var(--altar-space, #2d2838); }
+  .altar-nav.is-menu-open { border-radius: 0 0 6px 6px; background: rgba(255, 243, 169, .08); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 }
 @media (max-width: 749px) {
   .altar-nav { padding: 12px 8px; }
   .altar-nav__content { padding: 0 8px; }
   .altar-nav__panel { padding: 20px 8px; }
+  .altar-nav__panel-utilities { flex-direction: column; align-items: flex-end; gap: 12px; }
 }
 /* Below 768px store.js opens the search modal instead of the floating panel. */
 @media (max-width: 767px) { .altar-nav__search-panel.search-floating-container { display: none; } }
