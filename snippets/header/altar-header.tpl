@@ -130,6 +130,7 @@
 			</button>
 		</div>
 	</div>
+	<div class="altar-nav__menu-rule" aria-hidden="true"></div>
 	<div class="altar-nav__panel" id="altar-nav-panel-{{ section.id }}" data-altar-menu-panel hidden>
 		<nav class="altar-nav__panel-menu" aria-label="{{ 'Navegación principal' | translate }}">
 			{% for item in navigation %}
@@ -141,15 +142,15 @@
 			{% if altar_show_search %}
 				<button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search" data-modal-url="#modal-search">{{ altar_action_icon }}<span>{{ altar_search_label }}</span></button>
 			{% endif %}
-			{% if altar_show_account %}
-				<a class="altar-nav__panel-item" href="{{ customer ? store.customer_home_url : store.customer_login_url }}">{{ altar_action_icon }}<span>{{ customer ? altar_account_label : altar_login_label }}</span></a>
-			{% endif %}
 			{% if altar_show_cart %}
 				{% if use_ajax_cart %}
 					<button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart">{{ altar_action_icon }}<span>{{ altar_cart_label }}</span><span class="altar-nav__count">{{ cart.items_count | default(0) }}</span></button>
 				{% else %}
 					<a class="altar-nav__panel-item" href="{{ store.cart_url }}">{{ altar_action_icon }}<span>{{ altar_cart_label }}</span><span class="altar-nav__count">{{ cart.items_count | default(0) }}</span></a>
 				{% endif %}
+			{% endif %}
+			{% if altar_show_account %}
+				<a class="altar-nav__panel-item" href="{{ customer ? store.customer_home_url : store.customer_login_url }}">{{ altar_action_icon }}<span>{{ customer ? altar_account_label : altar_login_label }}</span></a>
 			{% endif %}
 		</div>
 	</div>
