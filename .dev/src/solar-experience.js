@@ -4317,11 +4317,15 @@ function playIntro() {
   introAnimate($(".altar-solar__fortune-cta-icon"), fade(200, 1440));
   // Menu and actions type in left to right, each arrow icon just ahead of its label.
   document.querySelectorAll(".altar-nav__menu a").forEach((link, index) => splitChars(link, { base: 1000 + index * 120, stagger: 35 }));
-  [".altar-nav__cart", ".altar-nav__search", ".altar-nav__account", ".altar-nav__menu-toggle"].forEach((selector, index) => {
-    const link = $(selector);
-    introAnimate(link?.querySelector(".altar-nav__action-icon"), fade(200, 1400 + index * 150));
-    link?.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 1450 + index * 150 + partIndex * 140, stagger: 35 }));
+  // Only the actions on screen take a turn. On tablet / mobile the bar shows just the brand and Menu, so Menu types in
+  // right after the wordmark instead of waiting behind the hidden Cart, Search and Login.
+  const isShown = (element) => element && getComputedStyle(element).display !== "none" && element.getClientRects().length > 0;
+  [".altar-nav__cart", ".altar-nav__search", ".altar-nav__account"].map((selector) => $(selector)).filter(isShown).forEach((link, index) => {
+    introAnimate(link.querySelector(".altar-nav__action-icon"), fade(200, 1400 + index * 150));
+    link.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 1450 + index * 150 + partIndex * 140, stagger: 35 }));
   });
+  const menuToggle = $(".altar-nav__menu-toggle");
+  if (isShown(menuToggle)) menuToggle.querySelectorAll(":scope > span").forEach((part) => splitChars(part, { base: 600, stagger: 35 }));
   document.querySelectorAll(".altar-solar__manifesto-ids > span").forEach((part, index) => splitChars(part, { base: 2200 + index * 300, stagger: 35 }));
 
   // 1.7–3 s · controls load in; the ticker is unmasked left to right.
