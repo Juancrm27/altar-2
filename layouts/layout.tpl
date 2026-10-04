@@ -102,10 +102,8 @@
       {{ page_template_content }}
     </main>
 
-    {# Footer layout template - the Altar home closes with its own section, so no footer there #}
-    {% if template != 'home' %}
-      {% layout_template 'footer' %}
-    {% endif %}
+    {# Native Ipanema footer #}
+    {% layout_template 'footer' %}
 
     {% if template != 'password' %}
       {# Quick shop modal #}

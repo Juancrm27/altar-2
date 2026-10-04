@@ -2893,9 +2893,9 @@ ${stonePositionsMarkup(4)}
   // Desktop-only badge that trails the pointer over interactive pieces ([data-cursor-label]),
   // naming what a click does. Follows 1:1 and may spill outside the hovered element.
   setupCursorBadge() {
-    const targets = this.root.querySelectorAll("[data-cursor-label]");
+    const targets = document.querySelectorAll("[data-cursor-label]");
     // A click on a campaign card jumps to the section it announces; drags never reach here.
-    this.root.querySelectorAll("[data-scroll-to]").forEach((element) => {
+    document.querySelectorAll("[data-scroll-to]").forEach((element) => {
       element.addEventListener("click", () => {
         document.querySelector(element.dataset.scrollTo)?.scrollIntoView({ behavior: REDUCED_MOTION.matches ? "auto" : "smooth", block: "start" });
       });
@@ -2927,7 +2927,7 @@ ${stonePositionsMarkup(4)}
       frame = 0;
       if (stale || !desktop.matches || pointer.x === null) return hide();
       const target = document.elementFromPoint(pointer.x, pointer.y)?.closest("[data-cursor-label]");
-      if (!target || !this.root.contains(target) || target.closest(".is-dragging")) return hide();
+      if (!target || !target.closest(".altar-solar, .altar-page-section") || target.closest(".is-dragging")) return hide();
       const text = labelFor(target);
       if (label.textContent !== text) label.textContent = text;
       badge.classList.toggle("is-back", isBack(target));

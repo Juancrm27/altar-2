@@ -5,22 +5,24 @@
      --col resolves against the width of the element's container, so use it on children of a full-width row. */
   --grid-margin: calc(12 * var(--u)); --grid-gutter: calc(20 * var(--u)); --col: calc((100% - 7 * var(--grid-gutter)) / 8); }
 @media (min-width: 1441px) { :root { --u: calc(100vw / 1440); } }
-:where(.altar-nav, .altar-footer, .altar-solar), :where(.altar-nav, .altar-footer, .altar-solar) * { box-sizing: border-box; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section), :where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) * { box-sizing: border-box; }
 /* Ipanema styles bare elements site-wide (body 14px, h1–h6, p, a, button). Inside Altar's own blocks put the
    browser defaults back, which is what the Altar design was built on; Altar's class rules still apply on top. */
-:where(.altar-nav, .altar-footer, .altar-solar) { font-size: medium; }
-:where(.altar-nav, .altar-footer, .altar-solar) :is(h1, h2, h3, h4, h5, h6) { margin: revert; font-family: inherit; font-size: revert; font-weight: revert; line-height: revert; }
-:where(.altar-nav, .altar-footer, .altar-solar) p { margin: revert; font-size: revert; line-height: revert; }
-:where(.altar-nav, .altar-footer, .altar-solar) a { text-decoration: revert; transition: revert; }
-:where(.altar-nav, .altar-footer, .altar-solar) a:is(:hover, :focus) { opacity: revert; }
-:where(.altar-nav, .altar-footer, .altar-solar) button { color: inherit; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) { font-size: medium; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) :is(h1, h2, h3, h4, h5, h6) { margin: revert; font-family: inherit; font-size: revert; font-weight: revert; line-height: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) p { margin: revert; font-size: revert; line-height: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) a { text-decoration: revert; transition: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) a:is(:hover, :focus) { opacity: revert; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) button { color: inherit; }
 html:has(body.template-home) { background: var(--altar-space, #2d2838); scroll-behavior: smooth; }
 body.template-home { margin: 0; color: var(--altar-text, #f7f2ec); background: var(--altar-space, #2d2838); font-family: Arial, Helvetica, sans-serif; }
-:where(.altar-nav, .altar-footer, .altar-solar) img { display: block; max-width: 100%; }
-:where(.altar-nav, .altar-footer, .altar-solar) a { color: inherit; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) img { display: block; max-width: 100%; }
+:where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) a { color: inherit; }
 .template-home .main-content { min-height: 100svh; }
 .visually-hidden { position: absolute !important; width: calc(1 * var(--u)); height: calc(1 * var(--u)); padding: 0; margin: calc(-1 * var(--u)); overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .altar-solar { position: relative; min-height: 300svh; overflow: clip; background: var(--space-color, #2d2838); isolation: isolate; }
+.altar-page-section { position: relative; isolation: isolate; }
+.section-altar-campaign, .section-altar-manifesto { position: relative; overflow: visible; background: #601e2a; }
 .altar-solar__stage { position: relative; width: 100%; height: 200svh; min-height: calc(1080 * var(--u)); margin-bottom: min(-100svh, calc(-540 * var(--u))); overflow: clip; background: transparent; }
 .altar-solar__sky { position: absolute; inset: 0; z-index: 0; opacity: 0; pointer-events: none; transition: opacity 700ms ease; }
 .altar-solar.is-ready .altar-solar__sky, .altar-solar.is-fallback .altar-solar__sky { opacity: 1; }

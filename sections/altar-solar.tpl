@@ -228,63 +228,6 @@
       </div>
     </div>
   </div>
-  <section class="altar-solar__ground altar-collection" id="coleccion" aria-label="Colección ELEMENTAL">
-    <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
-      <filter id="altar-grain-collection-{{ section.id }}" x="0" y="0" width="100%" height="100%">
-        <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
-        <feColorMatrix type="saturate" values="0"></feColorMatrix>
-      </filter>
-      <rect width="100%" height="100%" filter="url(#altar-grain-collection-{{ section.id }})"></rect>
-    </svg>
-    <div class="altar-collection__heading">
-      <div class="altar-collection__identity">
-        <div class="altar-collection__meta"><span>{{ solar_settings.collection_season | default('SS 27') }}</span><span>{{ solar_settings.collection_line | default('101 couture') }}</span></div>
-        <h2>{{ solar_settings.collection_title | default('ELEMENTAL') }}</h2>
-      </div>
-      <div class="altar-collection__note">
-        <span>{{ solar_settings.manifesto_note_label | default('As bordado') }}</span>
-        <p>{{ solar_settings.manifesto_note | default('Hecho despacio, a mano y con intención. Para quien sabe mirar más allá.') }}</p>
-      </div>
-    </div>
-    <div class="altar-collection__gallery">
-      <a class="altar-collection__photo" href="{{ solar_settings.collection_link_1 | default(store.products_url) }}" data-cursor-label="{{ 'Ver producto' | translate }}"><img src="{{ 'images/altar-collection-1.jpg' | static_url }}" alt="Modelo con vestido satinado en un escenario floral" width="339" height="472" loading="lazy"></a>
-      <a class="altar-collection__photo" href="{{ solar_settings.collection_link_2 | default(store.products_url) }}" data-cursor-label="{{ 'Ver producto' | translate }}"><img src="{{ 'images/altar-collection-2.jpg' | static_url }}" alt="Modelo con vestido negro transparente" width="339" height="472" loading="lazy"></a>
-      <a class="altar-collection__photo" href="{{ solar_settings.collection_link_3 | default(store.products_url) }}" data-cursor-label="{{ 'Ver producto' | translate }}"><img src="{{ 'images/altar-collection-3.jpg' | static_url }}" alt="Modelo con vestido escultural blanco" width="339" height="472" loading="lazy"></a>
-      <a class="altar-collection__photo" href="{{ solar_settings.collection_link_4 | default(store.products_url) }}" data-cursor-label="{{ 'Ver producto' | translate }}"><img src="{{ 'images/altar-collection-4.jpg' | static_url }}" alt="Modelo con guantes negros y vestido drapeado" width="339" height="472" loading="lazy"></a>
-    </div>
-    <div class="altar-collection__materia">
-      <span>{{ solar_settings.collection_materia_label | default('La materia') }}</span>
-      <p>{{ solar_settings.collection_materia | default('Cada material guarda una forma posible. El cuerpo termina de revelarla.') }}</p>
-    </div>
-  </section>
-  <section class="altar-closing" id="about" aria-label="Manifiesto de Altar">
-    <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
-      <filter id="altar-grain-closing-{{ section.id }}" x="0" y="0" width="100%" height="100%">
-        <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
-        <feColorMatrix type="saturate" values="0"></feColorMatrix>
-      </filter>
-      <rect width="100%" height="100%" filter="url(#altar-grain-closing-{{ section.id }})"></rect>
-    </svg>
-    <img class="altar-closing__symbol" src="{{ 'images/altar-symbol-large.svg' | static_url }}" alt="" width="698" height="673" loading="lazy">
-    <div class="altar-closing__content">
-      <div class="altar-closing__note">
-        <span>{{ solar_settings.closing_note_label | default('El tejido') }}</span>
-        <p>{{ solar_settings.closing_note | default('Formas únicas que cuentan historias, entrelazadas con paciencia y cariño.') }}</p>
-      </div>
-      <div class="altar-closing__identity">
-        <div class="altar-closing__head">
-          <div class="altar-collection__meta"><span>{{ solar_settings.collection_season | default('SS 27') }}</span><span>{{ solar_settings.collection_line | default('101 couture') }}</span></div>
-          <p class="altar-closing__wordmark"><span>altar</span><sup>©</sup></p>
-        </div>
-        <div class="altar-closing__manifesto">
-          <p class="altar-closing__lead">{{ solar_settings.closing_lead | default('En 2026,  Manifiesto') }}<span class="altar-closing__tag">{{ solar_settings.closing_place | default('Argentina') }}<sup>01</sup></span></p>
-          <p class="altar-closing__body">{{ solar_settings.closing_body | default('Me inspiran los altares paganos y populares: un santo local, una piedra del río y una diosa india. Los cuatro elementos representados. Un registro físico del universo interior y los arquetipos que resuenan. La libertad de armar un rincón y verlo crecer. Vincularse con lo divino sin culpa, miedo o manual heredado. Decido cómo juego las cartas que me tocan. El cielo y el infierno se sintonizan en lo cotidiano. Diseño sistemas para ofrendar más de lo que extraigo. Bailo entre el marco moral y lo salvaje. Practico rituales que ordenan el misterio de lo oculto. Una búsqueda humana, sensible, comercial e imperfecta. No pretende ser sagrada. Busca los puntos donde lo divino y lo mundano se encuentran. Escenas donde todos los que participan ganan. De esta curiosidad nace altar. Objetos que funcionan como amuletos para anclar quién soy, dónde habito y quién quiero ser. Piezas que se llevan en el cuerpo y evolucionan en cada colección.') }}</p>
-          <p class="altar-closing__signature"><span class="altar-closing__tag">{{ solar_settings.closing_author | default('Sofía Guevara') }}<sup>02</sup></span></p>
-          <p class="altar-closing__body">{{ solar_settings.closing_line | default('Un archivo de objetos para mundos interiores.') }}</p>
-        </div>
-      </div>
-    </div>
-  </section>
   <div class="altar-solar__effect" data-solar-effect aria-hidden="true">
     <svg class="altar-solar__grain" width="100%" height="100%" preserveAspectRatio="none">
       <filter id="altar-grain-{{ section.id }}" x="-20%" y="-20%" width="140%" height="140%">
@@ -316,24 +259,6 @@
     { "type": "setting", "setting_type": "text", "id": "channel_label", "label": "Nombre del canal", "default": "CHANNEL 01" },
     { "type": "setting", "setting_type": "text", "id": "player_label", "label": "Texto del reproductor", "default": "[  ALBA / AIRE ]  6:00 AM" },
     { "type": "setting", "setting_type": "text", "id": "spotify_url", "label": "Link de Spotify (tema, playlist o álbum)", "default": "https://open.spotify.com/intl-es/track/3wXY1YNt7JbhgdYEqYS7bk?si=dbd7cd56ba424345" },
-    { "type": "header", "content": "Colección (sección 3)" },
-    { "type": "setting", "setting_type": "text", "id": "collection_season", "label": "Temporada", "default": "SS 27" },
-    { "type": "setting", "setting_type": "text", "id": "collection_line", "label": "Línea", "default": "101 couture" },
-    { "type": "setting", "setting_type": "text", "id": "collection_title", "label": "Título", "default": "ELEMENTAL" },
-    { "type": "setting", "setting_type": "text", "id": "collection_link_1", "label": "Link foto 1" },
-    { "type": "setting", "setting_type": "text", "id": "collection_link_2", "label": "Link foto 2" },
-    { "type": "setting", "setting_type": "text", "id": "collection_link_3", "label": "Link foto 3" },
-    { "type": "setting", "setting_type": "text", "id": "collection_link_4", "label": "Link foto 4" },
-    { "type": "setting", "setting_type": "text", "id": "collection_materia_label", "label": "Etiqueta bajo la galería", "default": "La materia" },
-    { "type": "setting", "setting_type": "textarea", "id": "collection_materia", "label": "Texto bajo la galería", "default": "Cada material guarda una forma posible. El cuerpo termina de revelarla." },
-    { "type": "header", "content": "Cierre (sección 4)" },
-    { "type": "setting", "setting_type": "text", "id": "closing_note_label", "label": "Etiqueta", "default": "El tejido" },
-    { "type": "setting", "setting_type": "textarea", "id": "closing_note", "label": "Nota", "default": "Formas únicas que cuentan historias, entrelazadas con paciencia y cariño." },
-    { "type": "setting", "setting_type": "text", "id": "closing_lead", "label": "Encabezado del manifiesto", "default": "En 2026,  Manifiesto" },
-    { "type": "setting", "setting_type": "text", "id": "closing_place", "label": "Lugar", "default": "Argentina" },
-    { "type": "setting", "setting_type": "textarea", "id": "closing_body", "label": "Manifiesto", "default": "Me inspiran los altares paganos y populares: un santo local, una piedra del río y una diosa india. Los cuatro elementos representados. Un registro físico del universo interior y los arquetipos que resuenan. La libertad de armar un rincón y verlo crecer. Vincularse con lo divino sin culpa, miedo o manual heredado. Decido cómo juego las cartas que me tocan. El cielo y el infierno se sintonizan en lo cotidiano. Diseño sistemas para ofrendar más de lo que extraigo. Bailo entre el marco moral y lo salvaje. Practico rituales que ordenan el misterio de lo oculto. Una búsqueda humana, sensible, comercial e imperfecta. No pretende ser sagrada. Busca los puntos donde lo divino y lo mundano se encuentran. Escenas donde todos los que participan ganan. De esta curiosidad nace altar. Objetos que funcionan como amuletos para anclar quién soy, dónde habito y quién quiero ser. Piezas que se llevan en el cuerpo y evolucionan en cada colección." },
-    { "type": "setting", "setting_type": "text", "id": "closing_author", "label": "Firma", "default": "Sofía Guevara" },
-    { "type": "setting", "setting_type": "text", "id": "closing_line", "label": "Línea final", "default": "Un archivo de objetos para mundos interiores." },
     { "type": "header", "content": "Manifiesto" },
     { "type": "setting", "setting_type": "text", "id": "manifesto_code", "label": "Código", "default": "ELM. 01#" },
     { "type": "setting", "setting_type": "text", "id": "manifesto_collection", "label": "Colección", "default": "101 couture" },
@@ -347,7 +272,7 @@
     { "type": "setting", "setting_type": "color", "id": "space_color", "label": "Espacio", "default": "#2d2838" },
     { "type": "setting", "setting_type": "color", "id": "horizon_color", "label": "Degradado inferior", "default": "#ff9c71" },
     { "type": "setting", "setting_type": "color", "id": "sky_color", "label": "Reserva de color", "default": "#aebfc0" },
-    { "type": "setting", "setting_type": "color", "id": "ground_color", "label": "Sección 3 · Off white", "default": "#f4f0e8" }
+    { "type": "setting", "setting_type": "color", "id": "ground_color", "label": "Tierra 3D · Off white", "default": "#f4f0e8" }
   ],
   "presets": [
     {

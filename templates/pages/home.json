@@ -29,7 +29,53 @@
         }
       },
       "block_order": ["channel_1", "channel_2", "channel_3", "channel_4"]
+    },
+    "altar_campaign": {
+      "type": "altar-campaign",
+      "settings": {
+        "season": "SS 27",
+        "line": "101 couture",
+        "title": "ELEMENTAL",
+        "note_label": "As bordado",
+        "note": "Hecho despacio, a mano y con intención. Para quien sabe mirar más allá.",
+        "materia_label": "La materia",
+        "materia": "Cada material guarda una forma posible. El cuerpo termina de revelarla.",
+        "background_color": "#601e2a"
+      },
+      "blocks": {
+        "photo_1": {
+          "type": "altar-campaign-image",
+          "settings": { "alt_text": "Modelo con vestido satinado en un escenario floral" }
+        },
+        "photo_2": {
+          "type": "altar-campaign-image",
+          "settings": { "alt_text": "Modelo con vestido negro transparente" }
+        },
+        "photo_3": {
+          "type": "altar-campaign-image",
+          "settings": { "alt_text": "Modelo con vestido escultural blanco" }
+        },
+        "photo_4": {
+          "type": "altar-campaign-image",
+          "settings": { "alt_text": "Modelo con guantes negros y vestido drapeado" }
+        }
+      },
+      "block_order": ["photo_1", "photo_2", "photo_3", "photo_4"]
+    },
+    "altar_manifesto": {
+      "type": "altar-manifesto",
+      "settings": {
+        "season": "SS 27",
+        "line": "101 couture",
+        "note_label": "El tejido",
+        "note": "Formas únicas que cuentan historias, entrelazadas con paciencia y cariño.",
+        "lead": "En 2026,  Manifiesto",
+        "place": "Argentina",
+        "author": "Sofía Guevara",
+        "final_line": "Un archivo de objetos para mundos interiores.",
+        "background_color": "#601e2a"
+      }
     }
   },
-  "order": ["altar_solar"]
+  "order": ["altar_solar", "altar_campaign", "altar_manifesto"]
 }
