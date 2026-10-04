@@ -108,13 +108,13 @@
             <img
               {% if section.blocks | length %}
                 {% for block in section.blocks %}
-                  {% set floating_fallback = loop.index == 1 ? ('images/altar-elemental-fw27.png' | static_url) : (loop.index == 2 ? ('images/altar-channel-2.jpg' | static_url) : (loop.index == 3 ? ('images/altar-channel-3.jpg' | static_url) : ('images/altar-channel-4.jpg' | static_url))) %}
+                  {% set floating_fallback = loop.index == 1 ? ('images/altar-elemental-fw27.webp' | static_url) : (loop.index == 2 ? ('images/altar-channel-2.jpg' | static_url) : (loop.index == 3 ? ('images/altar-channel-3.jpg' | static_url) : ('images/altar-channel-4.jpg' | static_url))) %}
                   {% set floating_media = block.settings.floating_image and block.settings.floating_image starts with '@media-lib:' ? (block.settings.floating_image | resolve_media) : null %}
                   {% set floating_url = floating_media ? floating_media.sourceUrl : floating_fallback %}
                   {% if loop.first %}src="{{ floating_url }}"{% else %}data-channel-image-{{ loop.index }}="{{ floating_url }}"{% endif %}
                 {% endfor %}
               {% else %}
-                src="{{ 'images/altar-elemental-fw27.png' | static_url }}"
+                src="{{ 'images/altar-elemental-fw27.webp' | static_url }}"
                 data-channel-image-2="{{ 'images/altar-channel-2.jpg' | static_url }}"
                 data-channel-image-3="{{ 'images/altar-channel-3.jpg' | static_url }}"
                 data-channel-image-4="{{ 'images/altar-channel-4.jpg' | static_url }}"
