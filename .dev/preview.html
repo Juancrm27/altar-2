@@ -315,6 +315,13 @@
         </div>
       </div>
     </footer>
+    <script>
+      // Local only: store links open the Ipanema simulation. The Netlify review copy keeps the "Work in progress" page.
+      if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) {
+        document.querySelectorAll('a[href="./storefront.html"]').forEach(function (a) { a.href = "./ipanema.html#/tienda"; });
+        document.querySelector(".altar-nav__cart")?.setAttribute("href", "./ipanema.html?open=cart#/tienda");
+      }
+    </script>
     <script src="../static/js/solar-experience.js"></script>
   </body>
 </html>

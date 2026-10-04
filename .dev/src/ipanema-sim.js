@@ -579,6 +579,8 @@ function initEvents() {
     const closer = target.closest(".js-modal-close-private");
     if (closer) { closeModal(closer.dataset.target); if (closer.tagName !== "A") event.preventDefault(); return; }
     if (target.closest("a[href^='#/']")) $$(".modal.modal-visible").forEach((m) => closeModal(`#${m.id}`));
+    const sameRoute = target.closest("a[href^='#/']");
+    if (sameRoute && sameRoute.getAttribute("href") === location.hash) { event.preventDefault(); renderRoute(); scrollTo(0, 0); }
 
     const item = target.closest(".js-cart-item");
     if (item && target.closest("[data-sim-remove]")) setQty(item.dataset.slug, item.dataset.variant, 0);
