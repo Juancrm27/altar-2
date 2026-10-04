@@ -51,9 +51,8 @@
 			<span class="altar-nav__divider altar-nav__divider--brand" aria-hidden="true"></span>
 			<div class="altar-nav__wordmark-block">
 				<span class="altar-nav__eyebrow">{{ altar_concept_label }}</span>
-				<a class="altar-nav__wordmark" href="{{ store.url }}">
-					<span>{{ altar_wordmark }}</span><sup>©</sup>
-				</a>
+				{# Keep the inline children together: the intro character splitter must not animate template indentation. #}
+				<a class="altar-nav__wordmark" href="{{ store.url }}"><span>{{ altar_wordmark }}</span><sup>©</sup></a>
 			</div>
 			<span class="altar-nav__divider altar-nav__divider--metadata" aria-hidden="true"></span>
 			<div class="altar-nav__metadata">
