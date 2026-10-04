@@ -56,6 +56,8 @@ body[data-sim] { margin: 0; color: var(--main-foreground); background: var(--mai
 
 /* Search suggestions */
 .altar-nav__search-panel .search-form-wrap { text-transform: none; letter-spacing: 0; }
+.template-home[data-sim-base] .site-header { position: fixed; }
+body[data-sim]:not(.template-home) .site-header { position: sticky; }
 .sim-search-suggestions { margin-top: 8px; }
 .sim-search-suggestions .sim-suggestion { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; color: inherit; font-size: var(--font-small); text-align: left; text-decoration: none; }
 .sim-suggestion-thumb { width: 40px; height: 54px; background: var(--main-foreground-opacity-05) center / cover; }

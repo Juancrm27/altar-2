@@ -2,7 +2,63 @@
   "type": "header",
   "name": "t:names.header",
   "sections": {
-    "altar_header": { "type": "altar-header", "settings": {} }
+    "header": {
+      "type": "header",
+      "settings": {
+        "header_style": "altar",
+        "altar_concept_label": "[  CONCEPT_STORE  ]",
+        "altar_wordmark": "altar",
+        "altar_metadata_date": "",
+        "altar_metadata_location": "C.A.B.A. (ARG)",
+        "altar_search_label": "Search",
+        "altar_login_label": "Login",
+        "altar_account_label": "Account",
+        "altar_cart_label": "Cart",
+        "altar_menu_label": "Menu",
+        "altar_show_search": true,
+        "altar_show_account": true,
+        "altar_show_cart": true,
+        "logo_position_desktop": "left",
+        "section_width": "full",
+        "vertical_padding": 0,
+        "horizontal_padding": 0,
+        "use_different_mobile_padding": true,
+        "vertical_padding_mobile": 0,
+        "horizontal_padding_mobile": 0,
+        "head_fix_desktop": true
+      },
+      "blocks": {
+        "logo": {
+          "type": "header-logo",
+          "settings": {
+            "height": 40,
+            "use_different_mobile_height": false
+          }
+        },
+        "utilities": {
+          "type": "header-utilities",
+          "settings": {
+            "format": "icons_text",
+            "search_type": "icon",
+            "cart_icon": "bag",
+            "show_languages_header": false
+          }
+        },
+        "navigation": {
+          "type": "header-navigation",
+          "settings": {
+            "nav_uppercase": true,
+            "show_categories_link": false,
+            "show_mobile_categories": false,
+            "nav_alignment_desktop": "center",
+            "vertical_padding": 0,
+            "items_gap": 18,
+            "show_secondary_menu": false
+          }
+        }
+      },
+      "block_order": ["logo", "utilities", "navigation"]
+    }
   },
-  "order": ["altar_header"]
+  "order": ["header"]
 }

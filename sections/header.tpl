@@ -70,6 +70,7 @@
 {# Sticky header #}
 {% set sticky_val = section.settings.head_fix_desktop %}
 {% set is_sticky = sticky_val == true or sticky_val == 'true' or sticky_val == 1 or sticky_val == '1' %}
+{% set is_altar_header = section.settings.header_style == 'altar' %}
 
 {# Header styles using CSS custom properties #}
 {% set header_styles %}
@@ -92,6 +93,16 @@
 	{% if full_width %}--header-padding-x: {{ horizontal_padding }}px; --header-padding-x-mobile: {{ horizontal_padding_mobile }}px;{% endif %}
 {% endset %}
 
+{% if is_altar_header %}
+	{% include 'snippets/header/altar-header.tpl' with {
+		logo_block: logo_block,
+		utilities_block: utilities_block,
+		navigation_block: navigation_block,
+		header_with_categories_classes: header_with_categories_classes,
+		is_sticky: is_sticky,
+		header_styles: header_styles
+	} %}
+{% else %}
 <div
 	class="js-head-main head-main {{ header_with_categories_classes }}"
 	data-store="head"
@@ -140,6 +151,7 @@
 		{% endif %}
 	{% endfor %}
 </div>
+{% endif %}
 
 {# Order notification #}
 {% if status_page_url %}
@@ -170,8 +182,127 @@
     { "type": "header-utilities" },
     { "type": "header-navigation" }
   ],
-  "settings": [
-    {
+	"settings": [
+	  {
+	    "type": "header",
+	    "content": "Identidad de Altar"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "select",
+	    "id": "header_style",
+	    "label": "Estilo del encabezado",
+	    "options": [
+	      { "value": "classic", "label": "Ipanema" },
+	      { "value": "altar", "label": "Altar" }
+	    ],
+	    "default": "classic"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "image_picker",
+	    "id": "altar_logo",
+	    "label": "Símbolo de Altar",
+	    "info": "Si queda vacío se usa el símbolo incluido en el tema.",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_concept_label",
+	    "label": "Etiqueta de marca",
+	    "default": "[  CONCEPT_STORE  ]",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_wordmark",
+	    "label": "Nombre visible",
+	    "default": "altar",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_metadata_date",
+	    "label": "Fecha fija",
+	    "info": "Dejar vacío para mostrar la fecha actual.",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_metadata_location",
+	    "label": "Ubicación",
+	    "default": "C.A.B.A. (ARG)",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_search_label",
+	    "label": "Texto de búsqueda",
+	    "default": "Search",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_login_label",
+	    "label": "Texto de ingreso",
+	    "default": "Login",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_account_label",
+	    "label": "Texto de cuenta iniciada",
+	    "default": "Account",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_cart_label",
+	    "label": "Texto del carrito",
+	    "default": "Cart",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_menu_label",
+	    "label": "Texto del menú móvil",
+	    "default": "Menu",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "toggle",
+	    "id": "altar_show_search",
+	    "label": "Mostrar búsqueda",
+	    "default": true,
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "toggle",
+	    "id": "altar_show_account",
+	    "label": "Mostrar acceso a la cuenta",
+	    "default": true,
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "toggle",
+	    "id": "altar_show_cart",
+	    "label": "Mostrar carrito",
+	    "default": true,
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
       "type": "header",
       "content": "t:names.disposition"
     },
