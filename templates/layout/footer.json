@@ -15,8 +15,12 @@
         "returns_label": "Solicitud de devolución",
         "faq_label": "FAQs",
         "contact_label": "Contacto",
-        "address": "Buenos Aires, Argentina",
-        "campaign_label": "Campaña SS27",
+        "address": "Buenos Aires, Arg.",
+        "whatsapp_label": "WhatsApp",
+        "email_label": "Correo",
+        "explore_store_label": "Store",
+        "explore_about_label": "About",
+        "explore_makers_label": "Makers",
         "descriptor": "CONCEPT STORE  /",
         "footer_payments_show": true,
         "footer_shipping_show": true
@@ -25,8 +29,7 @@
         "explore": {
           "type": "footer-menu",
           "settings": {
-            "title": "Explorar",
-            "menu": "navigation"
+            "title": "Explorar"
           }
         }
       },

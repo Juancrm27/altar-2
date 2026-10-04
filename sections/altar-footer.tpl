@@ -71,6 +71,19 @@
         {% endif %}
       </nav>
 
+      <div class="altar-footer__group altar-footer__group--address">
+        <p class="altar-footer__label">{{ footer_settings.contact_label | default('Contacto') }}</p>
+        {% if footer_settings.address or store.address %}
+          {% if footer_settings.address_url %}
+            <a href="{{ footer_settings.address_url }}" target="_blank" rel="noopener noreferrer">{{ footer_settings.address | default(store.address) }}</a>
+          {% else %}
+            <span>{{ footer_settings.address | default(store.address) }}</span>
+          {% endif %}
+        {% endif %}
+        {% if store.whatsapp %}<a href="{{ store.whatsapp }}">{{ footer_settings.whatsapp_label | default('WhatsApp') }}</a>{% endif %}
+        {% if store.email %}<a href="mailto:{{ store.email }}">{{ footer_settings.email_label | default('Correo') }}</a>{% endif %}
+      </div>
+
       {% for block in section.blocks %}
         {% if block.type == 'footer-menu' %}
           {% set menu_id = block.settings.menu %}
@@ -81,26 +94,13 @@
                 <a href="{{ item.url }}" {% if item.url | is_external %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
               {% endfor %}
             {% else %}
-              <a href="{{ store.products_url }}">Store</a>
-              <a href="{{ store.url }}/#about">About</a>
+              <a href="{{ footer_settings.explore_store_url | default(store.products_url) }}">{{ footer_settings.explore_store_label | default('Store') }}</a>
+              <a href="{{ footer_settings.explore_about_url | default(store.url ~ '/#about') }}">{{ footer_settings.explore_about_label | default('About') }}</a>
+              <a href="{{ footer_settings.explore_makers_url | default(store.url ~ '/#makers') }}">{{ footer_settings.explore_makers_label | default('Makers') }}</a>
             {% endif %}
           </nav>
         {% endif %}
       {% endfor %}
-
-      <div class="altar-footer__group altar-footer__group--address">
-        <p class="altar-footer__label">{{ footer_settings.contact_label | default('Contacto') }}</p>
-        {% if store.email %}<a href="mailto:{{ store.email }}">{{ store.email }}</a>{% endif %}
-        {% if store.whatsapp %}<a href="{{ store.whatsapp }}">WhatsApp</a>{% endif %}
-        {% if footer_settings.address or store.address %}
-          {% if footer_settings.address_url %}
-            <a href="{{ footer_settings.address_url }}" target="_blank" rel="noopener noreferrer">{{ footer_settings.address | default(store.address) }}</a>
-          {% else %}
-            <span>{{ footer_settings.address | default(store.address) }}</span>
-          {% endif %}
-        {% endif %}
-        {% if footer_settings.campaign_label %}<a href="{{ store.url }}/#coleccion">{{ footer_settings.campaign_label }}</a>{% endif %}
-      </div>
     </div>
 
     {% if footer_settings.descriptor %}<p class="altar-footer__descriptor">{{ footer_settings.descriptor }}</p>{% endif %}
@@ -256,9 +256,59 @@
     {
       "type": "setting",
       "setting_type": "text",
-      "id": "campaign_label",
-      "label": "Link de campaña",
-      "default": "Campaña SS27"
+      "id": "whatsapp_label",
+      "label": "Texto de WhatsApp",
+      "default": "WhatsApp"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "email_label",
+      "label": "Texto del correo",
+      "default": "Correo"
+    },
+    {
+      "type": "header",
+      "content": "Explorar"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "explore_store_label",
+      "label": "Texto de la tienda",
+      "default": "Store"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "explore_store_url",
+      "label": "Link de la tienda"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "explore_about_label",
+      "label": "Texto de About",
+      "default": "About"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "explore_about_url",
+      "label": "Link de About"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "explore_makers_label",
+      "label": "Texto de Makers",
+      "default": "Makers"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "explore_makers_url",
+      "label": "Link de Makers"
     },
     {
       "type": "setting",
@@ -326,8 +376,7 @@
       {
         "type": "footer-menu",
         "settings": {
-          "title": "Explorar",
-          "menu": "navigation"
+          "title": "Explorar"
         }
       }
     ]
