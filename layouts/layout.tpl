@@ -50,6 +50,7 @@
       }
     </style>
     {{ 'css/altar.css' | static_url | static_inline }}
+    {{ 'css/altar-footer.css' | static_url | static_inline }}
 
     {% set async_js = true %}
 
