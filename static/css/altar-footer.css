@@ -66,6 +66,7 @@
 
 .altar-footer__top {
   display: grid;
+  min-height: calc(220 * var(--footer-u));
   grid-template-columns: repeat(8, minmax(0, 1fr));
   column-gap: var(--footer-gutter);
   row-gap: calc(32 * var(--footer-u));
@@ -89,7 +90,7 @@
 }
 
 .altar-footer__body {
-  max-width: calc(290 * var(--footer-u));
+  max-width: none;
   font-size: calc(14 * var(--footer-u));
   line-height: calc(20 * var(--footer-u));
 }
@@ -132,7 +133,7 @@
 
 .site-footer .altar-footer__field .altar-footer__input::placeholder {
   color: inherit;
-  opacity: .72;
+  opacity: 1;
   text-transform: uppercase;
 }
 
@@ -184,17 +185,19 @@
 .altar-footer__social {
   display: flex;
   margin-top: calc(20 * var(--footer-u));
+  min-height: calc(24 * var(--footer-u));
   flex-wrap: wrap;
   align-items: center;
   gap: calc(12 * var(--footer-u));
 }
 
 .altar-footer__social a,
-.altar-footer__social svg {
+.altar-footer__social svg,
+.altar-footer__social img {
   display: block;
-  width: calc(18 * var(--footer-u));
+  width: calc(24 * var(--footer-u));
   min-width: 16px;
-  height: calc(18 * var(--footer-u));
+  height: calc(24 * var(--footer-u));
   min-height: 16px;
   fill: currentColor;
 }
@@ -214,7 +217,6 @@
 .altar-footer__group--help { grid-column: 5 / 7; }
 .altar-footer__group--address { grid-column: 7 / 8; }
 .altar-footer__group--explore { grid-column: 8 / 9; }
-.altar-footer__group--address a:first-of-type,
 .altar-footer__keep-case { text-transform: none; }
 
 .altar-footer__descriptor {
@@ -247,14 +249,54 @@
   background: transparent;
 }
 
+/* Figma 220:109 · bottom: 1px rule, 16px gap, 20px meta row (copyright + platform credit | legal links). */
+.altar-footer__bottom {
+  padding-top: calc(16 * var(--footer-u));
+  border-top: 1px solid currentColor;
+}
+
+.altar-footer__meta {
+  display: flex;
+  min-height: calc(20 * var(--footer-u));
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(24 * var(--footer-u));
+}
+
+.altar-footer__meta-left {
+  display: flex;
+  align-items: center;
+  gap: calc(24 * var(--footer-u));
+  font-size: calc(10 * var(--footer-u));
+  line-height: calc(16 * var(--footer-u));
+  letter-spacing: calc(.2 * var(--footer-u));
+}
+
+.altar-footer__copyright {
+  opacity: .78;
+}
+
+.altar-footer__powered img {
+  display: block;
+  width: auto;
+  max-height: calc(14 * var(--footer-u));
+}
+
+/* Tiendanube's own legal block (seals, payment logos, AR consumer-defense links) stays, quietly, under the meta row. */
 .altar-footer__platform {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: calc(24 * var(--footer-u));
-  padding-top: calc(16 * var(--footer-u));
-  border-top: 1px solid currentColor;
   color: inherit;
+}
+
+.altar-footer__platform:not(:has(.footer-payments-shipping-container, .footer-seals-container, .claim-link)) {
+  display: none;
+}
+
+.altar-footer__platform :is(.footer-powered-by, .footer-copyright) {
+  display: none !important;
 }
 
 .altar-footer__platform .footer-payments-shipping-container {
@@ -324,14 +366,6 @@
   margin: 0 0 calc(6 * var(--footer-u));
 }
 
-.altar-footer__platform :is(.footer-powered-by, .footer-copyright) {
-  display: inline-block;
-  margin: 0;
-}
-
-.altar-footer__platform .footer-powered-by {
-  margin-right: calc(6 * var(--footer-u));
-}
 
 .altar-footer__platform .powered-by-logo {
   width: calc(112 * var(--footer-u));
@@ -383,8 +417,15 @@
   }
 
   .altar-footer__top {
+    min-height: 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 32px;
+  }
+
+  .altar-footer__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .altar-footer__newsletter,
