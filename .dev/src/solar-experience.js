@@ -602,6 +602,8 @@ const DEFAULT_LIGHTING = {
   foilBrushed: 0,
   foilBrushedAngle: 0,
   spaceColor: "#2d2838",
+  uiPrimaryColor: "#fff3a9",
+  uiSecondaryColor: "#601e2a",
   glowRoseColor: "#2d1a60",
   glowRoseIntensity: 5,
   glowCyanColor: "#7b41e6",
@@ -652,6 +654,32 @@ const COMPACT_LIGHTING = {
   manifestoY: 120,
 };
 const lightingDefaults = () => ({ ...DEFAULT_LIGHTING, ...(COMPACT_LAYOUT.matches ? COMPACT_LIGHTING : {}) });
+
+// UI palette (static/css/altar.css :root). The CSS follows the two variables; the SVG icons carry the primary
+// yellow inside the file, so they are re-tinted from their original source when it changes.
+const UI_ICON_PRIMARY = /#fff3a9/gi;
+const uiIconSources = new Map();
+let appliedUiPalette = "";
+function applyUiPalette(primary = DEFAULT_LIGHTING.uiPrimaryColor, secondary = DEFAULT_LIGHTING.uiSecondaryColor) {
+  const key = `${primary}|${secondary}`;
+  if (key === appliedUiPalette) return;
+  appliedUiPalette = key;
+  const rootStyle = document.documentElement.style;
+  rootStyle.setProperty("--altar-primary", primary);
+  rootStyle.setProperty("--altar-secondary", secondary);
+  const isDefault = primary.toLowerCase() === DEFAULT_LIGHTING.uiPrimaryColor;
+  document.querySelectorAll(".altar-nav img, .altar-solar img, .altar-footer img").forEach(async (image) => {
+    const original = image.dataset.uiIconSrc || image.getAttribute("src") || "";
+    if (!/\.svg(\?|$)/i.test(original)) return;
+    image.dataset.uiIconSrc = original;
+    if (isDefault) { image.src = original; return; }
+    if (!uiIconSources.has(original)) uiIconSources.set(original, fetch(original).then((response) => response.text()).catch(() => ""));
+    const markup = await uiIconSources.get(original);
+    if (!UI_ICON_PRIMARY.test(markup) || appliedUiPalette !== key) return;
+    UI_ICON_PRIMARY.lastIndex = 0;
+    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup.replace(UI_ICON_PRIMARY, primary))}`;
+  });
+}
 
 const PLANET_LAYOUT = {
   sun:      { position: [-2.3, -0.7, -1.5], radius: 1.15 },
@@ -1616,6 +1644,7 @@ class SolarExperience {
       layer.node.setAttribute("baseFrequency", Number(settings.grainFrequency).toFixed(2));
     });
     this.root.style.setProperty("--space-color", settings.spaceColor);
+    applyUiPalette(settings.uiPrimaryColor, settings.uiSecondaryColor);
     this.root.style.setProperty("--card-flip-duration", `${Number(settings.cardFlipDuration)}ms`);
     this.root.style.setProperty("--card-scale", Number(settings.cardScale));
     this.root.style.setProperty("--campaign-scale", Number(settings.layoutCampaignScale));
@@ -1780,6 +1809,10 @@ class SolarExperience {
       <div class="lighting-panel__body">
         <label class="is-boolean">Recordar cambios <input type="checkbox" data-lighting-persist></label>
         <label class="is-boolean">Ver tramos <input type="checkbox" data-lighting="showSections"></label>
+        <details><summary>Paleta UI</summary>
+          <label class="is-color">Primario <input type="color" data-lighting="uiPrimaryColor"></label>
+          <label class="is-color">Secundario <input type="color" data-lighting="uiSecondaryColor"></label>
+        </details>
         <details><summary>Manifiesto</summary>
           <label>Bloque X px <span><input type="range" min="-800" max="800" step="1" data-lighting="manifestoX"><output></output></span></label>
           <label>Bloque Y px <span><input type="range" min="-800" max="800" step="1" data-lighting="manifestoY"><output></output></span></label>
@@ -3315,7 +3348,7 @@ ${stonePositionsMarkup(4)}
     if (handle) {
       context.font = `300 ${SHARE_HANDLE_SIZE}px Inter, Arial, Helvetica, sans-serif`;
       if ("letterSpacing" in context) context.letterSpacing = "-0.33px";
-      context.fillStyle = "#fff3a9";
+      context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--altar-primary").trim() || "#fff3a9";
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.fillText(handle.toLocaleUpperCase("es"), SHARE_WIDTH / 2, SHARE_HANDLE_Y);

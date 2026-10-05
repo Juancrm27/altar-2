@@ -7,8 +7,8 @@
   position: relative;
   z-index: 1;
   display: block;
-  color: var(--footer-foreground, #601e2a);
-  background: var(--footer-background, #fff3a9);
+  color: var(--footer-foreground, var(--altar-secondary));
+  background: var(--footer-background, var(--altar-primary));
   font-family: Inter, Arial, Helvetica, sans-serif;
 }
 
@@ -25,8 +25,8 @@
   flex-direction: column;
   justify-content: space-between;
   gap: calc(40 * var(--footer-u));
-  color: var(--footer-foreground, #601e2a);
-  background: var(--footer-background, #fff3a9);
+  color: var(--footer-foreground, var(--altar-secondary));
+  background: var(--footer-background, var(--altar-primary));
   font-size: medium;
   font-weight: 400;
   font-kerning: normal;
