@@ -2600,6 +2600,8 @@ ${stonePositionsMarkup(4)}
 
   setupFoilCards() {
     this.foilCards = [];
+    // One deck for every channel: the front is always the star; the revealed face is one of the figures, at random.
+    this.cardVariantIndex = pickCardVariant();
     if (!window.WebGLRenderingContext) return;
 
     this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
@@ -2608,7 +2610,8 @@ ${stonePositionsMarkup(4)}
       const foilUrl = card.dataset.foilMap;
       if (!canvas || !baseUrl || !(foilUrl || card.dataset.foilFrame)) return;
 
-      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, 0, foilUrl)])
+      const variant = card.dataset.foilFrame ? this.cardVariantIndex : 0;
+      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, variant, foilUrl)])
         .then(([baseMap, foilMap]) => {
           const renderer = new THREE.WebGLRenderer({
             canvas,
@@ -2649,7 +2652,7 @@ ${stonePositionsMarkup(4)}
           const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
           scene.add(mesh);
 
-          const effect = { card, renderer, scene, camera, material, baseUrl, foilUrl: messageFrameUrl(card, 0) || foilUrl, maskSize: new THREE.Vector2(foilMap.image.width, foilMap.image.height) };
+          const effect = { card, renderer, scene, camera, material, baseUrl, foilUrl: messageFrameUrl(card, variant) || foilUrl, maskSize: new THREE.Vector2(foilMap.image.width, foilMap.image.height) };
           this.foilCards.push(effect);
           renderer.render(scene, camera);
           card.classList.add("is-foil-rendered");
@@ -2725,7 +2728,7 @@ ${stonePositionsMarkup(4)}
     afterIntro(() => {
       CHANNELS.forEach((_, index) => {
         photoSources(index).forEach(decodePhoto);
-        this.preloadCardChannel(index);
+        this.preloadCardVariant(index);
       });
     });
 
@@ -2783,8 +2786,6 @@ ${stonePositionsMarkup(4)}
       const index = current;
       const background = backgroundFor(index);
       applyLabel(index);
-      this.closeFortuneCard?.();
-      this.setCardChannel(index);
       // Everything animated starts together once the new photos are decoded.
       photosReady(index).then(() => {
         this.moveSystemToChannel(index, !REDUCED_MOTION.matches);
@@ -2812,7 +2813,6 @@ ${stonePositionsMarkup(4)}
       applyLabel(current);
       applyPhoto(current);
       applyBackground(backgroundFor(current));
-      this.setCardChannel(current);
       this.moveSystemToChannel(current, false);
       this.moveGroundToChannel(current, false);
     };
@@ -3357,32 +3357,25 @@ ${stonePositionsMarkup(4)}
     return new Promise((resolve) => output.toBlob(resolve, "image/jpeg", 0.92));
   }
 
-  // Swaps both card faces to a channel's artwork; faces without a channel variant keep channel 1.
-  setCardChannel(index) {
-    const suffix = index + 1;
-    this.cardChannelIndex = index;
+  // Puts one of the figures (message frames) on the revealed face; the current phrase is drawn over it.
+  // The front artwork never changes.
+  setCardVariant(index) {
+    this.cardVariantIndex = index;
     this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
-      const baseUrl = card.getAttribute(`data-channel-base-${suffix}`) || card.dataset.foilBase;
-      const foilUrl = card.getAttribute(`data-channel-map-${suffix}`) || card.dataset.foilMap;
-      const fallbackImage = card.querySelector(":scope > img");
-      if (fallbackImage && baseUrl) fallbackImage.src = baseUrl;
       const frameUrl = messageFrameUrl(card, index);
+      if (!frameUrl) return;
       const message = card.querySelector(".altar-solar__fortune-copy p");
-      if (message) {
-        message.dataset.defaultMessage ??= message.textContent;
-        message.textContent = frameUrl && this.messageMap
-          ? this.messageMap.phrase
-          : card.getAttribute(`data-channel-message-${suffix}`) || message.dataset.defaultMessage;
-      }
+      if (message && this.messageMap) message.textContent = this.messageMap.phrase;
       const effect = this.foilCards?.find((item) => item.card === card);
-      // A message face drawn over a frame is keyed by the frame; the phrase changes inside the same texture.
-      const mapKey = frameUrl || foilUrl;
-      if (!effect || (effect.baseUrl === baseUrl && effect.foilUrl === mapKey)) return;
-      effect.baseUrl = baseUrl;
-      effect.foilUrl = mapKey;
-      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, index, foilUrl)]).then(([baseMap, foilMap]) => {
-        if (effect.baseUrl !== baseUrl || effect.foilUrl !== mapKey) return;
-        effect.material.uniforms.uBaseMap.value = baseMap;
+      if (!effect) return;
+      // Same figure: only the phrase changes inside the same texture.
+      if (effect.foilUrl === frameUrl) {
+        this.drawMessageMap();
+        return;
+      }
+      effect.foilUrl = frameUrl;
+      this.loadCardMap(card, index, frameUrl).then((foilMap) => {
+        if (effect.foilUrl !== frameUrl) return;
         effect.material.uniforms.uFoilMap.value = foilMap;
         effect.maskSize.set(foilMap.image.width, foilMap.image.height);
       });
@@ -3438,8 +3431,8 @@ ${stonePositionsMarkup(4)}
     const map = this.messageMap;
     if (!map) return;
     clearTimeout(this.fortunePhraseTimer);
-    // Reopened before the next phrase was ready: pick it now.
-    if (map.revealed && !map.prepared) this.setFortunePhrase(pickFortunePhrase(map.phrase));
+    // Reopened before the next draw was ready: pick phrase and figure now.
+    if (map.revealed && !map.prepared) this.drawNextFortune();
     map.revealed = true;
     map.prepared = false;
     markFortuneSeen(map.phrase);
@@ -3450,28 +3443,22 @@ ${stonePositionsMarkup(4)}
     clearTimeout(this.fortunePhraseTimer);
     if (!map?.revealed) return;
     this.fortunePhraseTimer = setTimeout(() => {
-      this.setFortunePhrase(pickFortunePhrase(map.phrase));
+      this.drawNextFortune();
       map.prepared = true;
     }, delay);
   }
 
-  setFortunePhrase(phrase) {
+  // A new random phrase on a new random figure, drawn while the card is face down.
+  drawNextFortune() {
     const map = this.messageMap;
-    map.phrase = phrase;
-    if (map.message && messageFrameUrl(map.message.closest("[data-foil-card]"), this.cardChannelIndex ?? 0)) {
-      map.message.textContent = phrase;
-    }
-    this.drawMessageMap();
+    if (!map) return;
+    map.phrase = pickFortunePhrase(map.phrase);
+    this.setCardVariant(pickCardVariant(this.cardVariantIndex));
   }
 
-  // Fetches a channel's card textures early so the first switch to it doesn't wait on the network.
-  preloadCardChannel(index) {
-    const suffix = index + 1;
+  // Warms the image cache for a figure so revealing it never waits on the network.
+  preloadCardVariant(index) {
     this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
-      [card.getAttribute(`data-channel-base-${suffix}`), card.getAttribute(`data-channel-map-${suffix}`)]
-        .filter(Boolean)
-        .forEach((url) => this.loadFoilTexture(url).catch(() => {}));
-      // Message frames are drawn into the shared canvas later; warming the image cache is enough.
       const frameUrl = messageFrameUrl(card, index);
       if (frameUrl) loadImage(frameUrl).catch(() => {});
     });
@@ -3853,7 +3840,15 @@ function grainTile() {
   return (grainTile.canvas = canvas);
 }
 
-// Channel 1 reads data-foil-frame, the others data-channel-frame-N; no frame means a fixed map image.
+// Figures for the revealed face: data-foil-frame (star) and data-channel-frame-2…4 (flower, dots, circle).
+const CARD_VARIANTS = 4;
+
+function pickCardVariant(previous) {
+  const options = [...Array(CARD_VARIANTS).keys()].filter((index) => index !== previous);
+  return options[Math.floor(Math.random() * options.length)];
+}
+
+// Figure 1 reads data-foil-frame, the others data-channel-frame-N; no frame means a fixed map image.
 function messageFrameUrl(card, index) {
   if (!card) return null;
   return index === 0 ? card.dataset.foilFrame : card.getAttribute(`data-channel-frame-${index + 1}`);
