@@ -358,8 +358,8 @@
       </div>
     </footer>
     <script>
-      // Local only: store links open the Ipanema simulation. The Netlify review copy keeps the "Work in progress" page.
-      if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)) {
+      // Store links open the Ipanema simulation (shop, product, contact…), locally and on the Netlify review copy.
+      {
         document.querySelectorAll('a[href="./storefront.html"]').forEach(function (a) { a.href = "./ipanema.html#/tienda"; });
         var simPages = {
           "Contacto": "#/contacto",
