@@ -1267,7 +1267,8 @@ class SolarExperience {
     this.root = root;
     this.stage = root.querySelector("[data-solar-stage]");
     this.canvas = root.querySelector(".altar-solar__canvas");
-    this.grainLayers = Array.from(root.querySelectorAll("[data-grain-turbulence]")).map((node) => ({
+    // Every grain on the page (hero, sections 3·4 and the footer, which lives outside this root).
+    this.grainLayers = Array.from(document.querySelectorAll("[data-grain-turbulence]")).map((node) => ({
       node,
       section: Number(node.dataset.grainSection || 1),
       lastUpdate: 0,
@@ -1640,6 +1641,8 @@ class SolarExperience {
     this.root.style.setProperty("--effect-blur", `calc(${Number(settings.effectBlur)} * var(--u, 1px))`);
     this.root.style.setProperty("--grain-opacity", Number(settings.grainOpacity));
     this.root.style.setProperty("--section-grain-opacity", Number(settings.sectionGrainOpacity));
+    // The footer grain sits outside the solar root, so the section grain opacity also goes on :root.
+    document.documentElement.style.setProperty("--section-grain-opacity", Number(settings.sectionGrainOpacity));
     this.grainLayers.forEach((layer) => {
       layer.node.setAttribute("baseFrequency", Number(settings.grainFrequency).toFixed(2));
     });
@@ -3601,20 +3604,23 @@ ${stonePositionsMarkup(4)}
     this.timer.update(time);
     const delta = Math.min(this.timer.getDelta(), 0.1);
     this.renderFoilCards(time);
-    if (!this.visible || !this.renderer) return;
-    this.updateStars(REDUCED_MOTION.matches ? 0 : this.timer.getElapsed(), REDUCED_MOTION.matches ? 0 : delta);
-    this.updateSystem(this.timer.getElapsed(), delta);
-    if (!REDUCED_MOTION.matches) this.updateShootingStars(this.timer.getElapsed(), delta);
+    // Grain keeps moving while the 3D sleeps off screen: sections 3·4 and the footer still show it.
     if (!REDUCED_MOTION.matches) {
-      this.updateOrbits(delta);
+      const refreshRate = Math.max(1, Number(this.effectSettings?.grainSpeed ?? DEFAULT_LIGHTING.grainSpeed));
       this.grainLayers.forEach((layer) => {
-        const refreshRate = Math.max(1, Number(this.effectSettings?.grainSpeed ?? DEFAULT_LIGHTING.grainSpeed));
         if (time - layer.lastUpdate >= 1000 / refreshRate) {
           layer.seed = (layer.seed % 97) + 1;
           layer.node.setAttribute("seed", layer.seed);
           layer.lastUpdate = time;
         }
       });
+    }
+    if (!this.visible || !this.renderer) return;
+    this.updateStars(REDUCED_MOTION.matches ? 0 : this.timer.getElapsed(), REDUCED_MOTION.matches ? 0 : delta);
+    this.updateSystem(this.timer.getElapsed(), delta);
+    if (!REDUCED_MOTION.matches) this.updateShootingStars(this.timer.getElapsed(), delta);
+    if (!REDUCED_MOTION.matches) {
+      this.updateOrbits(delta);
     }
     this.drawScene();
   };
@@ -4259,6 +4265,8 @@ function initNewsletterPreview() {
 }
 
 function initSolarExperiences() {
+  // Scheduled first so it still runs if the 3D fails to start (no WebGL, model error).
+  setTimeout(initPageGrain, 0);
   initHeaderTheme();
   updateLiveDates();
   initNewsletterPreview();
@@ -4266,6 +4274,22 @@ function initSolarExperiences() {
     if (!root.solarExperience) root.solarExperience = new SolarExperience(root);
   });
   playIntro();
+}
+
+// Pages without a running 3D home (shop, product, cart… or a home whose WebGL failed) still move their
+// grain (footer, page background, sections 3·4): the same re-seeding at the panel's default refresh rate.
+// When the 3D runs, its own loop animates every grain and follows the lighting panel instead.
+function initPageGrain() {
+  const solarRunning = Array.from(document.querySelectorAll("[data-altar-solar]")).some((root) => root.solarExperience?.renderer);
+  if (solarRunning || REDUCED_MOTION.matches) return;
+  const nodes = Array.from(document.querySelectorAll("[data-grain-turbulence]"));
+  if (!nodes.length) return;
+  let seed = 1;
+  setInterval(() => {
+    if (document.hidden) return;
+    seed = (seed % 97) + 1;
+    nodes.forEach((node) => node.setAttribute("seed", seed));
+  }, 1000 / DEFAULT_LIGHTING.grainSpeed);
 }
 
 // Opening sequence, after virgilabloh.com: the frame (metadata, dashed rules) assembles first,

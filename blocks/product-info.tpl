@@ -10,7 +10,7 @@
 	{% if info_horizontal_padding %}padding-left: {{ info_horizontal_padding }}px; padding-right: {{ info_horizontal_padding }}px;{% endif %}
 {% endset %}
 
-<div class="js-product-info product-info d-flex flex-column" {{ block | block_attributes }} data-store="product-info-{{ product.id }}" {% if info_styles | trim %}style="{{ info_styles | trim }}"{% endif %}>
+<div class="js-product-info product-info altar-product-info d-flex flex-column" {{ block | block_attributes }} data-store="product-info-{{ product.id }}" {% if info_styles | trim %}style="{{ info_styles | trim }}"{% endif %}>
 	{# Product form always renders first (implicit, not a tree block) #}
 	{% include 'snippets/product/product-form.tpl' %}
 

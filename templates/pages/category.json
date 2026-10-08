@@ -24,14 +24,13 @@
         "columns_mobile": "2",
         "pagination": "infinite",
         "section_width": "page",
-        "vertical_padding": 0,
+        "vertical_padding": 32,
         "horizontal_padding": 32
       }
     }
   },
   "order": [
     "category_hero",
-    "heading",
     "product_list"
   ]
 }

@@ -77,6 +77,13 @@
   >
     {{ component('nubesdk-slot', { type: "before_main_content" }) }}
 
+    {# Altar: film grain behind the shop, product and contact pages (same layer as the home sections 3·4) #}
+    {% if template in ['category', 'search', 'product', 'contact'] %}
+      <div class="altar-page-grain" aria-hidden="true">
+        {% include 'snippets/altar-grain.tpl' with { grain_id: 'page', grain_class: '' } %}
+      </div>
+    {% endif %}
+
     {# SVG icons sprite #}
     {% include 'layouts/resources/icons-sprite.tpl' %}
 

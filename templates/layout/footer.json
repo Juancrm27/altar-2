@@ -7,6 +7,8 @@
       "settings": {
         "background_color": "#fff3a9",
         "text_color": "#601e2a",
+        "commerce_background_color": "#000000",
+        "commerce_text_color": "#FBF7E7",
         "newsletter_label": "[ NEWSLETTER ]",
         "newsletter_text": "Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.",
         "show_social": true,

@@ -2,6 +2,10 @@
 {% set password_page = template == 'password' %}
 {% set background_color = footer_settings.background_color | default('#fff3a9') %}
 {% set text_color = footer_settings.text_color | default('#601e2a') %}
+{% if template != 'home' %}
+  {% set background_color = footer_settings.commerce_background_color | default('#000000') %}
+  {% set text_color = footer_settings.commerce_text_color | default('#FBF7E7') %}
+{% endif %}
 {% set has_social_network = store.facebook or store.twitter or store.pinterest or store.instagram or store.tiktok or store.youtube %}
 
 {{ component('nubesdk-slot', { type: "before_footer" }) }}
@@ -11,8 +15,10 @@
   data-store="footer"
   data-section-id="{{ section.id }}"
   data-header-theme="light"
+  data-grain-footer
   style="--footer-background: {{ background_color }}; --footer-foreground: {{ text_color }}; --footer-foreground-opacity-10: {{ text_color }}1A; --footer-foreground-opacity-20: {{ text_color }}33; --footer-foreground-opacity-40: {{ text_color }}66; --footer-foreground-opacity-60: {{ text_color }}99; background-color: {{ background_color }}; color: {{ text_color }};"
 >
+  {% include 'snippets/altar-grain.tpl' with { grain_id: 'footer-' ~ section.id, grain_class: 'altar-footer__grain' } %}
   {% if not password_page %}
     <div class="altar-footer__top">
       <div class="altar-footer__newsletter">
@@ -51,7 +57,7 @@
               {% if social_url %}
                 <a href="{{ social_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social_network }} {{ store.name }}">
                   {% if social_network == 'instagram' %}
-                    <img src="{{ 'images/altar-instagram.svg' | static_url }}" alt="" width="24" height="24">
+                    <img class="altar-footer__social-mask" src="{{ 'images/altar-instagram.svg' | static_url }}" alt="" width="24" height="24" style="--altar-social-mask: url('{{ 'images/altar-instagram.svg' | static_url }}');">
                   {% else %}
                     <svg class="icon-inline" aria-hidden="true"><use xlink:href="#{{ social_network }}"/></svg>
                   {% endif %}
@@ -166,6 +172,24 @@
       "id": "text_color",
       "label": "Texto",
       "default": "#601e2a"
+    },
+    {
+      "type": "header",
+      "content": "Colores de páginas comerciales"
+    },
+    {
+      "type": "setting",
+      "setting_type": "color",
+      "id": "commerce_background_color",
+      "label": "Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "setting",
+      "setting_type": "color",
+      "id": "commerce_text_color",
+      "label": "Texto",
+      "default": "#FBF7E7"
     },
     {
       "type": "header",

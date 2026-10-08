@@ -27,6 +27,10 @@
 	data-sticky-header="{{ is_sticky ? 'true' : 'false' }}"
 	{% if header_styles | trim %}style="{{ header_styles | trim }}"{% endif %}
 >
+	{# Film grain over the header background on shop / product / contact pages (CSS shows it only there) #}
+	{% if template in ['category', 'search', 'product', 'contact'] %}
+		{% include 'snippets/altar-grain.tpl' with { grain_id: 'header', grain_class: 'altar-nav__grain' } %}
+	{% endif %}
 	<div class="altar-nav__rule altar-nav__rule--top" aria-hidden="true"></div>
 	<div class="altar-nav__content">
 		<div class="altar-nav__brand">

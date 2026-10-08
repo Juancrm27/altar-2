@@ -35,6 +35,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Catalogue, product and account pages invert the commercial palette (Figma 311:321): black footer, ivory text. */
+body:not(.template-home) .site-footer,
+body:not(.template-home) .site-footer .altar-footer {
+  color: var(--footer-foreground, var(--altar-commerce-background, #fbf7e7));
+  background: var(--footer-background, var(--altar-commerce-foreground, #000));
+}
+
 .site-footer .altar-footer :is(p, ul) {
   margin: 0;
 }
@@ -200,6 +207,14 @@
   height: calc(24 * var(--footer-u));
   min-height: 16px;
   fill: currentColor;
+}
+
+/* The Instagram asset ships with a fixed fill: paint it with currentColor through a mask so it follows the footer palette. */
+.altar-footer__social img.altar-footer__social-mask {
+  object-position: -9999px 0;
+  background: currentColor;
+  -webkit-mask: var(--altar-social-mask) center / contain no-repeat;
+  mask: var(--altar-social-mask) center / contain no-repeat;
 }
 
 .altar-footer__group {
@@ -480,3 +495,10 @@
     grid-column: 1;
   }
 }
+
+/* Film grain layer (snippets/altar-grain.tpl), same as the home sections 3·4 */
+.site-footer .altar-footer[data-grain-footer] { position: relative; isolation: isolate; }
+.site-footer .altar-footer > .altar-footer__grain { position: absolute; inset: 0; z-index: 0; pointer-events: none; mix-blend-mode: multiply; }
+.site-footer .altar-footer[data-grain-footer] > :not(.altar-footer__grain) { position: relative; z-index: 1; }
+/* Commercial pages use the black footer: lift it like the dark home sections */
+body:not(.template-home) .site-footer .altar-footer > .altar-footer__grain { mix-blend-mode: screen; }

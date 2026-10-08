@@ -18,13 +18,9 @@
 {% set show_sold_count = settings.products_sold %}
 {% set sold_count_threshold = settings.quantity_products_sold %}
 
-<div class="product-content">
+<div class="product-content{% if not home_main_product %} altar-product{% endif %}">
 
-	{# Breadcrumbs for product page #}
-
-	{% if not home_main_product %}
-		{% include 'snippets/breadcrumbs.tpl' %}
-	{% endif %}
+	{# Breadcrumbs: hidden on the Altar product page (Figma 363:308 starts with the gallery and the price row) #}
 
 	{# Sold products quantity #}
 
@@ -40,31 +36,10 @@
 		</div>
 	{% endif %}
 
-	{# Product name #}
-
-	{% if home_main_product %}
-		<h2 class="js-product-name product-name">{{ product.name }}</h2>
-	{% else %}
-
-		{# Product SKU #}
-
-		{% if show_sku and product.sku %}
-			<div class="product-sku">
-				{{ 'product.sku' | t }}: <span class="js-product-sku">{{ product.sku }}</span>
-			</div>
-		{% endif %}
-
-		{{ component('nubesdk-slot', { type: "before_product_detail_name" }) }}
-
-		<h1 class="js-product-name product-name" data-store="product-name-{{ product.id }}">{{ product.name }}</h1>
-
-		{{ component('nubesdk-slot', { type: "after_product_detail_name" }) }}
-		
-	{% endif %}
-
-	{# Product price #}
+	{# Product price: captured so the Altar layout can place it above the name (Figma 363:308) #}
 
 	{% set is_subscription_only_product = product.isSubscribable() and product.isSubscriptionOnly() %}
+	{% set product_price_markup %}
 
 	{{ component('nubesdk-slot', { type: "before_product_detail_price" }) }}
 
@@ -142,22 +117,22 @@
 	} %}
 
 	{{ component('nubesdk-slot', { type: "after_product_detail_price" }) }}
+	{% endset %}
 
 	{% set installments_info = product.installments_info_from_any_variant %}
 	{% set hasDiscount = product.maxPaymentDiscount.value > 0 %}
 	{% set show_payments_info = show_installments and product.show_installments and product.display_price and installments_info %}
+	{% set hideDiscountContainer = not (hasDiscount and product.showMaxPaymentDiscount) %}
+	{% set hideDiscountDisclaimer = not product.showMaxPaymentDiscountNotCombinableDisclaimer %}
 
-	{{ component('nubesdk-slot', { type: "before_product_detail_payment_options" }) }}
+	{% if home_main_product %}
+		<h2 class="js-product-name product-name">{{ product.name }}</h2>
+		{{ product_price_markup }}
 
-	{% if not home_main_product and (show_payments_info or hasDiscount) %}
-		<div {% if installments_info %}data-target="#installments-modal"{% endif %} class="{% if installments_info %}js-modal-open-private js-fullscreen-modal-open{% endif %} js-product-payments-container product-payments-info" {% if not product.display_price or not (product.get_max_installments and product.get_max_installments(false)) %}style="display: none;"{% endif %}>
-	{% endif %}
+		{{ component('nubesdk-slot', { type: "before_product_detail_payment_options" }) }}
 		{% if show_payments_info %}
 			{% include 'snippets/payments/installments.tpl' with {location: 'product_detail', container_classes: { installment: "product-installment"}} %}
 		{% endif %}
-
-		{% set hideDiscountContainer = not (hasDiscount and product.showMaxPaymentDiscount) %}
-		{% set hideDiscountDisclaimer = not product.showMaxPaymentDiscountNotCombinableDisclaimer %}
 
 		<div class="js-product-discount-container product-payment-discount" {% if hideDiscountContainer %}style="display: none;"{% endif %}>
 			<span class="text-accent">{{ product.maxPaymentDiscount.value }}% {{ 'product.discount_off' | t }}</span> {{ 'product.paying_with' | t }} {{ product.maxPaymentDiscount.paymentProviderName }}
@@ -167,39 +142,43 @@
                     : 'product.not_combinable' | t }}
 			</div>
 		</div>
-	{% if not home_main_product and (show_payments_info or hasDiscount) %}
-			<a id="btn-installments" class="product-payments-link btn-link" href="#" {% if not (product.get_max_installments and product.get_max_installments(false)) %}style="display: none;"{% endif %}>
-				{% if not hasDiscount and not show_installments %}
-					{{ 'product.see_payment_methods' | t }}
-				{% else %}
-					{{ 'product.see_more_details' | t }}
-				{% endif %}
-			</a>
+		{{ component('nubesdk-slot', { type: "after_product_detail_payment_options" }) }}
+	{% else %}
+		{# Altar · Figma 363:308 — price row (marker + price | category) sits above the name #}
+		{% set altar_category = '' %}
+		{% for crumb in breadcrumbs %}
+			{% if not crumb.last %}{% set altar_category = crumb.name %}{% endif %}
+		{% endfor %}
+		<div class="altar-product-head">
+			<div class="altar-product-head-price">
+				<span class="altar-product-marker" aria-hidden="true"></span>
+				{{ product_price_markup }}
+			</div>
+			{% if altar_category %}
+				<span class="altar-product-category">{{ altar_category }}</span>
+			{% endif %}
 		</div>
-	{% endif %}
 
-	{{ component('nubesdk-slot', { type: "after_product_detail_payment_options" }) }}
+		{{ component('nubesdk-slot', { type: "before_product_detail_name" }) }}
+
+		<h1 class="js-product-name product-name" data-store="product-name-{{ product.id }}">{{ product.name }}</h1>
+
+		{{ component('nubesdk-slot', { type: "after_product_detail_name" }) }}
+	{% endif %}
 
 	{# Product form, includes: Variants, CTA and Shipping calculator #}
 
 	{{ component('nubesdk-slot', { type: "before_product_detail_add_to_cart" }) }}
 
-	<form id="product_form" class="js-product-form product-form" method="post" action="{{ store.cart_url }}" data-store="product-form-{{ product.id }}" data-contact-url="{{ store.contact_url }}">
-		<input type="hidden" name="add_to_cart" value="{{product.id}}" />
-
-		{# Product availability #}
-		{% set show_product_quantity = product.available and product.display_price %}
-
-		{# Gift promotion message #}
-		{% include 'snippets/promotions/gift-promotion-message.tpl' %}
-
-		{# Free shipping minimum message #}
-		{% set shipping_best_discount = cart.free_shipping.min_price_free_shipping %}
-		{% set has_shipping_best_discount = shipping_best_discount.min_price %}
-		{% set has_product_free_shipping = product.free_shipping %}
-
+	{# Free shipping minimum message (home: inside the form; product page: spec table) #}
+	{% set shipping_best_discount = cart.free_shipping.min_price_free_shipping %}
+	{% set has_shipping_best_discount = shipping_best_discount.min_price %}
+	{% set has_product_free_shipping = product.free_shipping %}
+	{% set show_product_quantity = product.available and product.display_price %}
+	{% set free_shipping_markup %}
 		{% if not product.is_non_shippable and show_product_quantity %}
-			<div class="js-free-shipping-minimum-message free-shipping-message product-free-shipping" {% if not (has_shipping_best_discount or has_product_free_shipping) %}style="display: none;"{% endif %}>
+			<div class="js-free-shipping-minimum-message free-shipping-message product-free-shipping{% if not home_main_product %} altar-spec{% endif %}" {% if not (has_shipping_best_discount or has_product_free_shipping) %}style="display: none;"{% endif %}>
+				{% if not home_main_product %}<span class="altar-spec-label">Envío:</span>{% endif %}
 				<div class="product-free-shipping-inner">
 					<span class="product-free-shipping-icon">
 						<svg class="free-shipping-icon icon-inline"><use xlink:href="#truck"/></svg>
@@ -226,6 +205,19 @@
 				</div>
 			</div>
 		{% endif %}
+	{% endset %}
+
+	<form id="product_form" class="js-product-form product-form" method="post" action="{{ store.cart_url }}" data-store="product-form-{{ product.id }}" data-contact-url="{{ store.contact_url }}">
+		<input type="hidden" name="add_to_cart" value="{{product.id}}" />
+
+		{# Product availability #}
+		{% set show_product_quantity = product.available and product.display_price %}
+
+		{# Gift promotion message #}
+		{% include 'snippets/promotions/gift-promotion-message.tpl' %}
+
+		{# Free shipping minimum message (captured above) #}
+		{% if home_main_product %}{{ free_shipping_markup }}{% endif %}
 
 		{# Promotion details message #}
 
@@ -315,6 +307,59 @@
 	{{ component('nubesdk-slot', { type: "after_product_detail_add_to_cart" }) }}
 
 	{% if not home_main_product %}
+		{# Altar · Figma 363:308 — spec table, ⅓ – ⅔ cells with hairlines. Rows keep the theme's JS hooks. #}
+		<div class="altar-product-specs">
+			{% if product.brand or product.sku %}
+				<div class="altar-spec-row">
+					<div class="altar-spec">
+						<span class="altar-spec-label">Maker:</span>
+						<span class="altar-spec-value">{{ product.brand | default(store.name) }}</span>
+					</div>
+					<div class="altar-spec">
+						<span class="altar-spec-label">{{ 'product.sku' | t }}:</span>
+						<span class="altar-spec-value altar-spec-sku"><span class="altar-barcode" aria-hidden="true"></span><span class="js-product-sku">{{ product.sku }}</span></span>
+					</div>
+				</div>
+			{% endif %}
+
+			{{ component('nubesdk-slot', { type: "before_product_detail_payment_options" }) }}
+			{% if show_payments_info or hasDiscount %}
+				<div {% if installments_info %}data-target="#installments-modal"{% endif %} class="{% if installments_info %}js-modal-open-private js-fullscreen-modal-open{% endif %} js-product-payments-container product-payments-info altar-spec-row" {% if not product.display_price or not (product.get_max_installments and product.get_max_installments(false)) %}style="display: none;"{% endif %}>
+					<div class="altar-spec">
+						<span class="altar-spec-label">Cuotas:</span>
+						{% if show_payments_info %}
+							{% include 'snippets/payments/installments.tpl' with {location: 'product_detail', container_classes: { installment: "product-installment"}} %}
+						{% endif %}
+					</div>
+					<div class="altar-spec">
+						<span class="altar-spec-label">Medios de pago:</span>
+						<div class="js-product-discount-container product-payment-discount" {% if hideDiscountContainer %}style="display: none;"{% endif %}>
+							<span class="text-accent">{{ product.maxPaymentDiscount.value }}% {{ 'product.discount_off' | t }}</span> {{ 'product.paying_with' | t }} {{ product.maxPaymentDiscount.paymentProviderName }}
+							<div class="js-product-discount-disclaimer product-payment-discount-disclaimer" {% if hideDiscountDisclaimer %}style="display: none;"{% endif %}>
+								{{ product.showMaxPaymentDiscountCombinesWithSomeDiscounts ? 'product.not_combinable_some' | t : 'product.not_combinable' | t }}
+							</div>
+						</div>
+						<a id="btn-installments" class="product-payments-link btn-link" href="#" {% if not (product.get_max_installments and product.get_max_installments(false)) %}style="display: none;"{% endif %}>
+							{{ not hasDiscount and not show_installments ? 'product.see_payment_methods' | t : 'product.see_more_details' | t }}
+						</a>
+					</div>
+				</div>
+			{% endif %}
+			{{ component('nubesdk-slot', { type: "after_product_detail_payment_options" }) }}
+
+			<div class="altar-spec-row">
+				<div class="altar-spec altar-spec-stock">
+					<span class="altar-spec-label">Stock:</span>
+					<span class="altar-spec-value altar-stock-available">Disponible</span>
+					<span class="altar-spec-value altar-stock-none">{{ 'product.out_of_stock' | t }}</span>
+				</div>
+				{{ free_shipping_markup }}
+			</div>
+		</div>
+	{% endif %}
+
+
+	{% if not home_main_product %}
 		{# Shipping and pickup options - hidden for home_main_product #}
 
 		{% set show_product_fulfillment = show_shipping and (store.has_shipping or store.branches) and not product.free_shipping and not product.is_non_shippable %}
@@ -322,19 +367,25 @@
 		{{ component('nubesdk-slot', { type: "before_product_detail_shipping_options" }) }}
 
 		{% if show_product_fulfillment and not home_main_product %}
-			<div class="product-shipping-wrapper shipping-wrapper">
-				{# Shipping calculator and branch link #}
+			<div class="altar-product-section altar-product-shipping">
+				<span class="altar-spec-label altar-section-label">Envío</span>
+				<div class="altar-product-section-body">
+					<p class="altar-section-note">Calculá el costo y el tiempo de entrega con tu código postal.</p>
+					<div class="product-shipping-wrapper shipping-wrapper">
+						{# Shipping calculator and branch link #}
 
-				<div id="product-shipping-container" class="product-shipping-calculator list" {% if not product.display_price or not product.has_stock %}style="display:none;"{% endif %} data-shipping-url="{{ store.shipping_calculator_url }}" data-free-label="{{ 'shipping.free' | t }}">
-					{% if store.has_shipping %}
-						{% include "snippets/shipping/shipping-calculator.tpl" with {'shipping_calculator_variant' : product.selected_or_first_available_variant, 'product_detail': true} %}
-					{% endif %}
+						<div id="product-shipping-container" class="product-shipping-calculator list" {% if not product.display_price or not product.has_stock %}style="display:none;"{% endif %} data-shipping-url="{{ store.shipping_calculator_url }}" data-free-label="{{ 'shipping.free' | t }}">
+							{% if store.has_shipping %}
+								{% include "snippets/shipping/shipping-calculator.tpl" with {'shipping_calculator_variant' : product.selected_or_first_available_variant, 'product_detail': true} %}
+							{% endif %}
+						</div>
+
+						{% if store.branches %}
+							{# Link for branches #}
+							{% include "snippets/shipping/branches.tpl" with {'product_detail': true} %}
+						{% endif %}
+					</div>
 				</div>
-
-				{% if store.branches %}
-					{# Link for branches #}
-					{% include "snippets/shipping/branches.tpl" with {'product_detail': true} %}
-				{% endif %}
 			</div>
 
 		{% endif %}

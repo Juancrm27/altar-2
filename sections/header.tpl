@@ -26,6 +26,8 @@
 {% set horizontal_padding_mobile = full_width and use_different_mobile_padding ? section.settings.horizontal_padding_mobile | default(horizontal_padding) : horizontal_padding %}
 {% set background_color = section.settings.background_color %}
 {% set text_color = section.settings.text_color %}
+{% set altar_commerce_background = section.settings.altar_commerce_background | default('#FBF7E7') %}
+{% set altar_commerce_foreground = section.settings.altar_commerce_foreground | default('#000000') %}
 
 {# Logo settings for CSS variables #}
 {% set logo_height = logo_block ? logo_block.settings.height | default(50) : 50 %}
@@ -83,6 +85,8 @@
 	{% if utilities_icon_foreground %}--header-utilities-foreground: {{ utilities_icon_foreground }};{% endif %}
 	{% if featured_link_color %}--header-featured-link-foreground: {{ featured_link_color }};{% endif %}
 	{% if nav_divider_color %}--header-nav-divider-color: {{ nav_divider_color }};{% endif %}
+	--altar-commerce-background: {{ altar_commerce_background }};
+	--altar-commerce-foreground: {{ altar_commerce_foreground }};
 	--logo-height-mobile: {{ logo_height_mobile }}px;
 	--logo-height-desktop: {{ logo_height }}px;
 	--utility-icon-size: {{ utilities_icon_size }}px;
@@ -300,6 +304,27 @@
 	    "id": "altar_show_cart",
 	    "label": "Mostrar carrito",
 	    "default": true,
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "header",
+	    "content": "Colores de páginas comerciales",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "color",
+	    "id": "altar_commerce_background",
+	    "label": "Fondo",
+	    "default": "#FBF7E7",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
+	    "setting_type": "color",
+	    "id": "altar_commerce_foreground",
+	    "label": "Texto e íconos",
+	    "default": "#000000",
 	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
 	  },
 	  {
