@@ -218,7 +218,8 @@
         breakpoints: {
           768: {
             slidesPerView: columnsDesktop,
-            slidesPerGroup: columnsDesktop
+            slidesPerGroup: columnsDesktop,
+            spaceBetween: 20 // Altar: 8-col grid gutter
           }
         },
         on: {

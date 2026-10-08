@@ -17,7 +17,8 @@
 		</div>
 	{% endif %}
 {% else %}
-	{% if pages.numbers %}
+	{# Altar: no "1 / 1" counter when every product fits on one page #}
+	{% if pages.numbers and pages.amount > 1 %}
 		<div class="pagination-nav">
 			<a {% if pages.previous %}href="{{ pages.previous }}"{% endif %} class="pagination-arrow pagination-arrow-prev {% if not pages.previous %}opacity-30 disabled{% endif %}">
 				<svg class="slider-arrow slider-arrow-prev icon-inline"><use xlink:href="#arrow-long"/></svg>

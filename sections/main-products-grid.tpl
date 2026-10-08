@@ -67,16 +67,11 @@
 
     {# Mobile filter/sort controls + modals #}
     {% if has_filters_available %}
-      {% include 'snippets/product-list/filters/filters-modals.tpl' %}
+      {% include 'snippets/product-list/filters/filters-modals.tpl' with {altar_toolbar: true} %}
     {% endif %}
 
-    {# Main content: Filters sidebar + Product grid #}
-    <div class="grid{% if display_products and has_filters_available %} grid-md-auto-4{% endif %}">
-      {# Filters sidebar (desktop) #}
-      {% if has_filters_available %}
-        {% include 'snippets/product-list/filters/filters-controls.tpl' %}
-      {% endif %}
-
+    {# Main content: the filter drawer is used on every screen size. #}
+    <div>
       {# Product grid #}
       {% set columns_mobile = section.settings.columns_mobile %}
       {% set columns = section.settings.columns %}
@@ -94,17 +89,29 @@
 
       <div data-store="{{ grid_id }}">
         {% if display_products %}
-          {# Sort by - hidden when only placeholders are showing #}
+          {# Altar storefront toolbar. It keeps Tiendanube's native filters and sorting. #}
           {% if has_real_products %}
-            <div class="product-list-sort-by text-right">
-              <div class="d-none d-md-inline-block">
-                {% include 'snippets/product-list/filters/sort-by.tpl' %}
+            <div class="altar-shop-controls">
+              {% if has_filters_available %}
+                <button type="button" class="js-modal-open-private altar-shop-filter" data-target="#modal-filters" data-component="filter-button">
+                  <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#filter"/></svg>
+                  <span>{{ 'general.filter' | t }}</span>
+                </button>
+              {% else %}
+                <span class="altar-shop-controls-spacer" aria-hidden="true"></span>
+              {% endif %}
+              <span class="altar-shop-count">{{ products_count }} {{ 'general.products_label' | t }}</span>
+              <div class="altar-shop-sort">
+                <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#sort-by"/></svg>
+                <div class="altar-shop-sort-field">
+                  {% include 'snippets/product-list/filters/sort-by.tpl' with {label: false} %}
+                </div>
               </div>
             </div>
           {% endif %}
 
           {# Product list #}
-          <div class="js-product-table grid {{ grid_mobile_class }} {{ grid_desktop_class }}">
+          <div class="js-product-table grid {{ grid_mobile_class }} {{ grid_desktop_class }} altar-shop-grid">
             {# Prioritize first 2 product images for LCP. Category bumps the threshold to absorb category-hero. #}
             {% set is_priority_section = section.index <= (template == 'category' ? 3 : 2) %}
             {% for product in display_products %}

@@ -7,6 +7,8 @@
       "settings": {
         "background_color": "#fff3a9",
         "text_color": "#601e2a",
+        "commerce_background_color": "#000000",
+        "commerce_text_color": "#FBF7E7",
         "newsletter_label": "[ NEWSLETTER ]",
         "newsletter_text": "Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.",
         "show_social": true,
@@ -21,9 +23,12 @@
         "explore_store_label": "Store",
         "explore_about_label": "About",
         "explore_makers_label": "Makers",
-        "descriptor": "CONCEPT STORE  /",
-        "footer_payments_show": true,
-        "footer_shipping_show": true
+        "descriptor": "CONCEPT STORE  /  C.A.B.A. (ARG)",
+        "footer_payments_show": false,
+        "footer_shipping_show": false,
+        "newsletter_placeholder": "Tu correo",
+        "newsletter_submit_label": "Suscribirme",
+        "copyright_name": "altar"
       },
       "blocks": {
         "explore": {
@@ -33,8 +38,12 @@
           }
         }
       },
-      "block_order": ["explore"]
+      "block_order": [
+        "explore"
+      ]
     }
   },
-  "order": ["altar_footer"]
+  "order": [
+    "altar_footer"
+  ]
 }

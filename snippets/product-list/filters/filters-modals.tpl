@@ -15,6 +15,7 @@
 } %}
 
 {% if products %}
+	{% if not altar_toolbar %}
 	<div class="js-category-controls category-controls{% if products and has_filters_available %} grid-no-gap grid-2{% endif %}">
 		{% if has_filters_available %}
 			<button class="js-modal-open-private category-filter-button" data-target="#modal-filters" data-component="filter-button">
@@ -37,6 +38,7 @@
 		</button>
 	</div>
 	<div class="js-category-controls-prev category-controls-sticky-detector"></div>
+	{% endif %}
 		{% if has_filters_available %}
 			{% embed 'snippets/modals/modal.tpl' with {
 				modal_id: 'modal-filters',

@@ -2,6 +2,10 @@
 {% set password_page = template == 'password' %}
 {% set background_color = footer_settings.background_color | default('#fff3a9') %}
 {% set text_color = footer_settings.text_color | default('#601e2a') %}
+{% if template != 'home' %}
+  {% set background_color = footer_settings.commerce_background_color | default('#000000') %}
+  {% set text_color = footer_settings.commerce_text_color | default('#FBF7E7') %}
+{% endif %}
 {% set has_social_network = store.facebook or store.twitter or store.pinterest or store.instagram or store.tiktok or store.youtube %}
 
 {{ component('nubesdk-slot', { type: "before_footer" }) }}
@@ -11,8 +15,10 @@
   data-store="footer"
   data-section-id="{{ section.id }}"
   data-header-theme="light"
+  data-grain-footer
   style="--footer-background: {{ background_color }}; --footer-foreground: {{ text_color }}; --footer-foreground-opacity-10: {{ text_color }}1A; --footer-foreground-opacity-20: {{ text_color }}33; --footer-foreground-opacity-40: {{ text_color }}66; --footer-foreground-opacity-60: {{ text_color }}99; background-color: {{ background_color }}; color: {{ text_color }};"
 >
+  {% include 'snippets/altar-grain.tpl' with { grain_id: 'footer-' ~ section.id, grain_class: 'altar-footer__grain' } %}
   {% if not password_page %}
     <div class="altar-footer__top">
       <div class="altar-footer__newsletter">
@@ -22,7 +28,7 @@
         <form class="altar-footer__form newsletter-form" method="post" action="/winnie-pooh" onsubmit="this.setAttribute('action', '');" data-store="newsletter-form">
           <div class="altar-footer__field newsletter-form-wrapper input-append">
             <label class="visually-hidden" for="altar-newsletter-email">{{ 'footer.email_placeholder' | t }}</label>
-            <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input newsletter-form-input form-control" placeholder="{{ 'footer.email_placeholder' | t }}" autocomplete="email" required aria-label="{{ 'footer.email_placeholder' | t }}">
+            <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input newsletter-form-input form-control" placeholder="{{ footer_settings.newsletter_placeholder | default('Tu correo') }}" autocomplete="email" required aria-label="{{ 'footer.email_placeholder' | t }}">
             <div class="winnie-pooh" style="display: none;">
               <label for="winnie-pooh-newsletter-altar">{{ 'contact.do_not_fill' | t }}</label>
               <input id="winnie-pooh-newsletter-altar" type="text" name="winnie-pooh">
@@ -30,8 +36,8 @@
             <input type="hidden" name="name" value="{{ 'newsletter.anonymous_name' | t }}">
             <input type="hidden" name="message" value="{{ 'newsletter.subscription_request' | t }}">
             <input type="hidden" name="type" value="newsletter">
-            <button type="submit" name="contact" class="altar-footer__submit newsletter-form-button" aria-label="{{ 'general.send' | t }}">
-              <span>{{ 'general.send' | t }}</span>
+            <button type="submit" name="contact" class="altar-footer__submit newsletter-form-button">
+              <span>{{ footer_settings.newsletter_submit_label | default('Suscribirme') }}</span>
               <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h5v5M3.5 8.5l5-5"/></svg>
             </button>
           </div>
@@ -50,7 +56,11 @@
               {% set social_url = attribute(store, social_network) %}
               {% if social_url %}
                 <a href="{{ social_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social_network }} {{ store.name }}">
-                  <svg class="icon-inline" aria-hidden="true"><use xlink:href="#{{ social_network }}"/></svg>
+                  {% if social_network == 'instagram' %}
+                    <img class="altar-footer__social-mask" src="{{ 'images/altar-instagram.svg' | static_url }}" alt="" width="24" height="24" style="--altar-social-mask: url('{{ 'images/altar-instagram.svg' | static_url }}');">
+                  {% else %}
+                    <svg class="icon-inline" aria-hidden="true"><use xlink:href="#{{ social_network }}"/></svg>
+                  {% endif %}
                 </a>
               {% endif %}
             {% endfor %}
@@ -105,12 +115,20 @@
 
     {% if footer_settings.descriptor %}<p class="altar-footer__descriptor">{{ footer_settings.descriptor }}</p>{% endif %}
 
-    {% if footer_settings.terms_url or footer_settings.privacy_url %}
-      <nav class="altar-footer__editorial-legal" aria-label="Legales">
-        {% if footer_settings.terms_url %}<a href="{{ footer_settings.terms_url }}">Términos y condiciones</a>{% endif %}
-        {% if footer_settings.privacy_url %}<a href="{{ footer_settings.privacy_url }}">Política de privacidad</a>{% endif %}
-      </nav>
-    {% endif %}
+    <div class="altar-footer__bottom">
+      <div class="altar-footer__meta">
+        <div class="altar-footer__meta-left">
+          <p class="altar-footer__copyright">©{{ 'now' | date('Y') }} {{ footer_settings.copyright_name | default('altar') }}</p>
+          {% if new_powered_by_link %}<span class="altar-footer__powered">{{ new_powered_by_link }}</span>{% endif %}
+        </div>
+        {% if footer_settings.terms_url or footer_settings.privacy_url %}
+          <nav class="altar-footer__editorial-legal" aria-label="Legales">
+            {% if footer_settings.terms_url %}<a href="{{ footer_settings.terms_url }}">{{ footer_settings.terms_label | default('Términos y condiciones') }}</a>{% endif %}
+            {% if footer_settings.privacy_url %}<a href="{{ footer_settings.privacy_url }}">{{ footer_settings.privacy_label | default('Política de privacidad') }}</a>{% endif %}
+          </nav>
+        {% endif %}
+      </div>
+    </div>
 
     {% include 'snippets/footer/footer-country-selector.tpl' %}
   {% endif %}
@@ -157,6 +175,24 @@
     },
     {
       "type": "header",
+      "content": "Colores de páginas comerciales"
+    },
+    {
+      "type": "setting",
+      "setting_type": "color",
+      "id": "commerce_background_color",
+      "label": "Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "setting",
+      "setting_type": "color",
+      "id": "commerce_text_color",
+      "label": "Texto",
+      "default": "#FBF7E7"
+    },
+    {
+      "type": "header",
       "content": "Newsletter y redes"
     },
     {
@@ -172,6 +208,20 @@
       "id": "newsletter_text",
       "label": "Texto",
       "default": "Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar."
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Texto del campo de correo",
+      "default": "Tu correo"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "newsletter_submit_label",
+      "label": "Texto del botón",
+      "default": "Suscribirme"
     },
     {
       "type": "setting",
@@ -328,6 +378,27 @@
       "setting_type": "url",
       "id": "privacy_url",
       "label": "Política de privacidad"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "terms_label",
+      "label": "Texto de términos",
+      "default": "Términos y condiciones"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "privacy_label",
+      "label": "Texto de privacidad",
+      "default": "Política de privacidad"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "copyright_name",
+      "label": "Nombre en el copyright",
+      "default": "altar"
     },
     {
       "type": "header",

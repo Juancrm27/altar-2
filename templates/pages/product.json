@@ -3,16 +3,18 @@
     "main_product": {
       "type": "main-product",
       "settings": {
-        "section_width": "full"
+        "section_width": "page",
+        "column_gap": 20,
+        "vertical_padding": 32
       },
       "blocks": {
         "product_media": {
           "type": "product-media",
           "settings": {
-            "show_thumbnails": true,
+            "show_thumbnails": false,
             "thumbnail_position": "left",
             "format": "grid",
-            "columns": "1_and_2",
+            "columns": "1",
             "gap": 8
           }
         },
@@ -28,7 +30,7 @@
               "type": "description",
               "settings": {
                 "show_title": true,
-                "show_social": true
+                "show_social": false
               }
             },
             "purchase_info": {
@@ -44,16 +46,16 @@
                   "type": "icon-text-item",
                   "settings": {
                     "icon": "returns",
-                    "title": "t:defaults.heading",
-                    "description": "t:defaults.text"
+                    "title": "Cambios",
+                    "description": "Tenés 30 días para cambiar o devolver tu compra. Si llega dañada, escribinos y lo resolvemos."
                   }
                 },
                 "icon_security": {
                   "type": "icon-text-item",
                   "settings": {
                     "icon": "security",
-                    "title": "t:defaults.heading",
-                    "description": "t:defaults.text"
+                    "title": "Pago seguro",
+                    "description": "Pagá con tarjeta, transferencia o efectivo. Tus datos viajan protegidos."
                   }
                 }
               },
@@ -79,7 +81,7 @@
       "settings": {
         "products_source": "complementary",
         "section_width": "page",
-        "gap": 32,
+        "gap": 16,
         "vertical_padding": 0,
         "horizontal_padding": 0
       },
@@ -109,7 +111,7 @@
       "settings": {
         "products_source": "alternative",
         "section_width": "page",
-        "gap": 32,
+        "gap": 16,
         "vertical_padding": 0,
         "horizontal_padding": 0
       },

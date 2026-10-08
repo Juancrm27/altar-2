@@ -602,6 +602,8 @@ const DEFAULT_LIGHTING = {
   foilBrushed: 0,
   foilBrushedAngle: 0,
   spaceColor: "#2d2838",
+  uiPrimaryColor: "#fff3a9",
+  uiSecondaryColor: "#601e2a",
   glowRoseColor: "#2d1a60",
   glowRoseIntensity: 5,
   glowCyanColor: "#7b41e6",
@@ -652,6 +654,32 @@ const COMPACT_LIGHTING = {
   manifestoY: 120,
 };
 const lightingDefaults = () => ({ ...DEFAULT_LIGHTING, ...(COMPACT_LAYOUT.matches ? COMPACT_LIGHTING : {}) });
+
+// UI palette (static/css/altar.css :root). The CSS follows the two variables; the SVG icons carry the primary
+// yellow inside the file, so they are re-tinted from their original source when it changes.
+const UI_ICON_PRIMARY = /#fff3a9/gi;
+const uiIconSources = new Map();
+let appliedUiPalette = "";
+function applyUiPalette(primary = DEFAULT_LIGHTING.uiPrimaryColor, secondary = DEFAULT_LIGHTING.uiSecondaryColor) {
+  const key = `${primary}|${secondary}`;
+  if (key === appliedUiPalette) return;
+  appliedUiPalette = key;
+  const rootStyle = document.documentElement.style;
+  rootStyle.setProperty("--altar-primary", primary);
+  rootStyle.setProperty("--altar-secondary", secondary);
+  const isDefault = primary.toLowerCase() === DEFAULT_LIGHTING.uiPrimaryColor;
+  document.querySelectorAll(".altar-nav img, .altar-solar img, .altar-footer img").forEach(async (image) => {
+    const original = image.dataset.uiIconSrc || image.getAttribute("src") || "";
+    if (!/\.svg(\?|$)/i.test(original)) return;
+    image.dataset.uiIconSrc = original;
+    if (isDefault) { image.src = original; return; }
+    if (!uiIconSources.has(original)) uiIconSources.set(original, fetch(original).then((response) => response.text()).catch(() => ""));
+    const markup = await uiIconSources.get(original);
+    if (!UI_ICON_PRIMARY.test(markup) || appliedUiPalette !== key) return;
+    UI_ICON_PRIMARY.lastIndex = 0;
+    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup.replace(UI_ICON_PRIMARY, primary))}`;
+  });
+}
 
 const PLANET_LAYOUT = {
   sun:      { position: [-2.3, -0.7, -1.5], radius: 1.15 },
@@ -1239,7 +1267,8 @@ class SolarExperience {
     this.root = root;
     this.stage = root.querySelector("[data-solar-stage]");
     this.canvas = root.querySelector(".altar-solar__canvas");
-    this.grainLayers = Array.from(root.querySelectorAll("[data-grain-turbulence]")).map((node) => ({
+    // Every grain on the page (hero, sections 3·4 and the footer, which lives outside this root).
+    this.grainLayers = Array.from(document.querySelectorAll("[data-grain-turbulence]")).map((node) => ({
       node,
       section: Number(node.dataset.grainSection || 1),
       lastUpdate: 0,
@@ -1612,10 +1641,13 @@ class SolarExperience {
     this.root.style.setProperty("--effect-blur", `calc(${Number(settings.effectBlur)} * var(--u, 1px))`);
     this.root.style.setProperty("--grain-opacity", Number(settings.grainOpacity));
     this.root.style.setProperty("--section-grain-opacity", Number(settings.sectionGrainOpacity));
+    // The footer grain sits outside the solar root, so the section grain opacity also goes on :root.
+    document.documentElement.style.setProperty("--section-grain-opacity", Number(settings.sectionGrainOpacity));
     this.grainLayers.forEach((layer) => {
       layer.node.setAttribute("baseFrequency", Number(settings.grainFrequency).toFixed(2));
     });
     this.root.style.setProperty("--space-color", settings.spaceColor);
+    applyUiPalette(settings.uiPrimaryColor, settings.uiSecondaryColor);
     this.root.style.setProperty("--card-flip-duration", `${Number(settings.cardFlipDuration)}ms`);
     this.root.style.setProperty("--card-scale", Number(settings.cardScale));
     this.root.style.setProperty("--campaign-scale", Number(settings.layoutCampaignScale));
@@ -1780,6 +1812,10 @@ class SolarExperience {
       <div class="lighting-panel__body">
         <label class="is-boolean">Recordar cambios <input type="checkbox" data-lighting-persist></label>
         <label class="is-boolean">Ver tramos <input type="checkbox" data-lighting="showSections"></label>
+        <details><summary>Paleta UI</summary>
+          <label class="is-color">Primario <input type="color" data-lighting="uiPrimaryColor"></label>
+          <label class="is-color">Secundario <input type="color" data-lighting="uiSecondaryColor"></label>
+        </details>
         <details><summary>Manifiesto</summary>
           <label>Bloque X px <span><input type="range" min="-800" max="800" step="1" data-lighting="manifestoX"><output></output></span></label>
           <label>Bloque Y px <span><input type="range" min="-800" max="800" step="1" data-lighting="manifestoY"><output></output></span></label>
@@ -2567,6 +2603,8 @@ ${stonePositionsMarkup(4)}
 
   setupFoilCards() {
     this.foilCards = [];
+    // One deck for every channel: the front is always the star; the revealed face is one of the figures, at random.
+    this.cardVariantIndex = pickCardVariant();
     if (!window.WebGLRenderingContext) return;
 
     this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
@@ -2575,7 +2613,8 @@ ${stonePositionsMarkup(4)}
       const foilUrl = card.dataset.foilMap;
       if (!canvas || !baseUrl || !(foilUrl || card.dataset.foilFrame)) return;
 
-      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, 0, foilUrl)])
+      const variant = card.dataset.foilFrame ? this.cardVariantIndex : 0;
+      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, variant, foilUrl)])
         .then(([baseMap, foilMap]) => {
           const renderer = new THREE.WebGLRenderer({
             canvas,
@@ -2616,7 +2655,7 @@ ${stonePositionsMarkup(4)}
           const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
           scene.add(mesh);
 
-          const effect = { card, renderer, scene, camera, material, baseUrl, foilUrl: messageFrameUrl(card, 0) || foilUrl, maskSize: new THREE.Vector2(foilMap.image.width, foilMap.image.height) };
+          const effect = { card, renderer, scene, camera, material, baseUrl, foilUrl: messageFrameUrl(card, variant) || foilUrl, maskSize: new THREE.Vector2(foilMap.image.width, foilMap.image.height) };
           this.foilCards.push(effect);
           renderer.render(scene, camera);
           card.classList.add("is-foil-rendered");
@@ -2692,7 +2731,7 @@ ${stonePositionsMarkup(4)}
     afterIntro(() => {
       CHANNELS.forEach((_, index) => {
         photoSources(index).forEach(decodePhoto);
-        this.preloadCardChannel(index);
+        this.preloadCardVariant(index);
       });
     });
 
@@ -2750,8 +2789,6 @@ ${stonePositionsMarkup(4)}
       const index = current;
       const background = backgroundFor(index);
       applyLabel(index);
-      this.closeFortuneCard?.();
-      this.setCardChannel(index);
       // Everything animated starts together once the new photos are decoded.
       photosReady(index).then(() => {
         this.moveSystemToChannel(index, !REDUCED_MOTION.matches);
@@ -2779,7 +2816,6 @@ ${stonePositionsMarkup(4)}
       applyLabel(current);
       applyPhoto(current);
       applyBackground(backgroundFor(current));
-      this.setCardChannel(current);
       this.moveSystemToChannel(current, false);
       this.moveGroundToChannel(current, false);
     };
@@ -3315,7 +3351,7 @@ ${stonePositionsMarkup(4)}
     if (handle) {
       context.font = `300 ${SHARE_HANDLE_SIZE}px Inter, Arial, Helvetica, sans-serif`;
       if ("letterSpacing" in context) context.letterSpacing = "-0.33px";
-      context.fillStyle = "#fff3a9";
+      context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--altar-primary").trim() || "#fff3a9";
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.fillText(handle.toLocaleUpperCase("es"), SHARE_WIDTH / 2, SHARE_HANDLE_Y);
@@ -3324,32 +3360,25 @@ ${stonePositionsMarkup(4)}
     return new Promise((resolve) => output.toBlob(resolve, "image/jpeg", 0.92));
   }
 
-  // Swaps both card faces to a channel's artwork; faces without a channel variant keep channel 1.
-  setCardChannel(index) {
-    const suffix = index + 1;
-    this.cardChannelIndex = index;
+  // Puts one of the figures (message frames) on the revealed face; the current phrase is drawn over it.
+  // The front artwork never changes.
+  setCardVariant(index) {
+    this.cardVariantIndex = index;
     this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
-      const baseUrl = card.getAttribute(`data-channel-base-${suffix}`) || card.dataset.foilBase;
-      const foilUrl = card.getAttribute(`data-channel-map-${suffix}`) || card.dataset.foilMap;
-      const fallbackImage = card.querySelector(":scope > img");
-      if (fallbackImage && baseUrl) fallbackImage.src = baseUrl;
       const frameUrl = messageFrameUrl(card, index);
+      if (!frameUrl) return;
       const message = card.querySelector(".altar-solar__fortune-copy p");
-      if (message) {
-        message.dataset.defaultMessage ??= message.textContent;
-        message.textContent = frameUrl && this.messageMap
-          ? this.messageMap.phrase
-          : card.getAttribute(`data-channel-message-${suffix}`) || message.dataset.defaultMessage;
-      }
+      if (message && this.messageMap) message.textContent = this.messageMap.phrase;
       const effect = this.foilCards?.find((item) => item.card === card);
-      // A message face drawn over a frame is keyed by the frame; the phrase changes inside the same texture.
-      const mapKey = frameUrl || foilUrl;
-      if (!effect || (effect.baseUrl === baseUrl && effect.foilUrl === mapKey)) return;
-      effect.baseUrl = baseUrl;
-      effect.foilUrl = mapKey;
-      Promise.all([this.loadFoilTexture(baseUrl), this.loadCardMap(card, index, foilUrl)]).then(([baseMap, foilMap]) => {
-        if (effect.baseUrl !== baseUrl || effect.foilUrl !== mapKey) return;
-        effect.material.uniforms.uBaseMap.value = baseMap;
+      if (!effect) return;
+      // Same figure: only the phrase changes inside the same texture.
+      if (effect.foilUrl === frameUrl) {
+        this.drawMessageMap();
+        return;
+      }
+      effect.foilUrl = frameUrl;
+      this.loadCardMap(card, index, frameUrl).then((foilMap) => {
+        if (effect.foilUrl !== frameUrl) return;
         effect.material.uniforms.uFoilMap.value = foilMap;
         effect.maskSize.set(foilMap.image.width, foilMap.image.height);
       });
@@ -3405,8 +3434,8 @@ ${stonePositionsMarkup(4)}
     const map = this.messageMap;
     if (!map) return;
     clearTimeout(this.fortunePhraseTimer);
-    // Reopened before the next phrase was ready: pick it now.
-    if (map.revealed && !map.prepared) this.setFortunePhrase(pickFortunePhrase(map.phrase));
+    // Reopened before the next draw was ready: pick phrase and figure now.
+    if (map.revealed && !map.prepared) this.drawNextFortune();
     map.revealed = true;
     map.prepared = false;
     markFortuneSeen(map.phrase);
@@ -3417,28 +3446,22 @@ ${stonePositionsMarkup(4)}
     clearTimeout(this.fortunePhraseTimer);
     if (!map?.revealed) return;
     this.fortunePhraseTimer = setTimeout(() => {
-      this.setFortunePhrase(pickFortunePhrase(map.phrase));
+      this.drawNextFortune();
       map.prepared = true;
     }, delay);
   }
 
-  setFortunePhrase(phrase) {
+  // A new random phrase on a new random figure, drawn while the card is face down.
+  drawNextFortune() {
     const map = this.messageMap;
-    map.phrase = phrase;
-    if (map.message && messageFrameUrl(map.message.closest("[data-foil-card]"), this.cardChannelIndex ?? 0)) {
-      map.message.textContent = phrase;
-    }
-    this.drawMessageMap();
+    if (!map) return;
+    map.phrase = pickFortunePhrase(map.phrase);
+    this.setCardVariant(pickCardVariant(this.cardVariantIndex));
   }
 
-  // Fetches a channel's card textures early so the first switch to it doesn't wait on the network.
-  preloadCardChannel(index) {
-    const suffix = index + 1;
+  // Warms the image cache for a figure so revealing it never waits on the network.
+  preloadCardVariant(index) {
     this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
-      [card.getAttribute(`data-channel-base-${suffix}`), card.getAttribute(`data-channel-map-${suffix}`)]
-        .filter(Boolean)
-        .forEach((url) => this.loadFoilTexture(url).catch(() => {}));
-      // Message frames are drawn into the shared canvas later; warming the image cache is enough.
       const frameUrl = messageFrameUrl(card, index);
       if (frameUrl) loadImage(frameUrl).catch(() => {});
     });
@@ -3581,20 +3604,23 @@ ${stonePositionsMarkup(4)}
     this.timer.update(time);
     const delta = Math.min(this.timer.getDelta(), 0.1);
     this.renderFoilCards(time);
-    if (!this.visible || !this.renderer) return;
-    this.updateStars(REDUCED_MOTION.matches ? 0 : this.timer.getElapsed(), REDUCED_MOTION.matches ? 0 : delta);
-    this.updateSystem(this.timer.getElapsed(), delta);
-    if (!REDUCED_MOTION.matches) this.updateShootingStars(this.timer.getElapsed(), delta);
+    // Grain keeps moving while the 3D sleeps off screen: sections 3·4 and the footer still show it.
     if (!REDUCED_MOTION.matches) {
-      this.updateOrbits(delta);
+      const refreshRate = Math.max(1, Number(this.effectSettings?.grainSpeed ?? DEFAULT_LIGHTING.grainSpeed));
       this.grainLayers.forEach((layer) => {
-        const refreshRate = Math.max(1, Number(this.effectSettings?.grainSpeed ?? DEFAULT_LIGHTING.grainSpeed));
         if (time - layer.lastUpdate >= 1000 / refreshRate) {
           layer.seed = (layer.seed % 97) + 1;
           layer.node.setAttribute("seed", layer.seed);
           layer.lastUpdate = time;
         }
       });
+    }
+    if (!this.visible || !this.renderer) return;
+    this.updateStars(REDUCED_MOTION.matches ? 0 : this.timer.getElapsed(), REDUCED_MOTION.matches ? 0 : delta);
+    this.updateSystem(this.timer.getElapsed(), delta);
+    if (!REDUCED_MOTION.matches) this.updateShootingStars(this.timer.getElapsed(), delta);
+    if (!REDUCED_MOTION.matches) {
+      this.updateOrbits(delta);
     }
     this.drawScene();
   };
@@ -3820,7 +3846,15 @@ function grainTile() {
   return (grainTile.canvas = canvas);
 }
 
-// Channel 1 reads data-foil-frame, the others data-channel-frame-N; no frame means a fixed map image.
+// Figures for the revealed face: data-foil-frame (star) and data-channel-frame-2…4 (flower, dots, circle).
+const CARD_VARIANTS = 4;
+
+function pickCardVariant(previous) {
+  const options = [...Array(CARD_VARIANTS).keys()].filter((index) => index !== previous);
+  return options[Math.floor(Math.random() * options.length)];
+}
+
+// Figure 1 reads data-foil-frame, the others data-channel-frame-N; no frame means a fixed map image.
 function messageFrameUrl(card, index) {
   if (!card) return null;
   return index === 0 ? card.dataset.foilFrame : card.getAttribute(`data-channel-frame-${index + 1}`);
@@ -4231,6 +4265,8 @@ function initNewsletterPreview() {
 }
 
 function initSolarExperiences() {
+  // Scheduled first so it still runs if the 3D fails to start (no WebGL, model error).
+  setTimeout(initPageGrain, 0);
   initHeaderTheme();
   updateLiveDates();
   initNewsletterPreview();
@@ -4238,6 +4274,22 @@ function initSolarExperiences() {
     if (!root.solarExperience) root.solarExperience = new SolarExperience(root);
   });
   playIntro();
+}
+
+// Pages without a running 3D home (shop, product, cart… or a home whose WebGL failed) still move their
+// grain (footer, page background, sections 3·4): the same re-seeding at the panel's default refresh rate.
+// When the 3D runs, its own loop animates every grain and follows the lighting panel instead.
+function initPageGrain() {
+  const solarRunning = Array.from(document.querySelectorAll("[data-altar-solar]")).some((root) => root.solarExperience?.renderer);
+  if (solarRunning || REDUCED_MOTION.matches) return;
+  const nodes = Array.from(document.querySelectorAll("[data-grain-turbulence]"));
+  if (!nodes.length) return;
+  let seed = 1;
+  setInterval(() => {
+    if (document.hidden) return;
+    seed = (seed % 97) + 1;
+    nodes.forEach((node) => node.setAttribute("seed", seed));
+  }, 1000 / DEFAULT_LIGHTING.grainSpeed);
 }
 
 // Opening sequence, after virgilabloh.com: the frame (metadata, dashed rules) assembles first,

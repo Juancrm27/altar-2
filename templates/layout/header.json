@@ -18,6 +18,8 @@
         "altar_show_search": true,
         "altar_show_account": true,
         "altar_show_cart": true,
+        "altar_commerce_background": "#FBF7E7",
+        "altar_commerce_foreground": "#000000",
         "logo_position_desktop": "left",
         "section_width": "full",
         "vertical_padding": 0,

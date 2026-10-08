@@ -1,6 +1,7 @@
 /* Simulation only (.dev/ipanema.html). Everything else comes from Ipanema's CSS + altar.css.
    These rules fill the gaps where the simulation uses simplified markup, plus the "simulation map" panel. */
 body[data-sim] { margin: 0; color: var(--main-foreground); background: var(--main-background); font-family: var(--body-font); font-size: var(--font-base); }
+body[data-sim]:is(.template-category, .template-search, .template-product, .template-contact) { background: transparent; } /* as altar.css: grain layer shows through */
 .sim-section { padding-top: 32px; padding-bottom: 64px; }
 .sim-page-header { margin-bottom: 24px; }
 .sim-page-header h1 { margin: 0; font-family: var(--heading-font); font-size: var(--h3); }
@@ -16,10 +17,18 @@ body[data-sim] { margin: 0; color: var(--main-foreground); background: var(--mai
 .sim-inline-form .form-control { flex: 1; min-width: 0; }
 
 /* Catalog */
-.sim-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
-.sim-sort { display: flex; align-items: center; gap: 6px; }
-.sim-grid { --grid-gap: 16px; gap: 16px; }
+.template-category[data-sim] .sim-section { padding-bottom: 32px; font-family: "Inter", sans-serif; }
+.sim-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px; margin-bottom: 24px; }
+.sim-controls .altar-shop-count { justify-self: center; }
+.sim-sort { display: flex; width: 198px; align-items: center; gap: 8px; margin: 0; }
+.sim-sort .form-select { width: 176px; height: 42px; margin: 0; font: 400 12px/1 "Inter", sans-serif; }
+.sim-grid { --grid-gap: 20px; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: dense; column-gap: 20px; row-gap: 43px; }
+.sim-grid > .product-item { min-width: 0; margin: 0; }
+.sim-grid > .product-item:nth-child(18n + 1) { grid-column: 3 / span 2; grid-row: span 2; }
+.sim-grid > .product-item:nth-child(18n + 10) { grid-column: 1 / span 2; grid-row: span 2; }
 .sim-product-image { position: relative; display: block; overflow: hidden; aspect-ratio: 440 / 600; background: var(--main-foreground-opacity-05); }
+.sim-grid > .product-item:nth-child(18n + 1) .sim-product-image,
+.sim-grid > .product-item:nth-child(18n + 10) .sim-product-image { aspect-ratio: 636 / 968; }
 .sim-product-image img { width: 100%; height: 100%; object-fit: cover; transition: opacity .3s ease; }
 .sim-product-image-hover { position: absolute; inset: 0; opacity: 0; }
 .sim-product-image:hover .sim-product-image-hover { opacity: 1; }
@@ -32,7 +41,26 @@ body[data-sim] { margin: 0; color: var(--main-foreground); background: var(--mai
 .sim-filter-list li { padding: 6px 0; }
 .sim-filter-list a { color: inherit; }
 
-/* Product */
+@media (max-width: 767px) {
+  .sim-section { padding-top: 20px; }
+  .sim-controls { grid-template-columns: auto 1fr; gap: 12px; }
+  .sim-controls .altar-shop-count { display: none; }
+  .sim-sort { justify-self: end; }
+  .sim-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
+  .sim-grid > .product-item { grid-column: auto; grid-row: auto; }
+  .sim-grid .sim-product-image { aspect-ratio: 171 / 233; }
+  .sim-grid > .product-item:nth-child(7n + 1) { grid-column: 1 / -1; }
+  .sim-grid > .product-item:nth-child(7n + 1) .sim-product-image { aspect-ratio: 358 / 384; }
+}
+
+/* Product (layout comes from the theme + altar.css; only sim helpers here) */
+.section-main-product .sim-section { padding-top: 0; padding-bottom: 48px; }
+.product-stock-alert:empty { display: none; }
+.sim-related { padding-bottom: 64px; }
+.sim-related-grid { margin-top: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 20px; }
+.sim-related-grid > .product-item { margin: 0; }
+.sim-related-grid .sim-product-image { aspect-ratio: 310 / 423; }
+@media (max-width: 767px) { .sim-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; } }
 .sim-product { display: grid; gap: 32px; }
 @media (min-width: 768px) { .sim-product { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
 .sim-gallery { display: grid; gap: 8px; }

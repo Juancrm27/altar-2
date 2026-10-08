@@ -259,9 +259,11 @@ function freeShippingBar() {
 
 function shippingCalculator() {
   return `<form class="sim-shipping" data-sim-shipping>
-      <label class="form-label" for="sim-zip">${esc(t("shipping.calculate_shipping", "Calcular envío"))}</label>
-      <div class="sim-inline-form"><input id="sim-zip" class="form-control" inputmode="numeric" placeholder="${esc(t("shipping.your_zipcode", "Tu código postal"))}" required>
-      <button class="btn btn-secondary" type="submit">${esc(t("shipping.calculate", "Calcular"))}</button></div>
+      <div class="js-shipping-calculator-form">
+        <label class="form-label" for="sim-zip">${esc(t("shipping.calculate_shipping", "Calcular envío"))}</label>
+        <div class="input-append sim-inline-form"><input id="sim-zip" class="js-shipping-input form-control" inputmode="numeric" placeholder="${esc(t("shipping.your_zipcode", "Tu código postal"))}" required>
+        <button class="js-calculate-shipping btn btn-secondary btn-inline btn-outline" type="submit">${esc(t("shipping.calculate", "Calcular"))}</button></div>
+      </div>
       <div class="sim-shipping-results" data-sim-shipping-results></div>
     </form>`;
 }
@@ -330,9 +332,9 @@ const container = (inner, cls = "") => `<section class="container sim-section ${
 
 function productLabels(product) {
   const labels = [];
-  if (product.comparePrice) labels.push(`<span class="label label-default">${Math.round((1 - product.price / product.comparePrice) * 100)}% OFF</span>`);
-  if (product.freeShipping) labels.push(`<span class="label label-secondary">${icon("truck", "label-icon icon-inline")} ${esc(t("product.free_shipping", "Envío gratis"))}</span>`);
-  if (stockFor(product, defaultVariant(product)) === 0 && !Object.keys(product.options).length) labels.push(`<span class="label sim-label-nostock">${esc(t("product.out_of_stock", "Sin stock"))}</span>`);
+  if (product.comparePrice) labels.push(`<span class="label product-item-promo-label label-primary">${Math.round((1 - product.price / product.comparePrice) * 100)}% OFF</span>`);
+  if (product.freeShipping) labels.push(`<span class="label label-secondary shipping-label">${icon("truck", "label-icon icon-inline")} ${esc(t("product.free_shipping", "Envío gratis"))}</span>`);
+  if (stockFor(product, defaultVariant(product)) === 0 && !Object.keys(product.options).length) labels.push(`<span class="label product-item-no-stock sim-label-nostock">${esc(t("product.out_of_stock", "Sin stock"))}</span>`);
   return labels.length ? `<div class="labels sim-labels">${labels.join("")}</div>` : "";
 }
 
@@ -349,13 +351,13 @@ function productItem(product) {
           ${product.comparePrice ? `<span class="product-item-price-compare">${money(product.comparePrice)}</span>` : ""}
           <span class="js-price-display product-item-price">${money(product.price)}</span>
         </div>
-        <div class="sim-muted sim-small">${store.installments} cuotas sin interés de ${money(Math.round(product.price / store.installments))}</div>
+        <div class="product-item-installments">${store.installments} cuotas sin interés de ${money(Math.round(product.price / store.installments))}</div>
       </div>
     </div>`;
 }
 
 function productGrid(list) {
-  return `<div class="js-product-table grid grid-2 grid-md-4 sim-grid">${list.map(productItem).join("")}</div>`;
+  return `<div class="js-product-table grid grid-2 grid-md-4 sim-grid altar-shop-grid">${list.map(productItem).join("")}</div>`;
 }
 
 function categoryPage({ slug, query }) {
@@ -374,13 +376,12 @@ function categoryPage({ slug, query }) {
     return container(pageHeader(t("search.search_results", "Resultados de búsqueda")) + heading + productGrid(list.length ? list : products.slice(0, 4)));
   }
 
-  const breadcrumbs = `<nav class="breadcrumbs sim-breadcrumbs"><a href="${BASE}#/tienda">Inicio</a> / ${category ? `<a href="${BASE}#/tienda">Tienda</a> / <span>${esc(category.name)}</span>` : "<span>Tienda</span>"}</nav>`;
-  const controls = `<div class="filters-controls-content sim-controls">
-      <button type="button" class="btn btn-secondary btn-small" data-sim-open="#modal-filters">${icon("filter")} Filtrar</button>
-      <span class="sim-muted">${list.length} ${esc(t("general.products_label", "productos"))}</span>
-      <label class="product-list-sort-by sim-sort">${icon("sort-by")} <select class="form-select" data-sim-sort>
+  const controls = `<div class="filters-controls-content sim-controls altar-shop-controls">
+      <button type="button" class="btn btn-secondary btn-small altar-shop-filter" data-sim-open="#modal-filters">${icon("filter", "altar-shop-control-icon icon-inline")} Filtrar</button>
+      <span class="altar-shop-count">${list.length} ${esc(t("general.products_label", "productos"))}</span>
+      <label class="product-list-sort-by sim-sort altar-shop-sort">${icon("sort-by", "altar-shop-control-icon icon-inline")} <span class="altar-shop-sort-field"><span class="form-group"><select class="form-select form-select-small" data-sim-sort>
         ${[["relevancia", "Más relevantes"], ["menor", "Precio: menor a mayor"], ["mayor", "Precio: mayor a menor"], ["az", "A - Z"]].map(([v, l]) => `<option value="${v}" ${v === sort ? "selected" : ""}>${l}</option>`).join("")}
-      </select></label>
+      </select><span class="form-select-icon">${icon("chevron-down", "form-select-arrow icon-inline")}</span></span></span></label>
     </div>`;
   const filters = modal({ id: "modal-filters", title: "Filtrar", from: "left", widthDesktop: "small",
     body: `<p class="form-label">${esc(t("filters.categories_title", "Categorías"))}</p>
@@ -388,8 +389,8 @@ function categoryPage({ slug, query }) {
       <p class="form-label">${esc(t("filters.price.label", "Precio"))}</p>
       <div class="sim-inline-form"><input class="form-control" placeholder="${esc(t("filters.price.from", "Desde"))}"><input class="form-control" placeholder="${esc(t("filters.price.to", "Hasta"))}"><button type="button" class="btn btn-secondary">${esc(t("filters.price.apply", "Aplicar"))}</button></div>
       <p class="sim-note">Simulación: el filtro de precio no se aplica.</p>` });
-  return container(breadcrumbs + pageHeader(category ? category.name : "Tienda", `<p class="page-header-description sim-muted">Encabezado de categoría (category-hero / page-header).</p>`) + controls + productGrid(list) +
-    `<nav class="pagination-nav sim-pagination"><span class="pagination-counter">1 / 1</span></nav>`) + filters;
+  return container(controls + productGrid(list) +
+    "") + filters; // pagination.tpl hides the counter when there is a single page
 }
 
 const optionAxes = (product) => Object.entries(product.options);
@@ -400,44 +401,86 @@ function productPage({ slug }) {
   if (!product) return notFoundPage();
   const category = store.categories.find((c) => c.slug === product.category);
   const related = products.filter((p) => p.slug !== slug).slice(0, 4);
+  const cuota = money(Math.round(product.price / store.installments));
+  // Mirrors snippets/product/product-variants.tpl (label + strong value, js-variant-button chips).
   const variants = optionAxes(product).map(([axis, values], index) => `
     <div class="js-product-variants-group product-detail-variants-group">
-      <label class="form-label">${esc(axis)}: <strong data-sim-axis-label="${index}">${esc(values[0])}</strong></label>
-      <div class="sim-variant-buttons">${values.map((value, i) => `<button type="button" class="js-variant-button btn btn-variant ${i === 0 ? "selected" : ""}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content">${esc(value)}</span></button>`).join("")}</div>
+      <label class="form-label">${esc(axis)}: <strong class="js-insta-variation-label" data-sim-axis-label="${index}">${esc(values[0])}</strong></label>
+      ${values.map((value, i) => `<a class="js-variant-button btn btn-variant ${i === 0 ? "selected" : ""}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content">${esc(value)}</span></a>`).join("")}
     </div>`).join("");
-  return container(`
-    <nav class="breadcrumbs sim-breadcrumbs"><a href="${BASE}#/tienda">Inicio</a> / <a href="${BASE}#/categoria/${category.slug}">${esc(category.name)}</a> / <span>${esc(product.name)}</span></nav>
-    <div class="js-product-detail js-product-container sim-product" data-sim-product="${product.slug}">
-      <div class="js-product-images sim-gallery">${product.images.map((src) => `<img src="${src}" alt="${esc(product.name)}">`).join("")}</div>
-      <div class="js-product-info sim-product-info">
-        ${productLabels(product)}
-        <h1 class="js-product-name product-name">${esc(product.name)}</h1>
-        <div class="js-price-container product-price">
-          ${product.comparePrice ? `<span class="js-compare-price-display product-price-compare">${money(product.comparePrice)}</span>` : ""}
-          <span class="js-price-display product-price-display">${money(product.price)}</span>
+  const freeShipping = product.freeShipping
+    ? `<span class="text-accent">${esc(t("product.free_shipping", "Envío gratis"))}</span>`
+    : `<span class="text-accent">${esc(t("product.free_shipping", "Envío gratis"))}</span> <span>${esc(t("product.free_shipping_exceeding", "superando los"))} ${money(store.freeShippingFrom)}</span>`;
+  // Mirrors sections/main-product.tpl + blocks/product-info.tpl + snippets/product/product-form.tpl (Figma 363:308).
+  return `<section class="section section-main-product">
+    <div class="container sim-section">
+      <div class="js-product-detail js-product-container product-columns" data-sim-product="${product.slug}">
+        <div class="js-product-images product-images">
+          <div class="product-images-slider product-images-grid product-images-grid-columns-1" style="--product-images-grid-gap: 8px;"><div class="swiper-wrapper">
+            ${product.images.map((src) => `<div class="js-product-slide swiper-slide"><a class="js-product-slide-link product-slide-link" href="${src}" style="padding-bottom: 136.36%;"><img class="product-slider-image img-absolute" src="${src}" alt="${esc(product.name)}" style="width:100%;height:100%;object-fit:cover;"></a></div>`).join("")}
+          </div></div>
         </div>
-        ${product.comparePrice ? `<p class="sim-muted">${esc(t("product.compare_price_saving_message", "Ahorrás:"))} ${money(product.comparePrice - product.price)}</p>` : ""}
-        <p class="product-payment-discount sim-muted">${store.installments} cuotas sin interés de ${money(Math.round(product.price / store.installments))} · <a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments">${esc(t("product.see_payment_methods", "Ver medios de pago"))}</a></p>
-        <form class="js-product-form product-form" data-sim-product-form>
-          <div class="js-product-variants product-detail-variants">${variants}</div>
-          <p class="js-product-stock product-stock-label sim-stock" data-sim-stock></p>
-          <div class="sim-actions">
-            <div class="form-quantity-container"><div class="form-quantity sim-quantity">
-              <button type="button" class="js-quantity-down form-quantity-icon btn" data-sim-step="-1" aria-label="Restar">${icon("minus")}</button>
-              <input class="form-control sim-qty-input" type="number" min="1" value="1" data-sim-qty-input aria-label="Cantidad">
-              <button type="button" class="js-quantity-up form-quantity-icon btn" data-sim-step="1" aria-label="Sumar">${icon("plus")}</button>
-            </div></div>
-            <button type="submit" class="js-addtocart js-prod-submit-form btn btn-primary btn-big btn-block" data-sim-add>${esc(t("product.add_to_cart", "Agregar al carrito"))}</button>
+        <div class="js-product-info product-info altar-product-info d-flex flex-column">
+          <div class="product-content altar-product">
+            <div class="altar-product-head">
+              <div class="altar-product-head-price">
+                <span class="altar-product-marker" aria-hidden="true"></span>
+                <div class="js-price-container product-price"><div class="product-price-main">
+                  ${product.comparePrice ? `<div class="js-compare-price-display product-price-compare">${money(product.comparePrice)}</div>` : ""}
+                  <div class="product-price-row"><span class="js-price-display product-price-display">${money(product.price)}</span></div>
+                </div></div>
+              </div>
+              <span class="altar-product-category">${esc(category.name)}</span>
+            </div>
+            <h1 class="js-product-name product-name">${esc(product.name)}</h1>
+            <form class="js-product-form product-form" data-sim-product-form>
+              <div class="js-product-variants product-detail-variants">${variants}</div>
+              <div class="product-stock-alert" data-sim-stock></div>
+              <div class="product-actions">
+                <div class="form-quantity-container"><div class="form-quantity">
+                  <span class="js-quantity-down form-quantity-icon btn" data-sim-step="-1" aria-label="Restar">${icon("minus")}</span>
+                  <input class="form-control js-quantity-input" type="number" min="1" value="1" data-sim-qty-input aria-label="Cantidad">
+                  <span class="js-quantity-up form-quantity-icon btn" data-sim-step="1" aria-label="Sumar">${icon("plus")}</span>
+                </div></div>
+                <div class="buy-button-container"><button type="submit" class="js-addtocart js-prod-submit-form btn btn-primary btn-big btn-block cart" data-sim-add>${esc(t("product.add_to_cart", "Agregar al carrito"))}</button></div>
+              </div>
+              <p class="alert alert-warning" data-sim-add-error style="display:none;"></p>
+            </form>
+            <div class="altar-product-specs">
+              <div class="altar-spec-row">
+                <div class="altar-spec"><span class="altar-spec-label">Maker:</span><span class="altar-spec-value">Altar</span></div>
+                <div class="altar-spec"><span class="altar-spec-label">SKU:</span><span class="altar-spec-value altar-spec-sku"><span class="altar-barcode" aria-hidden="true"></span><span class="js-product-sku">ALT-${esc(product.slug.toUpperCase().slice(0, 3))}-0001</span></span></div>
+              </div>
+              <div class="js-product-payments-container product-payments-info altar-spec-row">
+                <div class="altar-spec"><span class="altar-spec-label">Cuotas:</span><div class="product-installment">${store.installments} cuotas sin interés de ${cuota}</div></div>
+                <div class="altar-spec"><span class="altar-spec-label">Medios de pago:</span><div class="product-payment-discount">Tarjetas · Transferencia · Efectivo</div><a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments">${esc(t("product.see_payment_methods", "Ver medios de pago"))}</a></div>
+              </div>
+              <div class="altar-spec-row">
+                <div class="altar-spec altar-spec-stock"><span class="altar-spec-label">Stock:</span><span class="altar-spec-value altar-stock-available">Disponible</span><span class="altar-spec-value altar-stock-none">${esc(t("product.out_of_stock", "Sin stock"))}</span></div>
+                <div class="js-free-shipping-minimum-message free-shipping-message product-free-shipping altar-spec"><span class="altar-spec-label">Envío:</span><div class="product-free-shipping-inner"><span class="product-free-shipping-icon">${icon("truck", "free-shipping-icon icon-inline")}</span><div class="product-free-shipping-body">${freeShipping}</div></div></div>
+              </div>
+            </div>
+            <div class="altar-product-section altar-product-shipping">
+              <span class="altar-spec-label altar-section-label">Envío</span>
+              <div class="altar-product-section-body">
+                <p class="altar-section-note">Calculá el costo y el tiempo de entrega con tu código postal.</p>
+                <div class="product-shipping-wrapper shipping-wrapper">${shippingCalculator()}</div>
+              </div>
+            </div>
           </div>
-          <p class="alert alert-warning" data-sim-add-error style="display:none;"></p>
-        </form>
-        ${product.freeShipping ? `<p class="product-free-shipping">${icon("truck")} ${esc(t("product.free_shipping", "Envío gratis"))}</p>` : `<p class="free-shipping-message sim-muted">${icon("truck")} ${esc(t("product.free_shipping", "Envío gratis"))} ${esc(t("product.free_shipping_exceeding", "superando los"))} ${money(store.freeShippingFrom)}</p>`}
-        <div class="product-shipping-wrapper shipping-wrapper">${shippingCalculator()}</div>
-        <div class="user-content"><h2 class="sim-h3">${esc(t("product.description", "Descripción"))}</h2><p>${esc(product.description)}</p></div>
+          <div class="product-info-description"><h3 class="product-description-heading">${esc(t("product.description", "Descripción"))}</h3><div class="js-product-description product-description-content user-content"><p>${esc(product.description)}</p></div></div>
+          <div class="product-purchase-info">
+            <div class="icon-text-item icon-text-item-horizontal"><div class="icon-text-item-content"><div class="icon-text-item-title">Cambios</div><div class="icon-text-item-description">Tenés 30 días para cambiar o devolver tu compra. Si llega dañada, escribinos y lo resolvemos.</div></div></div>
+            <div class="icon-text-item icon-text-item-horizontal"><div class="icon-text-item-content"><div class="icon-text-item-title">Pago seguro</div><div class="icon-text-item-description">Pagá con tarjeta, transferencia o efectivo. Tus datos viajan protegidos.</div></div></div>
+          </div>
+        </div>
       </div>
     </div>
-    <h2 class="products-section-title sim-h3">Productos relacionados</h2>
-    ${productGrid(related)}`) +
+  </section>
+  <section class="section-related-products"><div class="container sim-related">
+    <div class="heading-block h2">Productos relacionados</div>
+    <div class="js-product-table grid grid-2 grid-md-4 sim-related-grid">${related.map(productItem).join("")}</div>
+  </div></section>` +
     modal({ id: "modal-payments", title: t("product.see_payment_methods", "Medios de pago"), widthDesktop: "small",
       body: `<p>Tarjetas de crédito: hasta ${store.installments} cuotas sin interés.</p><p>Transferencia: 10% de descuento.</p><p class="sim-note">Simulación: en la tienda real lo arma Tiendanube.</p>` });
 }
@@ -543,6 +586,8 @@ function updateProductState() {
   const stock = stockFor(product, selectedVariant(root));
   const add = $("[data-sim-add]", root);
   add.disabled = stock === 0;
+  add.classList.toggle("nostock", stock === 0);
+  add.classList.toggle("cart", stock !== 0);
   add.textContent = stock === 0 ? t("product.out_of_stock", "Sin stock") : t("product.add_to_cart", "Agregar al carrito");
   const label = $("[data-sim-stock]", root);
   label.textContent = stock === 0 ? t("product.out_of_stock", "Sin stock") : stock !== Infinity && stock <= 3 ? `${t("product.only_left", "¡Solo quedan")} ${stock} ${t("product.in_stock", "en stock!")}` : "";
