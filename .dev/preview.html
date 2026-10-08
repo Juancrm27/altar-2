@@ -41,7 +41,7 @@
           </div>
           <nav class="altar-nav__menu" aria-label="Navegación principal">
             <a href="./preview.html">Home</a>
-            <a href="./storefront.html">Shop</a>
+            <a href="./ipanema.html#/tienda">Shop</a>
             <a href="#">Contacto</a>
           </nav>
           <div class="altar-nav__actions">
@@ -67,7 +67,7 @@
         <div class="altar-nav__panel" id="altar-nav-panel" data-altar-menu-panel hidden>
           <nav class="altar-nav__panel-menu" aria-label="Navegación principal">
             <a href="./preview.html">Home</a>
-            <a href="./storefront.html">Shop</a>
+            <a href="./ipanema.html#/tienda">Shop</a>
             <a href="#">Contacto</a>
           </nav>
           <div class="altar-nav__panel-rule" aria-hidden="true"></div>
@@ -254,10 +254,10 @@
               </div>
             </div>
             <div class="altar-collection__gallery">
-              <a class="altar-collection__photo" href="./storefront.html" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-1.jpg" alt="Modelo con vestido satinado en un escenario floral" width="339" height="472" loading="lazy"></a>
-              <a class="altar-collection__photo" href="./storefront.html" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-2.jpg" alt="Modelo con vestido negro transparente" width="339" height="472" loading="lazy"></a>
-              <a class="altar-collection__photo" href="./storefront.html" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-3.jpg" alt="Modelo con vestido escultural blanco" width="339" height="472" loading="lazy"></a>
-              <a class="altar-collection__photo" href="./storefront.html" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-4.jpg" alt="Modelo con guantes negros y vestido drapeado" width="339" height="472" loading="lazy"></a>
+              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-1.jpg" alt="Modelo con vestido satinado en un escenario floral" width="339" height="472" loading="lazy"></a>
+              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-2.jpg" alt="Modelo con vestido negro transparente" width="339" height="472" loading="lazy"></a>
+              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-3.jpg" alt="Modelo con vestido escultural blanco" width="339" height="472" loading="lazy"></a>
+              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-4.jpg" alt="Modelo con guantes negros y vestido drapeado" width="339" height="472" loading="lazy"></a>
             </div>
             <div class="altar-collection__materia">
               <span>La materia</span>
@@ -338,7 +338,7 @@
           </div>
           <nav class="altar-footer__group altar-footer__group--explore" aria-label="Explorar">
             <p class="altar-footer__label">Explorar</p>
-            <a href="./storefront.html">Store</a>
+            <a href="./ipanema.html#/tienda">Store</a>
             <a href="#about">About</a>
             <a href="#">Makers</a>
           </nav>
@@ -358,9 +358,9 @@
       </div>
     </footer>
     <script>
-      // Store links open the Ipanema simulation (shop, product, contact…), locally and on the Netlify review copy.
+      // Footer placeholders (#) open their simulation pages. Store links point to ipanema.html in the markup itself:
+      // Netlify's pretty URLs rewrite hrefs on deploy, so they can't be matched by their original value here.
       {
-        document.querySelectorAll('a[href="./storefront.html"]').forEach(function (a) { a.href = "./ipanema.html#/tienda"; });
         var simPages = {
           "Contacto": "#/contacto",
           "Envíos y devoluciones": "#/pagina/envios", "Solicitud de devolución": "#/contacto", "FAQs": "#/pagina/faqs",
