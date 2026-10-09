@@ -694,3 +694,11 @@ body:not(.template-category):not(.template-search):not(.template-product):not(.t
 .template-contact .contact-form-section .contact-form-container { order: -1; }
 .template-contact .contact-info-container { text-align: center; }
 .template-contact .contact-info-container .list li { justify-content: center; }
+
+/* — Cart drawer (#modal-cart) and cart page in Inter (Figma "carrito"): regular text, semibold product name and total — */
+#modal-cart,
+#modal-cart :is(h1, h2, h3, h4, h5, h6, p, span, a, label, input, select, textarea, button, .btn, .form-control),
+body.template-cart .main-content,
+body.template-cart .main-content :is(h1, h2, h3, h4, h5, h6, p, span, a, label, input, select, textarea, button, .btn, .form-control) { font-family: "Inter", sans-serif; }
+#modal-cart :is(.cart-item-name, .cart-totals-total, .cart-totals-total *),
+body.template-cart .main-content :is(.cart-item-name, .cart-totals-total, .cart-totals-total *) { font-weight: 600; }
