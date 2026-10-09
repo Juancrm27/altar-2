@@ -31,6 +31,28 @@
         "id": "altar_text_color",
         "label": "Color de texto (portada)",
         "default": "#f7f2ec"
+      },
+      {
+        "type": "header",
+        "content": "Textura"
+      },
+      {
+        "type": "setting",
+        "setting_type": "toggle",
+        "id": "altar_commerce_grain",
+        "label": "Mostrar grano en páginas comerciales",
+        "default": true
+      },
+      {
+        "type": "setting",
+        "setting_type": "range",
+        "id": "altar_grain_opacity",
+        "label": "Intensidad del grano",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "%",
+        "default": 16
       }
     ]
   },

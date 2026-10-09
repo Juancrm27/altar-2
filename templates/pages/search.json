@@ -6,6 +6,7 @@
     "product_list": {
       "type": "main-products-grid",
       "settings": {
+        "layout_style": "altar_editorial",
         "columns_mobile": "2",
         "columns": "4",
         "pagination": "infinite"

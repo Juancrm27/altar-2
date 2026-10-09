@@ -1,5 +1,7 @@
+{# Every storefront page except the immersive home and password screen uses Altar's commercial palette. #}
+{% set is_altar_commerce = template != 'home' and template != 'password' %}
 <!DOCTYPE html>
-<html lang="{{ html_lang }}">
+<html lang="{{ html_lang }}" class="{% if template == 'home' %}is-altar-home{% elseif is_altar_commerce %}is-altar-commerce{% endif %}">
   <head>
     {# Meta tags component #}
     {{ component('head-tags') }}
@@ -35,8 +37,10 @@
       </style>
     {% endif %}
 
-    {# Altar: intro animation, icons, Inter and the brand layer (loaded after Ipanema so it can override it) #}
-    <script>(function(d){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("altar-intro");setTimeout(function(){d.classList.remove("altar-intro")},4000)})(document.documentElement)</script>
+    {# Altar: intro animation only belongs to the immersive home. #}
+    {% if template == 'home' %}
+      <script>(function(d){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("altar-intro");setTimeout(function(){d.classList.remove("altar-intro")},4000)})(document.documentElement)</script>
+    {% endif %}
     <link rel="icon" href="{{ 'images/favicon.svg' | static_url }}" type="image/svg+xml">
     <link rel="icon" href="{{ 'images/favicon-32.png' | static_url }}" sizes="32x32" type="image/png">
     <link rel="apple-touch-icon" href="{{ 'images/apple-touch-icon.png' | static_url }}">
@@ -47,10 +51,18 @@
         --altar-horizon: {{ settings.altar_horizon_color | default('#ff9a70') }};
         --altar-sky: {{ settings.altar_sky_color | default('#aebfc0') }};
         --altar-text: {{ settings.altar_text_color | default('#f7f2ec') }};
+        --section-grain-opacity: calc({{ settings.altar_grain_opacity | default(16) }} / 100);
       }
     </style>
-    {{ 'css/altar.css' | static_url | static_inline }}
-    {{ 'css/altar-footer.css' | static_url | static_inline }}
+    {% if template == 'home' %}
+      {# The immersive home needs its brand CSS before first paint. #}
+      {{ 'css/altar.css' | static_url | static_inline }}
+      {{ 'css/altar-footer.css' | static_url | static_inline }}
+    {% else %}
+      {# Commercial pages cache the shared CSS instead of repeating ~100 KB inside every HTML response. #}
+      <link rel="stylesheet" href="{{ 'css/altar.css' | static_url }}">
+      <link rel="stylesheet" href="{{ 'css/altar-footer.css' | static_url }}">
+    {% endif %}
 
     {% set async_js = true %}
 
@@ -64,9 +76,8 @@
   </head>
 
   {% set cart_favicon_url = settings.cart_favicon ? (settings.cart_favicon | resolve_media).sourceUrl : '' %}
-
   <body
-    class="{% if customer %}customer-logged-in{% endif %} template-{{ template | replace('.', '-') | replace('/', '-') }} {% if template == 'password' %}body-password{% endif %}"
+    class="{% if customer %}customer-logged-in{% endif %} template-{{ template | replace('.', '-') | replace('/', '-') }}{% if is_altar_commerce %} is-altar-commerce{% endif %}{% if template == 'password' %} body-password{% endif %}"
     {% if settings.ajax_cart %}data-ajax-cart="true"{% endif %}
     {% if settings.inactive_tab_message %}
       data-inactive-tab-msg1="{{ settings.inactive_tab_message_01 | escape }}"
@@ -78,7 +89,7 @@
     {{ component('nubesdk-slot', { type: "before_main_content" }) }}
 
     {# Altar: film grain behind the shop, product and contact pages (same layer as the home sections 3·4) #}
-    {% if template in ['category', 'search', 'product', 'contact'] %}
+    {% if settings.altar_commerce_grain is not same as(false) and template in ['category', 'search', 'product', 'contact'] %}
       <div class="altar-page-grain" aria-hidden="true">
         {% include 'snippets/altar-grain.tpl' with { grain_id: 'page', grain_class: '' } %}
       </div>
@@ -152,8 +163,11 @@
       });
     </script>
 
-    {# Altar: 3D home, header and footer behaviour #}
-    <script src="{{ 'js/solar-experience.js' | static_url }}" defer></script>
+    {# Lightweight shared behaviour; the heavy 3D bundle is exclusive to the home. #}
+    <script src="{{ 'js/altar-site.js' | static_url }}" defer></script>
+    {% if template == 'home' %}
+      <script src="{{ 'js/solar-experience.js' | static_url }}" defer></script>
+    {% endif %}
 
     {% platform_body_content %}
   </body>

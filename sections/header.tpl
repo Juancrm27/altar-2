@@ -284,6 +284,14 @@
 	  },
 	  {
 	    "type": "setting",
+	    "setting_type": "text",
+	    "id": "altar_close_label",
+	    "label": "Texto para cerrar el menú",
+	    "default": "Cerrar",
+	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
+	  },
+	  {
+	    "type": "setting",
 	    "setting_type": "toggle",
 	    "id": "altar_show_search",
 	    "label": "Mostrar búsqueda",

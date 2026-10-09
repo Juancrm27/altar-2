@@ -17,6 +17,13 @@
 {% set show_shipping = settings.shipping_calculator_product_page %}
 {% set show_sold_count = settings.products_sold %}
 {% set sold_count_threshold = settings.quantity_products_sold %}
+{% set altar_maker_label = product_info_settings.altar_maker_label | default('Maker') %}
+{% set altar_installments_label = product_info_settings.altar_installments_label | default('Cuotas') %}
+{% set altar_payments_label = product_info_settings.altar_payments_label | default('Medios de pago') %}
+{% set altar_stock_label = product_info_settings.altar_stock_label | default('Stock') %}
+{% set altar_stock_available_label = product_info_settings.altar_stock_available_label | default('Disponible') %}
+{% set altar_shipping_label = product_info_settings.altar_shipping_label | default('Envío') %}
+{% set altar_shipping_note = product_info_settings.altar_shipping_note | default('Calculá el costo y el tiempo de entrega con tu código postal.') %}
 
 <div class="product-content{% if not home_main_product %} altar-product{% endif %}">
 
@@ -178,7 +185,7 @@
 	{% set free_shipping_markup %}
 		{% if not product.is_non_shippable and show_product_quantity %}
 			<div class="js-free-shipping-minimum-message free-shipping-message product-free-shipping{% if not home_main_product %} altar-spec{% endif %}" {% if not (has_shipping_best_discount or has_product_free_shipping) %}style="display: none;"{% endif %}>
-				{% if not home_main_product %}<span class="altar-spec-label">Envío:</span>{% endif %}
+				{% if not home_main_product %}<span class="altar-spec-label">{{ altar_shipping_label }}:</span>{% endif %}
 				<div class="product-free-shipping-inner">
 					<span class="product-free-shipping-icon">
 						<svg class="free-shipping-icon icon-inline"><use xlink:href="#truck"/></svg>
@@ -309,30 +316,30 @@
 	{% if not home_main_product %}
 		{# Altar · Figma 363:308 — spec table, ⅓ – ⅔ cells with hairlines. Rows keep the theme's JS hooks. #}
 		<div class="altar-product-specs">
-			{% if product.brand or product.sku %}
-				<div class="altar-spec-row">
+			<div class="altar-spec-row{% if not product.sku %} altar-spec-row--single{% endif %}">
 					<div class="altar-spec">
-						<span class="altar-spec-label">Maker:</span>
+						<span class="altar-spec-label">{{ altar_maker_label }}:</span>
 						<span class="altar-spec-value">{{ product.brand | default(store.name) }}</span>
 					</div>
+					{% if product.sku %}
 					<div class="altar-spec">
 						<span class="altar-spec-label">{{ 'product.sku' | t }}:</span>
 						<span class="altar-spec-value altar-spec-sku"><span class="altar-barcode" aria-hidden="true"></span><span class="js-product-sku">{{ product.sku }}</span></span>
 					</div>
+					{% endif %}
 				</div>
-			{% endif %}
 
 			{{ component('nubesdk-slot', { type: "before_product_detail_payment_options" }) }}
 			{% if show_payments_info or hasDiscount %}
 				<div {% if installments_info %}data-target="#installments-modal"{% endif %} class="{% if installments_info %}js-modal-open-private js-fullscreen-modal-open{% endif %} js-product-payments-container product-payments-info altar-spec-row" {% if not product.display_price or not (product.get_max_installments and product.get_max_installments(false)) %}style="display: none;"{% endif %}>
 					<div class="altar-spec">
-						<span class="altar-spec-label">Cuotas:</span>
+						<span class="altar-spec-label">{{ altar_installments_label }}:</span>
 						{% if show_payments_info %}
 							{% include 'snippets/payments/installments.tpl' with {location: 'product_detail', container_classes: { installment: "product-installment"}} %}
 						{% endif %}
 					</div>
 					<div class="altar-spec">
-						<span class="altar-spec-label">Medios de pago:</span>
+						<span class="altar-spec-label">{{ altar_payments_label }}:</span>
 						<div class="js-product-discount-container product-payment-discount" {% if hideDiscountContainer %}style="display: none;"{% endif %}>
 							<span class="text-accent">{{ product.maxPaymentDiscount.value }}% {{ 'product.discount_off' | t }}</span> {{ 'product.paying_with' | t }} {{ product.maxPaymentDiscount.paymentProviderName }}
 							<div class="js-product-discount-disclaimer product-payment-discount-disclaimer" {% if hideDiscountDisclaimer %}style="display: none;"{% endif %}>
@@ -347,14 +354,19 @@
 			{% endif %}
 			{{ component('nubesdk-slot', { type: "after_product_detail_payment_options" }) }}
 
-			<div class="altar-spec-row">
+			{% set has_shipping_spec = free_shipping_markup | trim %}
+			{% if show_stock or has_shipping_spec %}
+			<div class="altar-spec-row{% if not show_stock or not has_shipping_spec %} altar-spec-row--single{% endif %}">
+				{% if show_stock %}
 				<div class="altar-spec altar-spec-stock">
-					<span class="altar-spec-label">Stock:</span>
-					<span class="altar-spec-value altar-stock-available">Disponible</span>
+					<span class="altar-spec-label">{{ altar_stock_label }}:</span>
+					<span class="altar-spec-value altar-stock-available">{{ altar_stock_available_label }}</span>
 					<span class="altar-spec-value altar-stock-none">{{ 'product.out_of_stock' | t }}</span>
 				</div>
+				{% endif %}
 				{{ free_shipping_markup }}
 			</div>
+			{% endif %}
 		</div>
 	{% endif %}
 
@@ -368,9 +380,9 @@
 
 		{% if show_product_fulfillment and not home_main_product %}
 			<div class="altar-product-section altar-product-shipping">
-				<span class="altar-spec-label altar-section-label">Envío</span>
+				<span class="altar-spec-label altar-section-label">{{ altar_shipping_label }}</span>
 				<div class="altar-product-section-body">
-					<p class="altar-section-note">Calculá el costo y el tiempo de entrega con tu código postal.</p>
+					<p class="altar-section-note">{{ altar_shipping_note }}</p>
 					<div class="product-shipping-wrapper shipping-wrapper">
 						{# Shipping calculator and branch link #}
 
@@ -399,5 +411,4 @@
 	{# Product payments details #}
 	{% include 'snippets/product/product-payment-details.tpl' %}
 {% endif %}
-
 

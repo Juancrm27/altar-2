@@ -6,6 +6,7 @@
 {% set page_width = section.settings.section_width == 'page' %}
 {% set vertical_padding = section.settings.vertical_padding | default(32) %}
 {% set horizontal_padding = page_width ? 0 : section.settings.horizontal_padding | default(32) %}
+{% set visually_hidden = section.settings.visually_hidden | default(false) %}
 
 {# Colors #}
 {% set background_color = section.settings.background_color %}
@@ -13,7 +14,7 @@
 
 
 <div
-  class="page-header"
+  class="page-header{% if visually_hidden %} visually-hidden{% endif %}"
   data-store="page-title"
   style="padding: {{ vertical_padding }}px {{ horizontal_padding }}px; {% if background_color %}background-color: {{ background_color }};{% endif %} {% if text_color %}color: {{ text_color }};{% endif %}"
 >
@@ -23,7 +24,9 @@
 
         <div class="page-header-title-row">
           <div>
-            {% include 'snippets/breadcrumbs.tpl' %}
+            {% if not visually_hidden %}
+              {% include 'snippets/breadcrumbs.tpl' %}
+            {% endif %}
 
             {% set passwordless_template = template == 'account/login' and store_has_passwordless_login and not params.fallback %}
             <div class="page-header-title-inner">
@@ -80,14 +83,14 @@
                   {{ 'subscriptions.customer_subscriptions.address_page_title' | t }}
                 {% endif %}
               </h1>
-              {% if (template == 'category' or template == 'search') and products | length > 1 %}
+              {% if not visually_hidden and (template == 'category' or template == 'search') and products | length > 1 %}
                 <div class="page-header-count d-block d-md-none">
                   {{ products_count }} {{ 'general.products_label' | t }}
                 </div>
               {% endif %}
             </div>
 
-            {% if template == 'category' and category.description %}
+            {% if not visually_hidden and template == 'category' and category.description %}
               <p class="page-header-description">{{ category.description }}</p>
             {% endif %}
           </div>
@@ -107,6 +110,13 @@
   "limit": 1,
   "deletable": false,
   "settings": [
+    {
+      "type": "setting",
+      "setting_type": "toggle",
+      "id": "visually_hidden",
+      "label": "Ocultar visualmente y conservar para SEO",
+      "default": false
+    },
     {
       "type": "header",
       "content": "t:names.design"

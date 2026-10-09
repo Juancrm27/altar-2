@@ -3,6 +3,7 @@
 {# Uses private components for filters, sorting and product items #}
 
 {% set has_filters_available = products and has_filters_enabled and (filter_categories is not empty or product_filters is not empty) %}
+{% set altar_editorial_grid = section.settings.layout_style | default('altar_editorial') == 'altar_editorial' %}
 
 {# Pagination settings #}
 {% if section.settings.pagination == 'infinite' %}
@@ -42,7 +43,7 @@
 {% set horizontal_padding = page_width ? 0 : section.settings.horizontal_padding | default(32) %}
 
 
-<div class="products-grid section-main-products-grid"
+<div class="products-grid section-main-products-grid{% if altar_editorial_grid %} is-altar-editorial{% endif %}"
   style="{% if full_width %}--section-horizontal-padding: {{ horizontal_padding }}px;{% endif %} padding: {{ vertical_padding }}px {{ horizontal_padding }}px;"
   data-store="{{ grid_id }}">
   {% if page_width %}
@@ -67,11 +68,15 @@
 
     {# Mobile filter/sort controls + modals #}
     {% if has_filters_available %}
-      {% include 'snippets/product-list/filters/filters-modals.tpl' with {altar_toolbar: true} %}
+      {% include 'snippets/product-list/filters/filters-modals.tpl' with {altar_toolbar: altar_editorial_grid} %}
     {% endif %}
 
-    {# Main content: the filter drawer is used on every screen size. #}
-    <div>
+    {# Altar uses the filter drawer on every screen; standard Ipanema keeps its desktop sidebar. #}
+    <div class="{% if not altar_editorial_grid %}grid{% if display_products and has_filters_available %} grid-md-auto-4{% endif %}{% endif %}">
+      {% if has_filters_available and not altar_editorial_grid %}
+        {% include 'snippets/product-list/filters/filters-controls.tpl' %}
+      {% endif %}
+
       {# Product grid #}
       {% set columns_mobile = section.settings.columns_mobile %}
       {% set columns = section.settings.columns %}
@@ -89,29 +94,37 @@
 
       <div data-store="{{ grid_id }}">
         {% if display_products %}
-          {# Altar storefront toolbar. It keeps Tiendanube's native filters and sorting. #}
+          {# Both variants keep Tiendanube's native filters and sorting. #}
           {% if has_real_products %}
-            <div class="altar-shop-controls">
-              {% if has_filters_available %}
-                <button type="button" class="js-modal-open-private altar-shop-filter" data-target="#modal-filters" data-component="filter-button">
-                  <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#filter"/></svg>
-                  <span>{{ 'general.filter' | t }}</span>
-                </button>
-              {% else %}
-                <span class="altar-shop-controls-spacer" aria-hidden="true"></span>
-              {% endif %}
-              <span class="altar-shop-count">{{ products_count }} {{ 'general.products_label' | t }}</span>
-              <div class="altar-shop-sort">
-                <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#sort-by"/></svg>
-                <div class="altar-shop-sort-field">
-                  {% include 'snippets/product-list/filters/sort-by.tpl' with {label: false} %}
+            {% if altar_editorial_grid %}
+              <div class="altar-shop-controls">
+                {% if has_filters_available %}
+                  <button type="button" class="js-modal-open-private altar-shop-filter" data-target="#modal-filters" data-component="filter-button">
+                    <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#filter"/></svg>
+                    <span>{{ 'general.filter' | t }}</span>
+                  </button>
+                {% else %}
+                  <span class="altar-shop-controls-spacer" aria-hidden="true"></span>
+                {% endif %}
+                <span class="altar-shop-count">{{ products_count }} {{ 'general.products_label' | t }}</span>
+                <div class="altar-shop-sort">
+                  <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#sort-by"/></svg>
+                  <div class="altar-shop-sort-field">
+                    {% include 'snippets/product-list/filters/sort-by.tpl' with {label: false} %}
+                  </div>
                 </div>
               </div>
-            </div>
+            {% else %}
+              <div class="product-list-sort-by text-right">
+                <div class="d-none d-md-inline-block">
+                  {% include 'snippets/product-list/filters/sort-by.tpl' %}
+                </div>
+              </div>
+            {% endif %}
           {% endif %}
 
           {# Product list #}
-          <div class="js-product-table grid {{ grid_mobile_class }} {{ grid_desktop_class }} altar-shop-grid">
+          <div class="js-product-table grid {{ grid_mobile_class }} {{ grid_desktop_class }}{% if altar_editorial_grid %} altar-shop-grid{% endif %}">
             {# Prioritize first 2 product images for LCP. Category bumps the threshold to absorb category-hero. #}
             {% set is_priority_section = section.index <= (template == 'category' ? 3 : 2) %}
             {% for product in display_products %}
@@ -189,6 +202,17 @@
     {
       "type": "setting",
       "setting_type": "select",
+      "id": "layout_style",
+      "label": "Estilo de la grilla",
+      "options": [
+        { "value": "altar_editorial", "label": "Altar editorial" },
+        { "value": "ipanema", "label": "Ipanema estándar" }
+      ],
+      "default": "altar_editorial"
+    },
+    {
+      "type": "setting",
+      "setting_type": "select",
       "id": "columns",
       "label": "t:settings.columns_desktop",
       "icon": "DesktopIcon",
@@ -197,7 +221,8 @@
         { "value": "5", "label": "t:options.columns_5" },
         { "value": "6", "label": "t:options.columns_6" }
       ],
-      "default": "4"
+      "default": "4",
+      "visible_if": "{{ section.settings.layout_style == 'ipanema' }}"
     },
     {
       "type": "setting",
@@ -209,7 +234,8 @@
         { "value": "1", "label": "t:options.columns_1" },
         { "value": "2", "label": "t:options.columns_2" }
       ],
-      "default": "2"
+      "default": "2",
+      "visible_if": "{{ section.settings.layout_style == 'ipanema' }}"
     },
     {
       "type": "setting",

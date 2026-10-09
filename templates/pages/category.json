@@ -2,6 +2,7 @@
   "sections": {
     "category_hero": {
       "type": "category-hero",
+      "disabled": true,
       "settings": {
         "show_category_image": true,
         "section_width": "full",
@@ -12,14 +13,16 @@
     "heading": {
       "type": "page-header",
       "settings": {
+        "visually_hidden": true,
         "section_width": "page",
-        "vertical_padding": 32,
+        "vertical_padding": 0,
         "horizontal_padding": 32
       }
     },
     "product_list": {
       "type": "main-products-grid",
       "settings": {
+        "layout_style": "altar_editorial",
         "columns": "4",
         "columns_mobile": "2",
         "pagination": "infinite",
@@ -31,6 +34,7 @@
   },
   "order": [
     "category_hero",
+    "heading",
     "product_list"
   ]
 }

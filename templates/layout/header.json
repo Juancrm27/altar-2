@@ -15,6 +15,7 @@
         "altar_account_label": "Account",
         "altar_cart_label": "Cart",
         "altar_menu_label": "Menu",
+        "altar_close_label": "Cerrar",
         "altar_show_search": true,
         "altar_show_account": true,
         "altar_show_cart": true,

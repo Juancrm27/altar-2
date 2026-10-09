@@ -1,4 +1,4 @@
-# Integración futura con Tiendanube
+# Integración con Tiendanube
 
 Este repositorio se divide en dos capas deliberadamente separadas.
 
@@ -14,7 +14,7 @@ Se puede diseñar y probar sin acceso a una tienda:
 
 La prueba comercial está en `.dev/storefront.html`. Usa datos locales y `localStorage`; no intenta reemplazar el backend de Tiendanube.
 
-## 2. Capa que debe provenir del tema oficial
+## 2. Núcleo proveniente del tema oficial
 
 Al tener acceso al plan, se crea o descarga una copia de Ipanema y se conservan sus implementaciones completas para:
 
@@ -26,7 +26,7 @@ Al tener acceso al plan, se crea o descarga una copia de Ipanema y se conservan 
 - cuenta, contacto, páginas legales, blog, contraseña y 404
 - slots del Nube SDK y atributos `data-store` / `data-component`
 
-No se deben convertir las páginas provisionales actuales en una implementación paralela de comercio. La integración correcta consiste en trasladar la capa propia de Altar al tema oficial y conectar sus ajustes a datos reales.
+Las páginas comerciales ya están conectadas a la estructura oficial de Ipanema. La regla es conservar formularios, filtros, hooks, slots y datos reales, y resolver la identidad de Altar mediante variantes seleccionables, settings, bloques y CSS acotado.
 
 ## Contrato visual probado localmente
 
@@ -49,6 +49,6 @@ Los objetos del adaptador local equivalen a los datos futuros:
 | `localStorage` | carrito administrado por Tiendanube |
 | botón de checkout simulado | `store.cart_url` / checkout nativo |
 
-## Regla de migración
+## Regla de publicación
 
-Antes de publicar, todo dato comercial simulado debe desaparecer. En producción no deben quedar precios, stock, URLs de producto o identificadores escritos manualmente.
+La carpeta `.dev/` puede conservar datos simulados para diseño. Ningún precio, stock, URL de producto o identificador escrito manualmente debe trasladarse a los templates publicados. Antes de publicar, validar el tema en un borrador real de Tiendanube.

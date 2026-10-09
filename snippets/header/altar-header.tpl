@@ -14,6 +14,7 @@
 {% set altar_account_label = section.settings.altar_account_label | default('Account') %}
 {% set altar_cart_label = section.settings.altar_cart_label | default('Cart') %}
 {% set altar_menu_label = section.settings.altar_menu_label | default('Menu') %}
+{% set altar_close_label = section.settings.altar_close_label | default('Cerrar') %}
 {% set altar_show_search = section.settings.altar_show_search is not same as(false) %}
 {% set altar_show_account = section.settings.altar_show_account is not same as(false) %}
 {% set altar_show_cart = section.settings.altar_show_cart is not same as(false) %}
@@ -28,7 +29,7 @@
 	{% if header_styles | trim %}style="{{ header_styles | trim }}"{% endif %}
 >
 	{# Film grain over the header background on shop / product / contact pages (CSS shows it only there) #}
-	{% if template in ['category', 'search', 'product', 'contact'] %}
+	{% if settings.altar_commerce_grain is not same as(false) and template in ['category', 'search', 'product', 'contact'] %}
 		{% include 'snippets/altar-grain.tpl' with { grain_id: 'header', grain_class: 'altar-nav__grain' } %}
 	{% endif %}
 	<div class="altar-nav__rule altar-nav__rule--top" aria-hidden="true"></div>
@@ -49,7 +50,7 @@
 						image_priority_high: true,
 					} %}
 				{% else %}
-					<img class="altar-nav__logo-image" src="{{ 'images/altar-logo.svg' | static_url }}" alt="" width="40" height="39">
+					<img class="altar-nav__logo-image altar-nav__logo-image--default" src="{{ 'images/altar-logo.svg' | static_url }}" alt="" width="40" height="39">
 				{% endif %}
 			</a>
 			<span class="altar-nav__divider altar-nav__divider--brand" aria-hidden="true"></span>
@@ -129,7 +130,7 @@
 			</div>
 
 			{# Tablet / mobile: the menu unfolds inside the header (static/js/altar-header.js). #}
-			<button type="button" class="altar-nav__menu-toggle" data-altar-menu-toggle aria-expanded="false" aria-controls="altar-nav-panel-{{ section.id }}" data-label-open="{{ altar_menu_label }}" data-label-close="{{ 'Close' }}">
+			<button type="button" class="altar-nav__menu-toggle" data-altar-menu-toggle aria-expanded="false" aria-controls="altar-nav-panel-{{ section.id }}" data-label-open="{{ altar_menu_label }}" data-label-close="{{ altar_close_label }}">
 				<span data-altar-menu-label>{{ altar_menu_label }}</span>
 			</button>
 		</div>

@@ -4,6 +4,8 @@
     "altar_horizon_color": "#ff9a70",
     "altar_sky_color": "#aebfc0",
     "altar_text_color": "#f7f2ec",
+    "altar_commerce_grain": true,
+    "altar_grain_opacity": 16,
     "logo_height_desktop": 60,
     "logo_height_mobile": 42,
     "body_font_size": 12,

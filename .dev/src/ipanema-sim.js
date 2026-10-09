@@ -568,7 +568,8 @@ function currentRoute() {
 
 function renderRoute() {
   const route = currentRoute();
-  document.body.className = `template-${route.template}`;
+  const commerceTemplates = new Set(["category", "search", "product", "cart", "contact", "page", "account-login", "account-register", "account-reset", "404"]);
+  document.body.className = `template-${route.template}${commerceTemplates.has(route.template) ? " is-altar-commerce" : ""}`;
   $("[data-sim-view]").innerHTML = route.render();
   if (route.name === "product") updateProductState();
   renderMap(route.name);

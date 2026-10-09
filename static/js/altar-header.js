@@ -2,6 +2,9 @@
 // The panel unfolds inside the header; Menu turns into Close. Search and Cart inside it keep Ipanema's
 // own modals (js-modal-open-private), so the panel just closes itself before they open.
 (function () {
+  if (window.__altarHeaderInitialized) return;
+  window.__altarHeaderInitialized = true;
+
   var DESKTOP = window.matchMedia("(min-width: 1024px)");
 
   function setOpen(nav, open) {

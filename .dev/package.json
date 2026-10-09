@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "esbuild src/solar-experience.js --bundle --minify --format=iife --target=es2020 --outfile=../static/js/solar-experience.js",
+    "build": "esbuild src/solar-experience.js src/altar-site.js --bundle --minify --format=iife --target=es2020 --outdir=../static/js",
     "build:watch": "npm run build -- --watch",
     "preview": "python3 serve.py 4173"
   },

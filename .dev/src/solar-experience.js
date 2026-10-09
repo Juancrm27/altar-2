@@ -4202,94 +4202,11 @@ function spotifyEmbedUrl(url) {
   return match ? `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=generator&theme=0` : null;
 }
 
-const LIVE_DATE_TIME_ZONE = "America/Argentina/Buenos_Aires";
-
-function updateLiveDates() {
-  const now = new Date();
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", { timeZone: LIVE_DATE_TIME_ZONE, month: "short", day: "2-digit", year: "2-digit" })
-      .formatToParts(now)
-      .map(({ type, value }) => [type, value])
-  );
-  const isoDate = new Intl.DateTimeFormat("en-CA", { timeZone: LIVE_DATE_TIME_ZONE }).format(now);
-  document.querySelectorAll("[data-live-date]").forEach((element) => {
-    element.textContent = `${parts.month}/${parts.day}/${parts.year}`.toUpperCase();
-    element.setAttribute("datetime", isoDate);
-  });
-
-  // Check again shortly after the next minute boundary so the date flips at midnight.
-  clearTimeout(updateLiveDates.timer);
-  updateLiveDates.timer = setTimeout(updateLiveDates, 60000 - (now.getSeconds() * 1000 + now.getMilliseconds()) + 50);
-}
-
-// Switches the fixed header to its dark variant while it overlaps a light section
-// (any element marked with data-header-theme="light").
-function initHeaderTheme() {
-  const header = document.querySelector(".site-header");
-  if (!header || initHeaderTheme.ready) return;
-  initHeaderTheme.ready = true;
-  let frame = 0;
-  const update = () => {
-    frame = 0;
-    const probe = header.getBoundingClientRect().height / 2;
-    const onLight = Array.from(document.querySelectorAll('[data-header-theme="light"]')).some((section) => {
-      const bounds = section.getBoundingClientRect();
-      return bounds.top <= probe && bounds.bottom >= probe;
-    });
-    header.classList.toggle("is-on-light", onLight);
-  };
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(update);
-  };
-  window.addEventListener("scroll", schedule, { passive: true });
-  window.addEventListener("resize", schedule);
-  update();
-}
-
-// Newsletter forms without a destination (the local/Netlify preview) confirm in place;
-// on Tiendanube the form posts to the store's contact endpoint as usual.
-function initNewsletterPreview() {
-  document.querySelectorAll("[data-newsletter-form]:not([action])").forEach((form) => {
-    if (form.dataset.ready) return;
-    form.dataset.ready = "true";
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const note = form.querySelector(".altar-footer__legal");
-      if (note) {
-        note.textContent = "¡Listo! Ya estás en la lista.";
-        note.setAttribute("role", "status");
-      }
-      form.reset();
-    });
-  });
-}
-
 function initSolarExperiences() {
-  // Scheduled first so it still runs if the 3D fails to start (no WebGL, model error).
-  setTimeout(initPageGrain, 0);
-  initHeaderTheme();
-  updateLiveDates();
-  initNewsletterPreview();
   document.querySelectorAll("[data-altar-solar]").forEach((root) => {
     if (!root.solarExperience) root.solarExperience = new SolarExperience(root);
   });
   playIntro();
-}
-
-// Pages without a running 3D home (shop, product, cart… or a home whose WebGL failed) still move their
-// grain (footer, page background, sections 3·4): the same re-seeding at the panel's default refresh rate.
-// When the 3D runs, its own loop animates every grain and follows the lighting panel instead.
-function initPageGrain() {
-  const solarRunning = Array.from(document.querySelectorAll("[data-altar-solar]")).some((root) => root.solarExperience?.renderer);
-  if (solarRunning || REDUCED_MOTION.matches) return;
-  const nodes = Array.from(document.querySelectorAll("[data-grain-turbulence]"));
-  if (!nodes.length) return;
-  let seed = 1;
-  setInterval(() => {
-    if (document.hidden) return;
-    seed = (seed % 97) + 1;
-    nodes.forEach((node) => node.setAttribute("seed", seed));
-  }, 1000 / DEFAULT_LIGHTING.grainSpeed);
 }
 
 // Opening sequence, after virgilabloh.com: the frame (metadata, dashed rules) assembles first,

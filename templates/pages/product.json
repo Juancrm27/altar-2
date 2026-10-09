@@ -23,7 +23,14 @@
           "settings": {
             "gap": 40,
             "vertical_padding": 8,
-            "horizontal_padding": 0
+            "horizontal_padding": 0,
+            "altar_maker_label": "Maker",
+            "altar_installments_label": "Cuotas",
+            "altar_payments_label": "Medios de pago",
+            "altar_stock_label": "Stock",
+            "altar_stock_available_label": "Disponible",
+            "altar_shipping_label": "Envío",
+            "altar_shipping_note": "Calculá el costo y el tiempo de entrega con tu código postal."
           },
           "blocks": {
             "description": {

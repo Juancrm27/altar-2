@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="is-altar-commerce">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="../static/css/altar-footer.css">
     <link rel="stylesheet" href="./ipanema-sim.css">
   </head>
-  <body class="template-category" data-sim>
+  <body class="template-category is-altar-commerce" data-sim>
     <!-- layouts/layout.tpl renders this only on category / search / product -->
     <div class="altar-page-grain" aria-hidden="true"><svg class="altar-solar__grain altar-section-grain " width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-page" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-page)"></rect></svg></div>
     <div data-sim-icons></div>
@@ -30,7 +30,7 @@
         <div class="altar-nav__content">
           <div class="altar-nav__brand">
             <a class="altar-nav__logo" href="./preview.html" aria-label="Altar">
-              <img src="../static/images/altar-logo.svg" alt="" width="40" height="39">
+              <img class="altar-nav__logo-image altar-nav__logo-image--default" src="../static/images/altar-logo.svg" alt="" width="40" height="39">
             </a>
             <span class="altar-nav__divider altar-nav__divider--brand" aria-hidden="true"></span>
             <div class="altar-nav__wordmark-block">
@@ -149,7 +149,7 @@
     <aside class="sim-map" data-sim-map></aside>
 
     <script src="../static/js/altar-header.js" defer></script>
-    <script src="../static/js/solar-experience.js" defer></script>
+    <script src="../static/js/altar-site.js" defer></script>
     <script type="module" src="./src/ipanema-sim.js"></script>
   </body>
 </html>

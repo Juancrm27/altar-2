@@ -4,19 +4,20 @@ Prototipo de portada inmersiva construido como **tema seccionable** de Tiendanub
 
 ## Estructura
 
-El tema parte del **Ipanema oficial** de Tiendanube (copia de referencia sin modificar en `../Ipanema-Original`). Altar se suma como una capa propia, sin reescribir los archivos comerciales de Ipanema.
+El tema parte del **Ipanema oficial** de Tiendanube (copia de referencia en `../Ipanema-Original`). Altar se suma como una variante visual sobre sus secciones, bloques, hooks y formularios nativos. Las páginas comerciales conservan la lógica de Ipanema, aunque algunos archivos source fueron adaptados para la grilla editorial y la ficha de producto.
 
 **Capa Altar (lo nuestro):**
 
 - `sections/altar-solar.tpl`: portada 3D editable desde el administrador.
-- `sections/altar-header.tpl` / `sections/altar-footer.tpl`: header y footer de Altar, usados por `templates/layout/header.json` y `footer.json`.
-- `static/css/altar.css`: todos los estilos de Altar. Las reglas globales están limitadas a la portada o a `.altar-*` para no alterar las páginas de Ipanema.
-- `static/js/solar-experience.js`: bundle listo para publicar (fuente en `.dev/src/`).
+- `snippets/header/altar-header.tpl` / `sections/altar-footer.tpl`: variantes editables del header y footer, usadas por `templates/layout/header.json` y `footer.json`.
+- `static/css/altar.css`: portada, variante comercial, catálogo editorial y ficha Altar.
+- `static/js/altar-site.js`: comportamiento liviano compartido por todas las páginas.
+- `static/js/solar-experience.js`: bundle 3D cargado únicamente en la home (fuente en `.dev/src/`).
 - `static/models/`, `static/images/altar-*`, `static/fonts/`: modelos de Blender, imágenes y tipografía.
 - `layouts/layout.tpl`: es el de Ipanema con un bloque marcado "Altar" (tokens, `altar.css`, intro y script) y sin footer en la portada.
 - Ajustes globales: grupo "Identidad de Altar" en `config/settings_schema.json` (ids con prefijo `altar_`).
 
-**Ipanema (no tocar salvo para estilizar):** producto, categoría, búsqueda, carrito, cuenta, contacto, blog, 404 y contraseña, con sus `sections/`, `blocks/`, `snippets/`, `static/css/style-*.css` y `static/js/store.js`. Para adaptar su estética, preferir los ajustes globales del tema y reglas en `altar.css`.
+**Núcleo Ipanema:** carrito, cuenta, filtros, variantes, stock, cuotas, envíos, checkout, formularios, slots Nube SDK y atributos `data-store`. Al personalizarlo se deben conservar esos puntos de integración y preferir variantes seleccionables, settings y reglas acotadas en `altar.css`.
 
 `.dev/` contiene la fuente JavaScript y herramientas locales; Tiendanube CLI ignora carpetas ocultas.
 
@@ -63,8 +64,9 @@ No subas `.nuvem` al repositorio: contiene la configuración de acceso a la tien
 
 - La portada 3D es una sección reutilizable.
 - El catálogo local usa datos ficticios para validar la experiencia.
-- Las plantillas comerciales del tema siguen siendo marcadores de posición hasta importar el tema oficial.
-- No publicar este scaffold directamente sobre una tienda activa.
+- Catálogo y ficha de producto usan la lógica real de Ipanema con una variante visual Altar.
+- La simulación local usa datos ficticios y no reemplaza la validación del borrador real de Tiendanube.
+- Antes de publicar, probar filtros, carga infinita, variantes, stock, cuotas, envío, carrito y aplicaciones instaladas en el borrador.
 
 ## Preview online (Netlify)
 

@@ -2,7 +2,7 @@
 // Layout mirrors the repo so every "../static/..." path in the preview keeps working:
 //   dist/preview/  ← preview.html (+ index.html), storefront mock, its scripts and data
 //   dist/static/   ← theme assets (compiled JS, CSS, images, models)
-// No dependencies: static/js/solar-experience.js is already compiled and committed (run `npm run build` in .dev first).
+// No dependencies: static/js/solar-experience.js and altar-site.js are already compiled and committed.
 import { cpSync, existsSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -30,4 +30,5 @@ cpSync(join(dev, "preview.html"), join(dist, "preview", "index.html"));
 writeFileSync(join(dist, "index.html"), '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=./preview/"><title>Altar · preview</title><a href="./preview/">Abrir preview</a>\n');
 
 const js = join(dist, "static", "js", "solar-experience.js");
-console.log(`dist listo · solar-experience.js ${(statSync(js).size / 1024).toFixed(0)} KB`);
+const siteJs = join(dist, "static", "js", "altar-site.js");
+console.log(`dist listo · solar ${(statSync(js).size / 1024).toFixed(0)} KB · site ${(statSync(siteJs).size / 1024).toFixed(1)} KB`);

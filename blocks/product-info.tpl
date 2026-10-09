@@ -12,7 +12,7 @@
 
 <div class="js-product-info product-info altar-product-info d-flex flex-column" {{ block | block_attributes }} data-store="product-info-{{ product.id }}" {% if info_styles | trim %}style="{{ info_styles | trim }}"{% endif %}>
 	{# Product form always renders first (implicit, not a tree block) #}
-	{% include 'snippets/product/product-form.tpl' %}
+	{% include 'snippets/product/product-form.tpl' with { product_info_settings: block.settings } %}
 
 	{% for sub_block in block.blocks %}
 		{% if sub_block %}
@@ -33,6 +33,59 @@
 	"icon": "InfoCircleIcon",
 	"limit": 1,
 	"settings": [
+		{
+			"type": "header",
+			"content": "Textos de la ficha Altar"
+		},
+		{
+			"type": "setting",
+			"setting_type": "text",
+			"id": "altar_maker_label",
+			"label": "Etiqueta de marca",
+			"default": "Maker"
+		},
+		{
+			"type": "setting",
+			"setting_type": "text",
+			"id": "altar_installments_label",
+			"label": "Etiqueta de cuotas",
+			"default": "Cuotas"
+		},
+		{
+			"type": "setting",
+			"setting_type": "text",
+			"id": "altar_payments_label",
+			"label": "Etiqueta de medios de pago",
+			"default": "Medios de pago"
+		},
+		{
+			"type": "setting",
+			"setting_type": "text",
+			"id": "altar_stock_label",
+			"label": "Etiqueta de stock",
+			"default": "Stock"
+		},
+		{
+			"type": "setting",
+			"setting_type": "text",
+			"id": "altar_stock_available_label",
+			"label": "Texto de stock disponible",
+			"default": "Disponible"
+		},
+		{
+			"type": "setting",
+			"setting_type": "text",
+			"id": "altar_shipping_label",
+			"label": "Etiqueta de envío",
+			"default": "Envío"
+		},
+		{
+			"type": "setting",
+			"setting_type": "textarea",
+			"id": "altar_shipping_note",
+			"label": "Texto del cálculo de envío",
+			"default": "Calculá el costo y el tiempo de entrega con tu código postal."
+		},
 		{
 			"type": "header",
 			"content": "t:names.design"

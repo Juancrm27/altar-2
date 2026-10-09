@@ -2,7 +2,8 @@
 {% set password_page = template == 'password' %}
 {% set background_color = footer_settings.background_color | default('#fff3a9') %}
 {% set text_color = footer_settings.text_color | default('#601e2a') %}
-{% if template != 'home' %}
+{% set is_altar_commerce = template != 'home' and template != 'password' %}
+{% if is_altar_commerce %}
   {% set background_color = footer_settings.commerce_background_color | default('#000000') %}
   {% set text_color = footer_settings.commerce_text_color | default('#FBF7E7') %}
 {% endif %}
@@ -18,7 +19,9 @@
   data-grain-footer
   style="--footer-background: {{ background_color }}; --footer-foreground: {{ text_color }}; --footer-foreground-opacity-10: {{ text_color }}1A; --footer-foreground-opacity-20: {{ text_color }}33; --footer-foreground-opacity-40: {{ text_color }}66; --footer-foreground-opacity-60: {{ text_color }}99; background-color: {{ background_color }}; color: {{ text_color }};"
 >
-  {% include 'snippets/altar-grain.tpl' with { grain_id: 'footer-' ~ section.id, grain_class: 'altar-footer__grain' } %}
+  {% if template == 'home' or (is_altar_commerce and settings.altar_commerce_grain is not same as(false)) %}
+    {% include 'snippets/altar-grain.tpl' with { grain_id: 'footer-' ~ section.id, grain_class: 'altar-footer__grain' } %}
+  {% endif %}
   {% if not password_page %}
     <div class="altar-footer__top">
       <div class="altar-footer__newsletter">
