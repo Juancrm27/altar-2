@@ -23,11 +23,12 @@
       "type": "main-products-grid",
       "settings": {
         "layout_style": "altar_editorial",
+        "show_filters": false,
         "columns": "4",
         "columns_mobile": "2",
         "pagination": "infinite",
         "section_width": "page",
-        "vertical_padding": 32,
+        "vertical_padding": 0,
         "horizontal_padding": 32
       }
     }

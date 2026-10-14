@@ -164,6 +164,7 @@
     </script>
 
     {# Lightweight shared behaviour; the heavy 3D bundle is exclusive to the home. #}
+    <script src="{{ 'js/altar-header.js' | static_url }}" defer></script>
     <script src="{{ 'js/altar-site.js' | static_url }}" defer></script>
     {% if template == 'home' %}
       <script src="{{ 'js/solar-experience.js' | static_url }}" defer></script>

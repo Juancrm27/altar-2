@@ -287,7 +287,7 @@
 	    "setting_type": "text",
 	    "id": "altar_close_label",
 	    "label": "Texto para cerrar el menú",
-	    "default": "Cerrar",
+	    "default": "Close",
 	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
 	  },
 	  {

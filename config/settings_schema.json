@@ -914,7 +914,7 @@
         "setting_type": "toggle",
         "id": "quick_shop",
         "label": "t:settings.quick_add",
-        "default": true
+        "default": false
       },
       {
         "type": "setting",

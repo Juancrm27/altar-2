@@ -1443,6 +1443,45 @@
   }
 
   /**
+   * Altar Editorial Product Grid
+   * Applies the Figma editorial rhythm to the real product order. Desktop uses
+   * positions 3 and 10 in each 16-product cycle, alternating right / left.
+   * Tablet and mobile feature positions 3, 10, 17... at full grid width.
+   * Classes are recalculated after infinite scroll appends more products.
+   */
+  function initAltarEditorialGridAlignment() {
+    const grid = document.querySelector('.altar-shop-grid');
+    if (!grid) return;
+
+    let frame = null;
+
+    function applyEditorialPattern() {
+      frame = null;
+      const products = Array.from(grid.children).filter(function(child) {
+        return child.classList.contains('product-item');
+      });
+
+      products.forEach(function(card, index) {
+        const position = index + 1;
+        const desktopCyclePosition = ((position - 1) % 16) + 1;
+        const compactFeatured = position >= 3 && (position - 3) % 7 === 0;
+
+        card.classList.toggle('is-altar-featured-desktop-right', desktopCyclePosition === 3);
+        card.classList.toggle('is-altar-featured-desktop-left', desktopCyclePosition === 10);
+        card.classList.toggle('is-altar-featured-compact', compactFeatured);
+      });
+    }
+
+    function schedulePattern() {
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(applyEditorialPattern);
+    }
+
+    schedulePattern();
+    new MutationObserver(schedulePattern).observe(grid, { childList: true });
+  }
+
+  /**
    * Sticky Category Controls
    * Makes filter and sort controls sticky on category pages while scrolling.
    */
@@ -3727,6 +3766,7 @@
     // CATEGORY
     initProductItemSliders();
     initInfiniteScroll();
+    initAltarEditorialGridAlignment();
     initStickyCategoryControls();
     initQuickshop();
     initProductListVariantHandler();

@@ -4,8 +4,9 @@
 (function () {
   if (window.__altarHeaderInitialized) return;
   window.__altarHeaderInitialized = true;
+  window.__altarHeaderVersion = "2026-10-14";
 
-  var DESKTOP = window.matchMedia("(min-width: 1024px)");
+  var DESKTOP = window.matchMedia("(min-width: 1200px)");
 
   function setOpen(nav, open) {
     var toggle = nav.querySelector("[data-altar-menu-toggle]");

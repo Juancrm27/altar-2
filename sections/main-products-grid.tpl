@@ -4,6 +4,19 @@
 
 {% set has_filters_available = products and has_filters_enabled and (filter_categories is not empty or product_filters is not empty) %}
 {% set altar_editorial_grid = section.settings.layout_style | default('altar_editorial') == 'altar_editorial' %}
+{% set show_altar_filters = section.settings.show_filters | default(false) %}
+{% set altar_sort_text = {
+	'score-descending': 'sort_by.options.relevance' | t,
+	'user': 'sort_by.options.custom' | t,
+	'price-ascending': 'sort_by.options.price_ascending' | t,
+	'price-descending': 'sort_by.options.price_descending' | t,
+	'alpha-ascending': 'sort_by.options.alpha_ascending' | t,
+	'alpha-descending': 'sort_by.options.alpha_descending' | t,
+	'created-ascending': 'sort_by.options.created_ascending' | t,
+	'created-descending': 'sort_by.options.created_descending' | t,
+	'best-selling': 'sort_by.options.best_selling' | t,
+} %}
+{% set altar_current_sort = altar_sort_text[sort_by] | default('sort_by.options.relevance' | t) %}
 
 {# Pagination settings #}
 {% if section.settings.pagination == 'infinite' %}
@@ -67,7 +80,7 @@
     {% endif %}
 
     {# Mobile filter/sort controls + modals #}
-    {% if has_filters_available %}
+    {% if has_filters_available or (altar_editorial_grid and has_real_products) %}
       {% include 'snippets/product-list/filters/filters-modals.tpl' with {altar_toolbar: altar_editorial_grid} %}
     {% endif %}
 
@@ -94,24 +107,31 @@
 
       <div data-store="{{ grid_id }}">
         {% if display_products %}
-          {# Both variants keep Tiendanube's native filters and sorting. #}
+          {# Keep Tiendanube's native sorting and optional filter drawer. The approved
+             Altar layout only shows sorting by default on every breakpoint. #}
           {% if has_real_products %}
             {% if altar_editorial_grid %}
-              <div class="altar-shop-controls">
-                {% if has_filters_available %}
-                  <button type="button" class="js-modal-open-private altar-shop-filter" data-target="#modal-filters" data-component="filter-button">
+              <div class="altar-shop-controls{% if show_altar_filters and has_filters_available %} has-filter{% endif %}">
+                {% if show_altar_filters and has_filters_available %}
+                  <button
+                    type="button"
+                    class="altar-shop-filter js-modal-open-private"
+                    data-target="#modal-filters"
+                    data-component="filter-button">
                     <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#filter"/></svg>
                     <span>{{ 'general.filter' | t }}</span>
                   </button>
-                {% else %}
-                  <span class="altar-shop-controls-spacer" aria-hidden="true"></span>
                 {% endif %}
-                <span class="altar-shop-count">{{ products_count }} {{ 'general.products_label' | t }}</span>
                 <div class="altar-shop-sort">
-                  <svg class="altar-shop-control-icon icon-inline"><use xlink:href="#sort-by"/></svg>
-                  <div class="altar-shop-sort-field">
-                    {% include 'snippets/product-list/filters/sort-by.tpl' with {label: false} %}
-                  </div>
+                  <button
+                    type="button"
+                    class="altar-shop-sort-trigger js-modal-open-private"
+                    data-target="#modal-sort-by"
+                    aria-haspopup="dialog"
+                    aria-controls="modal-sort-by">
+                    <span>{{ altar_current_sort }}</span>
+                    <svg class="altar-shop-sort-chevron icon-inline"><use xlink:href="#chevron-down"/></svg>
+                  </button>
                 </div>
               </div>
             {% else %}
@@ -128,7 +148,10 @@
             {# Prioritize first 2 product images for LCP. Category bumps the threshold to absorb category-hero. #}
             {% set is_priority_section = section.index <= (template == 'category' ? 3 : 2) %}
             {% for product in display_products %}
-              {% include 'snippets/product-list/product-item/item.tpl' with {image_priority_high: is_priority_section and loop.index in [1, 2]} %}
+              {% include 'snippets/product-list/product-item/item.tpl' with {
+                image_priority_high: is_priority_section and loop.index in [1, 2],
+                altar_editorial_card: altar_editorial_grid,
+              } %}
             {% endfor %}
           </div>
 
@@ -209,6 +232,14 @@
         { "value": "ipanema", "label": "Ipanema estándar" }
       ],
       "default": "altar_editorial"
+    },
+    {
+      "type": "setting",
+      "setting_type": "toggle",
+      "id": "show_filters",
+      "label": "Mostrar filtros",
+      "default": false,
+      "visible_if": "{{ section.settings.layout_style == 'altar_editorial' }}"
     },
     {
       "type": "setting",

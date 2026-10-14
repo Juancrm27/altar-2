@@ -104,17 +104,17 @@ function setQty(slug, variant, qty) {
 
 /* ---------- Modals (snippets/modals/modal.tpl) ---------- */
 
-function modal({ id, title, from = "bottom", dockRight = false, widthDesktop = "medium", classes = "", body = "", foot = "" }) {
+function modal({ id, title, from = "bottom", dockRight = false, widthDesktop = "medium", classes = "", headerClass = "", titleClass = "", closeClass = "", closeIconClass = "", bodyClass = "", overlayClass = "", body = "", foot = "" }) {
   const md = dockRight ? "modal-md-docked modal-md-docked-right" : `modal-md-${from}`;
   return `<div id="${id}" class="js-modal-private modal modal-${from} ${md} modal-width-full modal-md-width-${widthDesktop} ${classes}" style="display:none;" data-url="${id}">
-      <div class="modal-header ${title ? "" : "no-title"}">
-        ${title ? `<span class="modal-title">${esc(title)}</span>` : ""}
-        <button type="button" class="js-modal-close-private modal-close" data-target="#${id}" aria-label="Cerrar">${icon("times", "modal-close-icon icon-inline")}</button>
+      <div class="modal-header ${title ? "" : "no-title"} ${headerClass}">
+        ${title ? `<span class="modal-title ${titleClass}">${esc(title)}</span>` : ""}
+        <button type="button" class="js-modal-close-private modal-close ${closeClass}" data-target="#${id}" aria-label="Cerrar">${icon("times", `modal-close-icon icon-inline ${closeIconClass}`)}</button>
       </div>
-      <div class="modal-body">${body}</div>
+      <div class="modal-body ${bodyClass}">${body}</div>
       ${foot ? `<div class="modal-footer">${foot}</div>` : ""}
     </div>
-    <div class="js-modal-close-private js-modal-overlay-private modal-overlay" data-target="#${id}" style="display:none;"></div>`;
+    <div class="js-modal-close-private js-modal-overlay-private modal-overlay ${overlayClass}" data-target="#${id}" style="display:none;"></div>`;
 }
 
 function openModal(selector) {
@@ -338,8 +338,18 @@ function productLabels(product) {
   return labels.length ? `<div class="labels sim-labels">${labels.join("")}</div>` : "";
 }
 
-function productItem(product) {
-  return `<div class="js-product-item-private product-item">
+function editorialClasses(position) {
+  if (!position) return "";
+  const desktopCyclePosition = ((position - 1) % 16) + 1;
+  return [
+    desktopCyclePosition === 3 ? "is-altar-featured-desktop-right" : "",
+    desktopCyclePosition === 10 ? "is-altar-featured-desktop-left" : "",
+    position >= 3 && (position - 3) % 7 === 0 ? "is-altar-featured-compact" : "",
+  ].filter(Boolean).join(" ");
+}
+
+function productItem(product, editorialPosition = 0) {
+  return `<div class="js-product-item-private product-item ${editorialClasses(editorialPosition)}">
       <a class="product-item-link sim-product-image" href="${BASE}#/producto/${product.slug}">
         <img src="${product.images[0]}" alt="${esc(product.name)}" loading="lazy">
         ${product.images[1] ? `<img class="sim-product-image-hover" src="${product.images[1]}" alt="" loading="lazy">` : ""}
@@ -357,7 +367,7 @@ function productItem(product) {
 }
 
 function productGrid(list) {
-  return `<div class="js-product-table grid grid-2 grid-md-4 sim-grid altar-shop-grid">${list.map(productItem).join("")}</div>`;
+  return `<div class="js-product-table grid grid-2 grid-md-4 sim-grid altar-shop-grid">${list.map((product, index) => productItem(product, index + 1)).join("")}</div>`;
 }
 
 function categoryPage({ slug, query }) {
@@ -368,6 +378,8 @@ function categoryPage({ slug, query }) {
   if (sort === "menor") list = [...list].sort((a, b) => a.price - b.price);
   if (sort === "mayor") list = [...list].sort((a, b) => b.price - a.price);
   if (sort === "az") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+  if (sort === "za") list = [...list].sort((a, b) => b.name.localeCompare(a.name));
+  if (sort === "nuevos") list = [...list].reverse();
 
   if (query !== undefined) {
     const heading = list.length
@@ -376,13 +388,19 @@ function categoryPage({ slug, query }) {
     return container(pageHeader(t("search.search_results", "Resultados de búsqueda")) + heading + productGrid(list.length ? list : products.slice(0, 4)));
   }
 
+  const sortOptions = [["relevancia", "Más relevantes"], ["menor", "Precio: menor a mayor"], ["mayor", "Precio: mayor a menor"], ["az", "A - Z"], ["za", "Z - A"], ["antiguos", "Más antiguos"], ["nuevos", "Más nuevos"], ["vendidos", "Más vendidos"]];
+  const selectedSort = sortOptions.find(([value]) => value === sort)?.[1] || sortOptions[0][1];
   const controls = `<div class="filters-controls-content sim-controls altar-shop-controls">
-      <button type="button" class="btn btn-secondary btn-small altar-shop-filter" data-sim-open="#modal-filters">${icon("filter", "altar-shop-control-icon icon-inline")} Filtrar</button>
-      <span class="altar-shop-count">${list.length} ${esc(t("general.products_label", "productos"))}</span>
-      <label class="product-list-sort-by sim-sort altar-shop-sort">${icon("sort-by", "altar-shop-control-icon icon-inline")} <span class="altar-shop-sort-field"><span class="form-group"><select class="form-select form-select-small" data-sim-sort>
-        ${[["relevancia", "Más relevantes"], ["menor", "Precio: menor a mayor"], ["mayor", "Precio: mayor a menor"], ["az", "A - Z"]].map(([v, l]) => `<option value="${v}" ${v === sort ? "selected" : ""}>${l}</option>`).join("")}
-      </select><span class="form-select-icon">${icon("chevron-down", "form-select-arrow icon-inline")}</span></span></span></label>
+      <div class="sim-sort altar-shop-sort">
+        <button type="button" class="altar-shop-sort-trigger js-modal-open-private" data-target="#modal-sort-by" aria-haspopup="dialog" aria-controls="modal-sort-by">
+          <span>${esc(selectedSort)}</span>${icon("chevron-down", "altar-shop-sort-chevron icon-inline")}
+        </button>
+      </div>
     </div>`;
+  const sortModal = modal({ id: "modal-sort-by", title: "[ ORDENAR POR ]", from: "bottom", widthDesktop: "large",
+    classes: "h-auto altar-sort-modal", headerClass: "altar-sort-modal__header", titleClass: "altar-sort-modal__title",
+    closeClass: "altar-sort-modal__close", closeIconClass: "altar-sort-modal__close-icon", bodyClass: "altar-sort-modal__body", overlayClass: "altar-sort-modal__overlay",
+    body: `<ul class="radio-button-container sort-by-options list-unstyled">${sortOptions.map(([value, label]) => `<li class="radio-button-item"><a href="#" class="radio-button ${value === sort ? "selected" : ""}" data-sim-sort-value="${value}"><span class="radio-button-content"><span class="radio-button-label">${esc(label)}</span></span></a></li>`).join("")}</ul>` });
   const filters = modal({ id: "modal-filters", title: "Filtrar", from: "left", widthDesktop: "small",
     body: `<p class="form-label">${esc(t("filters.categories_title", "Categorías"))}</p>
       <ul class="list-unstyled sim-filter-list"><li><a href="${BASE}#/tienda">Todas</a></li>${store.categories.map((c) => `<li><a href="${BASE}#/categoria/${c.slug}" ${c.slug === slug ? 'class="sim-strong"' : ""}>${esc(c.name)}</a></li>`).join("")}</ul>
@@ -390,7 +408,7 @@ function categoryPage({ slug, query }) {
       <div class="sim-inline-form"><input class="form-control" placeholder="${esc(t("filters.price.from", "Desde"))}"><input class="form-control" placeholder="${esc(t("filters.price.to", "Hasta"))}"><button type="button" class="btn btn-secondary">${esc(t("filters.price.apply", "Aplicar"))}</button></div>
       <p class="sim-note">Simulación: el filtro de precio no se aplica.</p>` });
   return container(controls + productGrid(list) +
-    "") + filters; // pagination.tpl hides the counter when there is a single page
+    "") + sortModal + filters; // pagination.tpl hides the counter when there is a single page
 }
 
 const optionAxes = (product) => Object.entries(product.options);
@@ -479,7 +497,7 @@ function productPage({ slug }) {
   </section>
   <section class="section-related-products"><div class="container sim-related">
     <div class="heading-block h2">Productos relacionados</div>
-    <div class="js-product-table grid grid-2 grid-md-4 sim-related-grid">${related.map(productItem).join("")}</div>
+    <div class="js-product-table grid grid-2 grid-md-4 sim-related-grid">${related.map((product) => productItem(product)).join("")}</div>
   </div></section>` +
     modal({ id: "modal-payments", title: t("product.see_payment_methods", "Medios de pago"), widthDesktop: "small",
       body: `<p>Tarjetas de crédito: hasta ${store.installments} cuotas sin interés.</p><p>Transferencia: 10% de descuento.</p><p class="sim-note">Simulación: en la tienda real lo arma Tiendanube.</p>` });
@@ -570,6 +588,15 @@ function renderRoute() {
   const route = currentRoute();
   const commerceTemplates = new Set(["category", "search", "product", "cart", "contact", "page", "account-login", "account-register", "account-reset", "404"]);
   document.body.className = `template-${route.template}${commerceTemplates.has(route.template) ? " is-altar-commerce" : ""}`;
+  const headerPage = ["shop", "category", "search", "product"].includes(route.name) ? "shop" : route.name === "contact" ? "contacto" : "none";
+  const header = $(".altar-nav");
+  if (header) header.dataset.altarPage = headerPage;
+  $$('[data-altar-page-link]').forEach((link) => {
+    const active = link.dataset.altarPageLink === headerPage;
+    link.classList.toggle("is-active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
   $("[data-sim-view]").innerHTML = route.render();
   if (route.name === "product") updateProductState();
   renderMap(route.name);
@@ -624,6 +651,13 @@ function renderMap(active) {
 function initEvents() {
   document.addEventListener("click", (event) => {
     const target = event.target;
+    const sortOption = target.closest("[data-sim-sort-value]");
+    if (sortOption) {
+      event.preventDefault();
+      location.hash = `${location.hash.split("?")[0]}?orden=${sortOption.dataset.simSortValue}`;
+      closeModal("#modal-sort-by");
+      return;
+    }
     const opener = target.closest(".js-modal-open-private, [data-sim-open]");
     if (opener) { event.preventDefault(); openModal(opener.dataset.target || opener.dataset.simOpen); return; }
     const closer = target.closest(".js-modal-close-private");
@@ -696,9 +730,6 @@ function initEvents() {
     }
   });
 
-  document.addEventListener("change", (event) => {
-    if (event.target.matches("[data-sim-sort]")) location.hash = `${location.hash.split("?")[0]}?orden=${event.target.value}`;
-  });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     closeSearch();

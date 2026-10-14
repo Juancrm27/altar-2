@@ -7,6 +7,9 @@
   --altar-secondary: #601e2a;
   --altar-commerce-background: #fbf7e7;
   --altar-commerce-foreground: #000000;
+  --altar-commerce-gray-dark: #54544f;
+  --altar-commerce-gray: #777771;
+  --altar-commerce-gray-light: #d2d0c6;
 }
 :root { --u: 1px;
   /* Figma layout grid: 8 columns, 12px margin, 20px gutter on the 1440 frame (scales with --u).
@@ -26,7 +29,10 @@ html.is-altar-home { color-scheme: dark; background: var(--altar-space, #2d2838)
 body.template-home { margin: 0; color: var(--altar-text, #f7f2ec); background: var(--altar-space, #2d2838); font-family: Arial, Helvetica, sans-serif; }
 html.is-altar-commerce,
 body.is-altar-commerce { color-scheme: light; color: var(--altar-commerce-foreground); background: var(--altar-commerce-background); }
-body.is-altar-commerce {
+/* Store panels opened from the home (cart, search, add-to-cart notice) use the same commercial palette as the shop */
+html.is-altar-home :is(.js-modal-private, .notification-cart-container) { color-scheme: light; color: var(--altar-commerce-foreground); }
+body.is-altar-commerce,
+html.is-altar-home :is(.js-modal-private, .notification-cart-container) {
   --main-background: var(--altar-commerce-background);
   --main-foreground: var(--altar-commerce-foreground);
   --button-primary-background-color: var(--altar-commerce-foreground);
@@ -40,10 +46,13 @@ body.is-altar-commerce {
   --button-tertiary-background: transparent;
   --button-tertiary-color: var(--altar-commerce-foreground);
   --button-tertiary-fill: var(--altar-commerce-foreground);
-  /* Product badges (Figma 305:214): sale in blue, free shipping in yellow, both with black text. */
-  --label-primary-background: #8fadc5;
+  /* Commercial states stay inside Altar's neutral palette. */
+  --accent-color: var(--altar-commerce-gray-dark);
+  --stock-color: var(--altar-commerce-gray);
+  --warning: var(--altar-commerce-gray);
+  --label-primary-background: var(--altar-commerce-gray-light);
   --label-primary-foreground: var(--altar-commerce-foreground);
-  --label-secondary-background: #ffff00;
+  --label-secondary-background: color-mix(in srgb, var(--altar-commerce-gray-light) 55%, var(--altar-commerce-background));
   --label-secondary-foreground: var(--altar-commerce-foreground);
 }
 :where(.altar-nav, .altar-footer, .altar-solar, .altar-page-section) img { display: block; max-width: 100%; }
@@ -262,6 +271,7 @@ a.altar-collection__photo { display: block; color: inherit; }
 .site-header.is-on-light .altar-nav { --altar-nav-color: var(--altar-secondary); }
 .site-header.is-on-light .altar-nav img { filter: brightness(0) opacity(.94); }
 .altar-nav a:hover, .altar-nav a:focus-visible { text-decoration: underline; text-underline-offset: calc(4 * var(--u)); }
+.altar-nav :is(.altar-nav__menu, .altar-nav__panel-menu) a.is-active { text-decoration: underline; text-underline-position: from-font; text-underline-offset: auto; }
 .altar-nav__rule { width: 100%; height: calc(6.338 * var(--u)); border-color: currentColor; border-style: dashed; border-width: calc(.423 * var(--u)) calc(.423 * var(--u)) 0; }
 .altar-nav__rule--bottom { border-width: 0 calc(.423 * var(--u)) calc(.423 * var(--u)); }
 .altar-nav__content { display: grid; width: 100%; height: calc(54 * var(--u)); padding: 0 calc(12 * var(--u)); grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
@@ -425,7 +435,7 @@ a.altar-collection__photo { display: block; color: inherit; }
 .altar-nav__account { text-decoration: none; }
 /* Search stands alone left of the divider, on the top line like the first item of the stack. */
 .altar-nav__actions > .altar-nav__search-container { align-self: flex-start; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
-.altar-nav .altar-nav__menu-toggle { display: none; font-size: calc(10 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
+.altar-nav .altar-nav__menu-toggle { display: none; font-size: calc(12 * var(--u)); line-height: calc(24 * var(--u)); text-transform: uppercase; }
 /* The actions column clips (intro animation), so the search panel is fixed under the header. */
 .altar-nav__search-panel.search-floating-container { position: fixed; top: calc(98 * var(--u)); right: var(--grid-margin); left: auto; z-index: 30; width: calc(var(--col, 160px) * 2 + var(--grid-gutter)); min-width: 280px; padding: calc(12 * var(--u)); color: var(--main-foreground, #000); background: var(--main-background, #fbf7e7); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity .2s ease, transform .2s ease, visibility .2s; }
 .altar-nav__search-panel.search-floating-container.visible { opacity: 1; visibility: visible; transform: none; }
@@ -433,16 +443,19 @@ a.altar-collection__photo { display: block; color: inherit; }
 body.is-altar-commerce .site-header,
 body.is-altar-commerce .head-main--altar { background: var(--altar-commerce-background, #fbf7e7) !important; }
 body.is-altar-commerce .altar-nav { --altar-nav-color: var(--altar-commerce-foreground, #000); }
-body.is-altar-commerce .altar-nav :is(.altar-nav__action-icon, .altar-nav__logo-image--default) { filter: brightness(0); }
+body.is-altar-commerce .altar-nav :is(.altar-nav__action-icon, .altar-nav__logo-image) { filter: brightness(0); }
 
 /* — Header / Site (Figma 265:168): tablet and mobile show brand + Menu; the menu unfolds inside the header — */
 .altar-nav__panel, .altar-nav__menu-rule { display: none; }
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
   .altar-nav__content { grid-template-columns: minmax(0, 1fr) auto; }
   .altar-nav__brand { gap: 9px; }
-  .altar-nav__menu, .altar-nav__metadata, .altar-nav__divider, .altar-nav__search-container, .altar-nav__action-stack { display: none; }
+  .altar-nav__menu, .altar-nav__metadata, .altar-nav__search-container, .altar-nav__action-stack { display: none; }
+  /* Tablet and mobile keep the two brand dividers; only dividers tied to
+     hidden desktop navigation/actions disappear. */
+  .altar-nav__divider--navigation, .altar-nav__divider--actions { display: none; }
   .altar-nav .altar-nav__menu-toggle { display: block; }
-  .altar-nav__panel { flex-direction: column; gap: 16px; padding: 20px 12px; }
+  .altar-nav__panel { flex-direction: column; gap: 16px; padding: 20px 12px 8px; }
   .altar-nav.is-menu-open .altar-nav__panel { display: flex; }
   .altar-nav.is-menu-open .altar-nav__menu-rule { display: block; width: 100%; height: 6.338px; border-bottom: .423px dashed currentColor; }
   .altar-nav__panel-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
@@ -450,73 +463,103 @@ body.is-altar-commerce .altar-nav :is(.altar-nav__action-icon, .altar-nav__logo-
   .altar-nav__panel-menu a { font-size: 12px; line-height: 24px; text-transform: uppercase; }
   .altar-nav__panel-rule { width: 100%; height: 6.338px; border-bottom: .423px dashed currentColor; }
   .altar-nav .altar-nav__panel-item { display: flex; gap: 3px; align-items: center; font-size: 10px; line-height: 24px; text-transform: uppercase; white-space: nowrap; }
-  .altar-nav.is-menu-open { border-radius: 0 0 6px 6px; background: color-mix(in srgb, var(--altar-primary) 8%, transparent); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  .altar-nav.is-menu-open { border-radius: 0 0 6px 6px; background: color-mix(in srgb, var(--altar-nav-color, var(--altar-primary)) 8%, transparent); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 }
 @media (max-width: 749px) {
   .altar-nav { padding: 12px 8px; }
   .altar-nav__content { padding: 0 8px; }
-  .altar-nav__panel { padding: 20px 8px; }
+  .altar-nav__panel { padding: 20px 8px 12px; }
   .altar-nav__panel-utilities { flex-direction: column; align-items: flex-end; gap: 12px; }
 }
 /* Below 768px store.js opens the search modal instead of the floating panel. */
 @media (max-width: 767px) { .altar-nav__search-panel.search-floating-container { display: none; } }
 
-/* — Shop / category: editorial product grid approved in Figma 303:169 and 303:170 — */
+/* — Shop / category: editorial product grid approved in Figma 438:658 — */
 .section-main-products-grid,
 .section-main-products-grid button,
 .section-main-products-grid input,
-.section-main-products-grid select { font-family: "Inter", sans-serif; }
-/* Three equal slots (Figma: Left / Center / Right) so the product count sits at the page centre */
-.altar-shop-controls { display: grid; min-height: 43px; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; column-gap: 16px; margin-bottom: 24px; }
-.altar-shop-controls > :first-child { justify-self: start; }
-.altar-shop-controls-spacer { width: 82px; }
+.section-main-products-grid select,
+.section-main-products-grid .btn { font-family: "Inter", sans-serif; }
+.section-main-products-grid.is-altar-editorial { padding-bottom: 88px !important; }
+/* Figma keeps Tiendanube's native sorting data and actions, presented through
+   Altar's compact trigger and responsive menu. Filters remain an editor option. */
+.altar-shop-controls { display: flex; min-height: 42px; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 12px; }
+.altar-shop-controls.has-filter { justify-content: space-between; }
 .altar-shop-filter { display: inline-flex; width: 82px; height: 28px; padding: 0 10px; align-items: center; justify-content: center; gap: 6px; color: currentColor; border: 1px solid currentColor; border-radius: 0; background: transparent; font-size: 12px; line-height: 16px; cursor: pointer; }
 .altar-shop-control-icon { width: 14px; height: 14px; flex: 0 0 auto; }
 .altar-shop-filter .altar-shop-control-icon { width: 12px; height: 12px; }
-.altar-shop-count { justify-self: center; color: #666; font-size: 12px; line-height: 17px; }
-.altar-shop-sort { display: flex; width: 198px; justify-self: end; align-items: center; gap: 8px; }
-.altar-shop-sort-field { position: relative; display: block; width: 176px; min-width: 0; }
-.altar-shop-sort-field .form-group { display: block; margin: 0; }
-.altar-shop-sort-field .form-label { display: none; }
-.altar-shop-sort-field .form-select { width: 100%; height: 42px; margin: 0; padding: 0 32px 0 12px; color: currentColor; font-size: 12px; line-height: 16px; background: var(--altar-commerce-background); border: 1px solid currentColor; border-radius: 3px; }
-.altar-shop-sort-field .form-select-icon { position: absolute; top: 50%; right: 12px; bottom: auto; display: flex; transform: translateY(-50%); pointer-events: none; }
-.altar-shop-sort-field .form-select-arrow { width: 10px; height: 10px; }
-/* Row pitch 546 at 1440: every card reserves the sale-price line, so rows stay even with or without a discount. */
-.altar-shop-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: dense; column-gap: 16px; row-gap: 43px; }
+.altar-shop-sort { display: flex; width: 176px; align-items: center; justify-content: flex-end; }
+.altar-shop-sort-trigger { display: inline-flex; width: 176px; height: 42px; align-items: center; justify-content: flex-end; gap: 6px; margin: 0; padding: 0; color: currentColor; background: transparent; border: 0; border-radius: 0; font: 400 10px/16px "Inter", sans-serif; letter-spacing: 0; text-transform: uppercase; cursor: pointer; }
+.altar-shop-sort-chevron { width: 12px; height: 12px; flex: 0 0 12px; transition: transform .2s ease; }
+body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hidden; }
+
+/* Sorting popover / bottom sheet (Figma 496:2322, 496:2427 and 496:2506). */
+.altar-sort-modal { color: var(--altar-commerce-foreground, #000); background: var(--altar-commerce-background, #fbf7e7); border: .42px dashed #000; border-radius: 0; font-family: "Inter", sans-serif; box-shadow: 0 8px 12px rgba(0, 0, 0, .08); }
+.altar-sort-modal__header { flex: 0 0 auto; height: 40.42px; padding: 0 16px; background: transparent; border-bottom: .42px dashed #000; }
+.altar-sort-modal__title { width: auto; margin: 0; font: 400 10px/16px "Inter", sans-serif; letter-spacing: 0; text-transform: uppercase; }
+.altar-sort-modal__close { display: inline-flex; align-items: center; justify-content: center; margin: 0; padding: 0; color: inherit; font: 400 10px/16px "Inter", sans-serif; text-transform: uppercase; }
+.altar-sort-modal__close::after { content: "CLOSE"; }
+.altar-sort-modal__close-icon { display: none; }
+.altar-sort-modal__body { height: auto; padding: 8px 0; overflow: hidden; }
+.altar-sort-modal .sort-by-options { width: 100%; margin: 0; gap: 0; }
+.altar-sort-modal .radio-button-item { width: 100%; margin: 0; }
+.altar-sort-modal .radio-button { display: flex; width: 100%; height: 36px; align-items: center; justify-content: flex-start; padding: 0 16px; color: inherit; }
+.altar-sort-modal .radio-button-content { width: 100%; }
+.altar-sort-modal .radio-button-icons-container { display: none; }
+.altar-sort-modal .radio-button-label { padding: 0; font: 400 10px/16px "Inter", sans-serif; text-align: left; text-transform: uppercase; }
+.altar-sort-modal .radio-button.selected .radio-button-label { text-decoration: underline; text-underline-offset: 2px; }
+.altar-sort-modal .filters-overlay { inset: 0; }
+.altar-sort-modal__overlay { z-index: 20000; }
+/* The desktop Figma grid is 1290px: 4 × 288px cards + 3 × 46px gutters.
+   Each regular row is 499px (379px image + 120px information) with a 36px gap. */
+.altar-shop-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: dense; column-gap: 46px; row-gap: 36px; }
 .altar-shop-grid > .product-item { min-width: 0; margin-bottom: 0; }
-.altar-shop-grid > .product-item:nth-child(18n + 1) { grid-column: 3 / span 2; grid-row: span 2; }
-.altar-shop-grid > .product-item:nth-child(18n + 10) { grid-column: 1 / span 2; grid-row: span 2; }
-.altar-shop-grid .product-item-image-container { aspect-ratio: 310 / 423; max-height: none; }
+.altar-shop-grid :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 288 / 379; max-height: none; }
 .altar-shop-grid .product-item-image-container > div[style*="padding-bottom"] { position: absolute; inset: 0; padding-bottom: 0 !important; }
 .altar-shop-grid .js-product-item-image-link-private { position: absolute; inset: 0; display: block; }
 .altar-shop-grid .product-item-image { width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center; }
-.altar-shop-grid > .product-item:nth-child(18n + 1) .product-item-image-container,
-.altar-shop-grid > .product-item:nth-child(18n + 10) .product-item-image-container { aspect-ratio: 636 / 968; }
-/* Card text (Figma 305:188): name 14/17, prices 7px below, compare 12/17 bold at 65%, price 16/19.5 bold, installments 10/12. */
+/* Card information is a stable 120px slot. Dynamic price, transfer and stock
+   lines remain data-driven, but cannot change the editorial row geometry. */
 :is(.altar-shop-grid, .section-related-products) .product-item-information { min-height: 80.5px; padding: 8px 0 0; }
+.altar-shop-grid .product-item-information { height: 120px; min-height: 120px; padding-top: 16px; overflow: hidden; text-align: center; }
+.altar-shop-grid .product-item-information-inner,
+.altar-shop-grid .product-item-link { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 6px; }
 :is(.altar-shop-grid, .section-related-products) .product-item-name { margin: 0; font-size: 14px; line-height: 17px; }
 :is(.altar-shop-grid, .section-related-products) .product-item-price-container { display: flex; flex-direction: column; align-items: flex-start; padding-top: 7px; }
-:is(.altar-shop-grid, .section-related-products) .product-item-price { font-size: 16px; font-weight: 700; line-height: 19.5px; }
-:is(.altar-shop-grid, .section-related-products) .product-item-price-compare { order: -1; margin: 0; color: rgba(0, 0, 0, .65); font-size: 12px; font-weight: 700; line-height: 17px; text-decoration: none; opacity: 1; }
+.altar-shop-grid .product-item-price-container { align-items: center; padding-top: 0; }
+:is(.altar-shop-grid, .section-related-products) .product-item-price { font-size: 16px; font-weight: 500; line-height: 19.5px; }
+:is(.altar-shop-grid, .section-related-products) .product-item-price-compare { order: -1; margin: 0; color: #777771; font-size: 12px; font-weight: 500; line-height: 17px; text-decoration: none; opacity: 1; }
 :is(.altar-shop-grid, .section-related-products) .product-item-installments { margin: 0; color: rgba(0, 0, 0, .65); font-size: 10px; line-height: 12px; opacity: 1; }
+/* Payment discount, low stock and inline discounts use one restrained family of grays. */
+.altar-shop-grid :is(.product-item-payment-discount, .product-item-stock-notice, .product-item-discount) { color: #777771; }
+.altar-shop-grid .product-item-payment-discount { font-weight: 500; }
 /* Badges sit 8px from the image's bottom-left corner, square, without the shipping icon. */
 :is(.altar-shop-grid, .section-related-products) .product-labels { top: auto; bottom: 8px; left: 8px; gap: 4px; }
 :is(.altar-shop-grid, .section-related-products) .label { margin: 0; padding: 3px 6px; font-size: 10px; line-height: 12px; border-radius: 0; }
 :is(.altar-shop-grid, .section-related-products) .label-icon { display: none; }
-:is(.altar-shop-grid, .section-related-products) .product-item-no-stock { color: var(--altar-commerce-background); background: var(--altar-commerce-foreground); }
+:is(.altar-shop-grid, .section-related-products) .product-item-no-stock { color: var(--altar-commerce-background); background: var(--altar-commerce-gray-dark); }
+.altar-shop-grid .is-altar-editorial-card { position: relative; cursor: pointer; }
+.altar-shop-grid .altar-editorial-card-hitarea { position: absolute; inset: 0; z-index: 1; }
+.altar-shop-grid .is-altar-editorial-card :is(.product-item-image-container, .product-item-information) { position: relative; z-index: 2; }
 .altar-shop-grid ~ * .pagination-counter { font-size: 14px; line-height: 20px; }
 
 @media (max-width: 767px) {
-  .altar-shop-controls { grid-template-columns: auto 1fr; column-gap: 12px; }
-  .altar-shop-controls .altar-shop-count,
-  .altar-shop-controls-spacer { display: none; }
-  .altar-shop-sort { justify-self: end; }
-  .altar-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
-  .altar-shop-grid .product-item-information { min-height: 0; }
+  .section-main-products-grid.is-altar-editorial .container,
+  body.template-category[data-sim] .sim-section.container { width: calc(100% - 48px); max-width: none; margin-right: auto; margin-left: auto; padding-right: 0; padding-left: 0; }
+  .altar-shop-controls { margin-bottom: 12px; }
+  .altar-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 23px; row-gap: 24px; }
+  .altar-shop-grid .product-item-information { height: auto; min-height: 0; padding-top: 12px; overflow: visible; }
   .altar-shop-grid > .product-item { grid-column: auto; grid-row: auto; }
-  .altar-shop-grid .product-item-image-container { aspect-ratio: 171 / 233; }
-  .altar-shop-grid > .product-item:nth-child(7n + 1) { grid-column: 1 / -1; }
-  .altar-shop-grid > .product-item:nth-child(7n + 1) .product-item-image-container { aspect-ratio: 358 / 384; }
+  .altar-shop-grid :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 498 / 655; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) { grid-column: 1 / -1; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 1018 / 1495; }
+  .altar-sort-modal { top: auto !important; right: 0 !important; bottom: -100% !important; left: 0 !important; z-index: 20001; width: 100% !important; height: auto !important; max-height: calc(100vh - 24px); padding-bottom: 12px; box-shadow: none; transform: none !important; }
+  .altar-sort-modal.modal-visible { bottom: 0 !important; }
+  .altar-sort-modal__header { height: 52.42px; padding: 0 24px; }
+  .altar-sort-modal__body { height: auto; padding: 8px 4px; }
+  .altar-sort-modal .radio-button { height: 48px; justify-content: flex-end; padding: 0 20px; }
+  .altar-sort-modal .radio-button-label { text-align: right; }
+  .altar-sort-modal__overlay { background: rgba(0, 0, 0, .4); }
 }
 
 /* — Product page · Option B "Ficha" (Figma 363:308): spec-sheet composition, Inter only — */
@@ -661,28 +704,56 @@ body.is-altar-commerce .altar-nav :is(.altar-nav__action-icon, .altar-nav__logo-
 }
 .altar-product-specs .altar-spec-row--single { grid-template-columns: minmax(0, 1fr); }
 
-/* Shop (Figma 303:169): 32px page margins, 4 flexible columns (329 @1440), featured spans 2×2 (678), 20px gutter, 43px rows */
-@media (min-width: 768px) {
+/* Shop (Figma 438:658): centred 1290px content area at 1728px, featured cards
+   span exactly two columns and two 499px rows. */
+@media (min-width: 1200px) {
+  body.is-altar-commerce .site-header { z-index: 20001; }
   .section-main-products-grid.is-altar-editorial .container,
-  body.template-category[data-sim] .sim-section.container { max-width: none; padding-right: 32px; padding-left: 32px; }
-  .altar-shop-grid { column-gap: var(--grid-gutter, 20px); }
-  /* Featured cards span exactly two rows: the regular cards set the row height and the featured image fills the rest */
-  .altar-shop-grid > .product-item:is(:nth-child(18n + 1), :nth-child(18n + 10)) { display: flex; flex-direction: column; }
-  .altar-shop-grid > .product-item:is(:nth-child(18n + 1), :nth-child(18n + 10)) :is(.product-item-image-container, .sim-product-image) { flex: 1 1 0; min-height: 0; aspect-ratio: auto; }
+  body.template-category[data-sim] .sim-section.container { width: calc(100% - 64px); max-width: 1290px; margin-right: auto; margin-left: auto; padding-right: 0; padding-left: 0; }
+  .altar-shop-grid { grid-auto-rows: 499px; column-gap: 46px; row-gap: 36px; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(16n + 3), .is-altar-featured-desktop-left, :nth-child(16n + 10)) { display: flex; flex-direction: column; grid-row: span 2; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(16n + 3)) { grid-column: 3 / span 2; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-left, :nth-child(16n + 10)) { grid-column: 1 / span 2; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(16n + 3), .is-altar-featured-desktop-left, :nth-child(16n + 10)) :is(.product-item-image-container, .sim-product-image) { flex: 1 1 0; min-height: 0; aspect-ratio: auto; }
+  .altar-sort-modal,
+  .altar-sort-modal.modal-visible { position: absolute; top: 156.68px !important; right: max(32px, calc((100vw - 1290px) / 2)) !important; bottom: auto !important; left: auto !important; width: 240px !important; height: auto !important; max-height: none; transform: none !important; }
+  .altar-sort-modal__body { height: auto; }
+  .altar-sort-modal__overlay { display: none !important; }
 }
 
-/* — Film grain beyond the home sections 3·4: footer (every page) and the shop / product / contact background.
+/* Tablet keeps the simpler two-column behavior used on mobile; the header also
+   switches to its menu version in this range. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  body.is-altar-commerce .site-header { z-index: 20001; }
+  .section-main-products-grid.is-altar-editorial .container,
+  body.template-category[data-sim] .sim-section.container { width: calc(100% - 48px); max-width: none; margin-right: auto; margin-left: auto; padding-right: 0; padding-left: 0; }
+  .altar-shop-controls { margin-bottom: 24px; }
+  .altar-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; row-gap: 24px; }
+  .altar-shop-grid > .product-item { grid-column: auto; grid-row: auto; }
+  .altar-shop-grid :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 498 / 655; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) { grid-column: 1 / -1; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 1018 / 1495; }
+  .altar-sort-modal,
+  .altar-sort-modal.modal-visible { position: absolute; top: 150.68px !important; right: 24px !important; bottom: auto !important; left: auto !important; width: 280px !important; height: auto !important; max-height: none; transform: none !important; }
+  .altar-sort-modal__body { height: auto; padding: 8px 0; }
+  .altar-sort-modal .radio-button { height: 48px; justify-content: flex-end; padding: 0 20px; }
+  .altar-sort-modal .radio-button-label { text-align: right; }
+  .altar-sort-modal__overlay { display: none !important; }
+}
+
+/* — Film grain beyond the home sections 3·4: footer (every page) and the product / contact background.
    Same SVG noise and the same --section-grain-opacity; screen lifts dark grounds, multiply marks light ones. — */
 .altar-page-grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-body:not(.template-category):not(.template-search):not(.template-product):not(.template-contact) .altar-page-grain { display: none; }
+body:not(.template-product):not(.template-contact) .altar-page-grain { display: none; }
 /* The ivory stays on <html>; the body goes transparent so the grain layer behind the content shows through */
-body:is(.template-category, .template-search, .template-product, .template-contact) { background: transparent; }
+body:is(.template-product, .template-contact) { background: transparent; }
+body:is(.template-category, .template-search) { background: var(--altar-commerce-background, #fbf7e7); }
 .altar-page-grain .altar-section-grain { mix-blend-mode: multiply; }
-/* Header on shop / product / contact: its opaque ivory (needed while sticky) gets the same grain. Both layers start at
+/* Header on product / contact: its opaque ivory (needed while sticky) gets the same grain. Both layers start at
    the viewport's top-left, so the noise lines up with the page grain below the header. */
-body:is(.template-category, .template-search, .template-product, .template-contact) .altar-nav { position: relative; isolation: isolate; }
+body:is(.template-product, .template-contact) .altar-nav { position: relative; isolation: isolate; }
 .altar-nav > .altar-nav__grain { position: absolute; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: multiply; }
-body:not(.template-category):not(.template-search):not(.template-product):not(.template-contact) .altar-nav__grain { display: none; }
+body:not(.template-product):not(.template-contact) .altar-nav__grain { display: none; }
 
 /* — Contact page: one centred column in Inter (title, form, store contact info underneath) — */
 .template-contact :is(.page-header, .contact-form-section, .sim-section),

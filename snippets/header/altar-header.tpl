@@ -14,11 +14,19 @@
 {% set altar_account_label = section.settings.altar_account_label | default('Account') %}
 {% set altar_cart_label = section.settings.altar_cart_label | default('Cart') %}
 {% set altar_menu_label = section.settings.altar_menu_label | default('Menu') %}
-{% set altar_close_label = section.settings.altar_close_label | default('Cerrar') %}
+{% set altar_close_label = section.settings.altar_close_label | default('Close') %}
 {% set altar_show_search = section.settings.altar_show_search is not same as(false) %}
 {% set altar_show_account = section.settings.altar_show_account is not same as(false) %}
 {% set altar_show_cart = section.settings.altar_show_cart is not same as(false) %}
 {% set use_ajax_cart = settings.ajax_cart and template != 'cart' %}
+{% set altar_page = 'none' %}
+{% if template == 'home' %}
+	{% set altar_page = 'home' %}
+{% elseif template in ['category', 'search', 'product'] %}
+	{% set altar_page = 'shop' %}
+{% elseif template == 'contact' %}
+	{% set altar_page = 'contacto' %}
+{% endif %}
 
 <div
 	class="js-head-main head-main head-main--altar altar-nav {{ header_with_categories_classes }}"
@@ -26,6 +34,7 @@
 	data-section-id="{{ section.id }}"
 	data-section-type="header"
 	data-sticky-header="{{ is_sticky ? 'true' : 'false' }}"
+	data-altar-page="{{ altar_page }}"
 	{% if header_styles | trim %}style="{{ header_styles | trim }}"{% endif %}
 >
 	{# Film grain over the header background on shop / product / contact pages (CSS shows it only there) #}
@@ -77,7 +86,13 @@
 			{% if navigation_block %}{{ navigation_block | block_attributes }}{% endif %}
 		>
 			{% for item in navigation %}
-				<a href="{{ item.url }}" {% if item.url | is_external %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
+				{% set altar_item_name = item.name | lower | trim %}
+				{% set altar_item_active = item.current
+					or (altar_page == 'home' and item.url == store.url)
+					or (altar_page == 'shop' and (item.url == store.products_url or altar_item_name in ['shop', 'tienda', 'store']))
+					or (altar_page == 'contacto' and (item.url == store.contact_url or altar_item_name in ['contacto', 'contact']))
+				%}
+				<a href="{{ item.url }}"{% if altar_item_active %} class="is-active" aria-current="page"{% endif %}{% if item.url | is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
 			{% endfor %}
 		</nav>
 
@@ -139,7 +154,13 @@
 	<div class="altar-nav__panel" id="altar-nav-panel-{{ section.id }}" data-altar-menu-panel hidden>
 		<nav class="altar-nav__panel-menu" aria-label="{{ 'Navegación principal' | translate }}">
 			{% for item in navigation %}
-				<a href="{{ item.url }}" {% if item.url | is_external %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
+				{% set altar_item_name = item.name | lower | trim %}
+				{% set altar_item_active = item.current
+					or (altar_page == 'home' and item.url == store.url)
+					or (altar_page == 'shop' and (item.url == store.products_url or altar_item_name in ['shop', 'tienda', 'store']))
+					or (altar_page == 'contacto' and (item.url == store.contact_url or altar_item_name in ['contacto', 'contact']))
+				%}
+				<a href="{{ item.url }}"{% if altar_item_active %} class="is-active" aria-current="page"{% endif %}{% if item.url | is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
 			{% endfor %}
 		</nav>
 		<div class="altar-nav__panel-rule" aria-hidden="true"></div>
@@ -161,4 +182,3 @@
 	</div>
 	<div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
 </div>
-<script src="{{ 'js/altar-header.js' | static_url }}" defer></script>

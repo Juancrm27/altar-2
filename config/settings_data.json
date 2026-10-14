@@ -30,7 +30,7 @@
     "promotion_labels_position": "over",
     "labels_on_image_position": "bottom",
     "product_installments": true,
-    "quick_shop": true,
+    "quick_shop": false,
     "product_color_variants": true,
     "product_hover": true,
     "product_item_slider": true,

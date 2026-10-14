@@ -5,9 +5,12 @@
 
 {# Global item settings #}
 
+{% set altar_editorial_card = altar_editorial_card | default(false) %}
 {% set show_installments_settings_value = (settings.product_installments ? true : false) and not reduced_item %}
 {% set show_color_variants_settings_value = (settings.product_color_variants ? true : false) and not reduced_item %}
-{% set show_quick_shop_settings_value = (settings.quick_shop ? true : false) and not reduced_item and not product.is_kit %}
+{# In the editorial shop the image and information already link to the product.
+   Keep Tiendanube's quick-shop everywhere else, but remove its extra CTA from this grid. #}
+{% set show_quick_shop_settings_value = (settings.quick_shop ? true : false) and not reduced_item and not product.is_kit and not altar_editorial_card %}
 {% set show_secondary_image_settings_value = settings.product_hover ? true : false %}
 {% set labels_value = reduced_item ? false : true %}
 {% set price_compare_value = reduced_item ? false : true %}
@@ -88,7 +91,7 @@
 {% set promotion_only_value = has_custom_percentage_off_promotion_label ? false : true %}
 {% set offer_only_value = has_custom_percentage_off_promotion_label ? true : false %}
 
-<div class="js-product-item-private product-item {{ product_item_classes.item }}" data-product-type="list" data-product-id="{{ product.id }}" data-store="product-item-{{ product.id }}" data-component="product-list-item" data-component-value="{{ product.id }}"{% if include_variants_data %} data-variants="{{ variants_data_value }}"{% endif %}{% if include_quickshop_id %} data-quickshop-id="quick{{ product.id }}"{% endif %}>
+<div class="js-product-item-private product-item {{ product_item_classes.item }}{% if altar_editorial_card %} is-altar-editorial-card{% endif %}" data-product-type="list" data-product-id="{{ product.id }}" data-store="product-item-{{ product.id }}" data-component="product-list-item" data-component-value="{{ product.id }}"{% if include_variants_data %} data-variants="{{ variants_data_value }}"{% endif %}{% if include_quickshop_id %} data-quickshop-id="quick{{ product.id }}"{% endif %}>
 
 	{% include 'snippets/product-list/product-item/item-image.tpl' with {
 		image_data_expand: data_expand,
@@ -225,6 +228,10 @@
 			} %}
 		{% endif %}
 	</div>
+
+	{% if altar_editorial_card %}
+		<a class="altar-editorial-card-hitarea" href="{{ url_with_selected_variant }}" tabindex="-1" aria-hidden="true"></a>
+	{% endif %}
 
 	{% if not product.is_placeholder %}
 		<span class="hidden" data-store="stock-product-{{ product.id }}-{% if product.has_stock %}{% if product.stock %}{{ product.stock }}{% else %}infinite{% endif %}{% else %}0{% endif %}"></span>

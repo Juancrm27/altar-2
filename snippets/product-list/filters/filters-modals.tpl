@@ -65,6 +65,7 @@
 			{% endembed %}
 		{% endif %}
 
+		{% set sort_modal_title = altar_toolbar ? '[ ORDENAR POR ]' : ('general.sort_by' | t) %}
 		{% embed 'snippets/modals/modal.tpl' with {
 			modal_id: 'modal-sort-by',
 			data_component: 'modal-sort-by',
@@ -74,10 +75,15 @@
 			layout: {
 				width_desktop: 'large',
 			},
-			title: 'general.sort_by' | t,
+			title: sort_modal_title,
 			modal_classes: {
-				modal: 'h-auto',
-				close_icon: 'icon-inline',
+				modal: altar_toolbar ? 'h-auto altar-sort-modal' : 'h-auto',
+				header: altar_toolbar ? 'altar-sort-modal__header' : '',
+				title: altar_toolbar ? 'altar-sort-modal__title' : '',
+				close_button: altar_toolbar ? 'altar-sort-modal__close' : '',
+				close_icon: altar_toolbar ? 'icon-inline altar-sort-modal__close-icon' : 'icon-inline',
+				body: altar_toolbar ? 'altar-sort-modal__body' : '',
+				overlay: altar_toolbar ? 'altar-sort-modal__overlay' : '',
 			}
 		} %}
 			{% block modal_body %}
