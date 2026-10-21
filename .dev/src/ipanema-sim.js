@@ -12,7 +12,7 @@ const CART_KEY = "altar-ipanema-sim-cart";
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-const money = (value) => new Intl.NumberFormat(store.locale, { style: "currency", currency: store.currency, maximumFractionDigits: 0 }).format(value);
+const money = (value) => new Intl.NumberFormat(store.locale, { style: "currency", currency: store.currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 const icon = (name, cls = "icon-inline") => `<svg class="${cls}"><use xlink:href="#${name}"/></svg>`;
 
 let settings = {};
@@ -78,6 +78,8 @@ function applyTokens() {
 const readCart = () => { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } };
 const writeCart = (items) => { try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch {} renderCart(); };
 const productBySlug = (slug) => products.find((p) => p.slug === slug);
+// The Ficha reference product (Figma 548:6520) is reachable by URL but not listed.
+const catalog = products.filter((p) => !p.hidden);
 const cartLines = () => readCart().map((line) => ({ ...line, product: productBySlug(line.slug) })).filter((l) => l.product);
 const cartCount = () => cartLines().reduce((sum, l) => sum + l.qty, 0);
 const cartTotal = () => cartLines().reduce((sum, l) => sum + l.qty * l.product.price, 0);
@@ -151,7 +153,7 @@ const searchForm = () => `<div class="search-form-wrap">
 
 function searchProducts(query) {
   const q = query.trim().toLowerCase();
-  return q ? products.filter((p) => `${p.name} ${p.category} ${p.description}`.toLowerCase().includes(q)) : [];
+  return q ? catalog.filter((p) => `${p.name} ${p.category} ${p.description}`.toLowerCase().includes(q)) : [];
 }
 
 function wireSearchForm(root) {
@@ -348,21 +350,55 @@ function editorialClasses(position) {
   ].filter(Boolean).join(" ");
 }
 
+// Mirrors snippets/product-list/payments/payment-discount-price.tpl (10% off with transfer in the mock store).
+const transferPrice = (price) => Math.round(price * (1 - store.transferDiscount));
+const paymentDiscount = (price, classes) => `<div class="js-payment-discount-price-product-container payment-discount-price-product-container ${classes}"><span class="js-payment-discount-price-product payment-discount-price-product">${money(transferPrice(price))}</span> <span>${esc(t("payment_discount.with", "con"))}</span> <span class="js-payment-discount-name-product">${esc(store.transferName)}</span></div>`;
+
+// product.display_price: off hides price, transfer and stock lines (item.tpl).
+const hasPrice = (product) => product.displayPrice !== false;
+
+// Mirrors item.tpl's stock notices (settings.last_product_text / latest_products_available).
+function stockNotice(product) {
+  const stock = stockFor(product, defaultVariant(product));
+  if (!Number.isFinite(stock) || stock === 0) return "";
+  if (stock === 1) return `<div class="product-item-stock-notice">${esc(settings.last_product_text || "¡Último disponible!")}</div>`;
+  if (stock <= (settings.latest_products_available || 0)) return `<div class="product-item-stock-notice">${esc(t("general.only_left", "¡Solo quedan"))} <span class="js-product-stock">${stock}</span> ${esc(t("general.in_stock", "en stock!"))}</div>`;
+  return "";
+}
+
+// Mirrors item-colors.tpl: first color as a swatch plus "+N".
+function itemColors(product) {
+  const colors = product.options.Color;
+  if (!settings.product_color_variants || !colors || colors.length < 2) return "";
+  const swatch = product.swatches?.[colors[0]];
+  return `<div class="product-item-colors-container order-first"><div class="product-item-colors-variation"><div class="product-item-colors" title="${esc(t("product_item.more_colors", "Ver más colores"))}">${swatch
+    ? `<span class="product-item-colors-bullet" title="${esc(colors[0])}" style="background: ${swatch}"></span><span class="product-item-colors-bullet-text">+${colors.length - 1}</span>`
+    : `<span class="product-item-colors-bullet-text">${colors.length} ${esc(t("product_item.colors", "colores"))}</span>`}</div></div></div>`;
+}
+
+// Mirrors snippets/product-list/product-item/item.tpl with altar_editorial_card.
 function productItem(product, editorialPosition = 0) {
-  return `<div class="js-product-item-private product-item ${editorialClasses(editorialPosition)}">
-      <a class="product-item-link sim-product-image" href="${BASE}#/producto/${product.slug}">
+  const url = `${BASE}#/producto/${product.slug}`;
+  return `<div class="js-product-item-private product-item is-altar-editorial-card ${editorialClasses(editorialPosition)}">
+      <a class="product-item-link sim-product-image" href="${url}">
         <img src="${product.images[0]}" alt="${esc(product.name)}" loading="lazy">
         ${product.images[1] ? `<img class="sim-product-image-hover" src="${product.images[1]}" alt="" loading="lazy">` : ""}
         ${productLabels(product)}
       </a>
       <div class="product-item-information">
-        <a class="product-item-link" href="${BASE}#/producto/${product.slug}"><div class="js-item-name product-item-name">${esc(product.name)}</div></a>
-        <div class="product-item-price-container">
-          ${product.comparePrice ? `<span class="product-item-price-compare">${money(product.comparePrice)}</span>` : ""}
-          <span class="js-price-display product-item-price">${money(product.price)}</span>
-        </div>
-        <div class="product-item-installments">${store.installments} cuotas sin interés de ${money(Math.round(product.price / store.installments))}</div>
+        <a class="product-item-link" href="${url}" title="${esc(product.name)}">
+          <div class="js-item-name product-item-name">${esc(product.name)}</div>
+          ${hasPrice(product) ? `<div class="product-item-price-container">
+            <span class="js-price-display product-item-price">${money(product.price)}</span>
+            ${product.comparePrice ? `<span class="js-compare-price-display product-item-price-compare">${money(product.comparePrice)}</span>` : ""}
+          </div>
+          <div class="product-item-installments">${store.installments} cuotas sin interés de ${money(Math.round(product.price / store.installments))}</div>
+          ${settings.payment_discount_price ? paymentDiscount(product.price, "product-item-payment-discount") : ""}
+          ${settings.last_product_category ? stockNotice(product) : ""}` : ""}
+          ${itemColors(product)}
+        </a>
       </div>
+      <a class="altar-editorial-card-hitarea" href="${url}" tabindex="-1" aria-hidden="true"></a>
     </div>`;
 }
 
@@ -372,7 +408,7 @@ function productGrid(list) {
 
 function categoryPage({ slug, query }) {
   const category = store.categories.find((c) => c.slug === slug);
-  let list = query !== undefined ? searchProducts(query) : category ? products.filter((p) => p.category === slug) : products;
+  let list = query !== undefined ? searchProducts(query) : category ? catalog.filter((p) => p.category === slug) : catalog;
   const params = new URLSearchParams(location.hash.split("?")[1] || "");
   const sort = params.get("orden") || "relevancia";
   if (sort === "menor") list = [...list].sort((a, b) => a.price - b.price);
@@ -385,7 +421,7 @@ function categoryPage({ slug, query }) {
     const heading = list.length
       ? `<div class="products-grid-header"><h2 class="products-grid-search-heading">${esc(t("search.showing", "Mostrando"))} <strong>${list.length}</strong> ${esc(list.length === 1 ? t("search.result_for_query", "resultado para") : t("search.results_for_query", "resultados para"))} “${esc(query)}”</h2></div>`
       : `<div class="products-grid-empty-message"><h2>${esc(t("search.no_results_for", "No encontramos nada para"))} “${esc(query)}”</h2><p>${esc(t("search.try_different_search", ""))}</p><p>${esc(t("search.maybe_interested", ""))}</p></div>`;
-    return container(pageHeader(t("search.search_results", "Resultados de búsqueda")) + heading + productGrid(list.length ? list : products.slice(0, 4)));
+    return container(pageHeader(t("search.search_results", "Resultados de búsqueda")) + heading + productGrid(list.length ? list : catalog.slice(0, 4)));
   }
 
   const sortOptions = [["relevancia", "Más relevantes"], ["menor", "Precio: menor a mayor"], ["mayor", "Precio: mayor a menor"], ["az", "A - Z"], ["za", "Z - A"], ["antiguos", "Más antiguos"], ["nuevos", "Más nuevos"], ["vendidos", "Más vendidos"]];
@@ -418,11 +454,11 @@ function productPage({ slug }) {
   const product = productBySlug(slug);
   if (!product) return notFoundPage();
   const category = store.categories.find((c) => c.slug === product.category);
-  const related = products.filter((p) => p.slug !== slug).slice(0, 4);
+  const related = product.related ? product.related.map(productBySlug).filter(Boolean) : catalog.filter((p) => p.slug !== slug).slice(0, 4);
   const cuota = money(Math.round(product.price / store.installments));
   // Mirrors snippets/product/product-variants.tpl (label + strong value, js-variant-button chips).
   const variants = optionAxes(product).map(([axis, values], index) => `
-    <div class="js-product-variants-group product-detail-variants-group">
+    <div class="js-product-variants-group product-detail-variants-group${["Color", "Cor"].includes(axis) ? " js-color-variants-container" : ""}">
       <label class="form-label">${esc(axis)}: <strong class="js-insta-variation-label" data-sim-axis-label="${index}">${esc(values[0])}</strong></label>
       ${values.map((value, i) => `<a class="js-variant-button btn btn-variant ${i === 0 ? "selected" : ""}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content">${esc(value)}</span></a>`).join("")}
     </div>`).join("");
@@ -442,11 +478,12 @@ function productPage({ slug }) {
           <div class="product-content altar-product">
             <div class="altar-product-head">
               <div class="altar-product-head-price">
-                <span class="altar-product-marker" aria-hidden="true"></span>
-                <div class="js-price-container product-price"><div class="product-price-main">
+                ${hasPrice(product) ? `<span class="altar-product-marker" aria-hidden="true"></span>` : ""}
+                ${hasPrice(product) ? `<div class="js-price-container product-price"><div class="product-price-main">
                   ${product.comparePrice ? `<div class="js-compare-price-display product-price-compare">${money(product.comparePrice)}</div>` : ""}
-                  <div class="product-price-row"><span class="js-price-display product-price-display">${money(product.price)}</span></div>
-                </div></div>
+                  <div class="product-price-row"><span class="js-price-display product-price-display">${money(product.price)}</span>${product.comparePrice ? `<span class="product-offer-label">${Math.round((1 - product.price / product.comparePrice) * 100)}% OFF</span>` : ""}</div>
+                </div>
+                ${settings.payment_discount_price ? paymentDiscount(product.price, "product-payment-discount-price") : ""}</div>` : ""}
               </div>
               <span class="altar-product-category">${esc(category.name)}</span>
             </div>
@@ -455,12 +492,14 @@ function productPage({ slug }) {
               <div class="js-product-variants product-detail-variants">${variants}</div>
               <div class="product-stock-alert" data-sim-stock></div>
               <div class="product-actions">
-                <div class="form-quantity-container"><div class="form-quantity">
+                ${hasPrice(product) ? `<div class="form-quantity-container"><div class="form-quantity">
                   <span class="js-quantity-down form-quantity-icon btn" data-sim-step="-1" aria-label="Restar">${icon("minus")}</span>
                   <input class="form-control js-quantity-input" type="number" min="1" value="1" data-sim-qty-input aria-label="Cantidad">
                   <span class="js-quantity-up form-quantity-icon btn" data-sim-step="1" aria-label="Sumar">${icon("plus")}</span>
-                </div></div>
-                <div class="buy-button-container"><button type="submit" class="js-addtocart js-prod-submit-form btn btn-primary btn-big btn-block cart" data-sim-add>${esc(t("product.add_to_cart", "Agregar al carrito"))}</button></div>
+                </div></div>` : ""}
+                <div class="buy-button-container">${hasPrice(product)
+                  ? `<button type="submit" class="js-addtocart js-prod-submit-form btn btn-primary btn-big btn-block cart" data-sim-add>${esc(t("product.add_to_cart", "Agregar al carrito"))}</button>`
+                  : `<button type="submit" class="js-addtocart js-prod-submit-form btn btn-primary btn-big btn-block contact" data-sim-contact>${esc(t("product.contact_for_price", "Consultar precio"))}</button>`}</div>
               </div>
               <p class="alert alert-warning" data-sim-add-error style="display:none;"></p>
             </form>
@@ -469,9 +508,9 @@ function productPage({ slug }) {
                 <div class="altar-spec"><span class="altar-spec-label">Maker:</span><span class="altar-spec-value">Altar</span></div>
                 <div class="altar-spec"><span class="altar-spec-label">SKU:</span><span class="altar-spec-value altar-spec-sku"><span class="altar-barcode" aria-hidden="true"></span><span class="js-product-sku">ALT-${esc(product.slug.toUpperCase().slice(0, 3))}-0001</span></span></div>
               </div>
-              <div class="js-product-payments-container product-payments-info altar-spec-row">
+              <div class="js-product-payments-container product-payments-info altar-spec-row"${hasPrice(product) ? "" : ' style="display: none;"'}>
                 <div class="altar-spec"><span class="altar-spec-label">Cuotas:</span><div class="product-installment">${store.installments} cuotas sin interés de ${cuota}</div></div>
-                <div class="altar-spec"><span class="altar-spec-label">Medios de pago:</span><div class="product-payment-discount">Tarjetas · Transferencia · Efectivo</div><a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments">${esc(t("product.see_payment_methods", "Ver medios de pago"))}</a></div>
+                <div class="altar-spec"><span class="altar-spec-label">Medios de pago:</span><div class="product-payment-discount">${Math.round(store.transferDiscount * 100)}% de descuento pagando con ${esc(store.transferName)}</div><a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments">Ver más detalles</a></div>
               </div>
               <div class="altar-spec-row">
                 <div class="altar-spec altar-spec-stock"><span class="altar-spec-label">Stock:</span><span class="altar-spec-value altar-stock-available">Disponible</span><span class="altar-spec-value altar-stock-none">${esc(t("product.out_of_stock", "Sin stock"))}</span></div>
@@ -497,7 +536,9 @@ function productPage({ slug }) {
   </section>
   <section class="section-related-products"><div class="container sim-related">
     <div class="heading-block h2">Productos relacionados</div>
-    <div class="js-product-table grid grid-2 grid-md-4 sim-related-grid">${related.map((product) => productItem(product)).join("")}</div>
+    <div class="products-list-slider altar-related-grid" style="--altar-related-columns: 4; --altar-related-columns-mobile: 2;">
+      <section class="products-section"><div><div class="products-section-container">${related.map((product) => productItem(product)).join("")}</div></div></section>
+    </div>
   </div></section>` +
     modal({ id: "modal-payments", title: t("product.see_payment_methods", "Medios de pago"), widthDesktop: "small",
       body: `<p>Tarjetas de crédito: hasta ${store.installments} cuotas sin interés.</p><p>Transferencia: 10% de descuento.</p><p class="sim-note">Simulación: en la tienda real lo arma Tiendanube.</p>` });
@@ -557,7 +598,7 @@ function contentPage({ slug }) {
 function notFoundPage() {
   return container(`<div class="error-page-container sim-404"><p class="error-page-subtitle">404</p><h1 class="error-page-title">${esc(t("general.page_not_found", "La página que estás buscando no existe."))}</h1>
     <a class="btn btn-primary" href="${BASE}#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a></div>
-    <h2 class="products-section-title sim-h3">Productos destacados</h2>${productGrid(products.slice(0, 4))}`);
+    <h2 class="products-section-title sim-h3">Productos destacados</h2>${productGrid(catalog.slice(0, 4))}`);
 }
 
 /* ---------- Router ---------- */
@@ -613,6 +654,7 @@ function updateProductState() {
   const product = productBySlug(root.dataset.simProduct);
   const stock = stockFor(product, selectedVariant(root));
   const add = $("[data-sim-add]", root);
+  if (!add) return; // "Consultar precio" state has no stock or quantity
   add.disabled = stock === 0;
   add.classList.toggle("nostock", stock === 0);
   add.classList.toggle("cart", stock !== 0);
@@ -625,8 +667,8 @@ function updateProductState() {
 /* ---------- Simulation map (not part of the theme) ---------- */
 
 function renderMap(active) {
-  const pages = [["shop", "#/tienda", "Categoría / tienda"], ["product", "#/producto/orbita", "Producto (con variantes)"], ["product", "#/producto/eclipse", "Producto con variante sin stock"],
-    ["product", "#/producto/agua", "Producto agotado"], ["search", "#/buscar?q=fuego", "Resultados de búsqueda"], ["search", "#/buscar?q=zzz", "Búsqueda sin resultados"],
+  const pages = [["shop", "#/tienda", "Categoría / tienda"], ["product", "#/producto/test-producto", "Producto (Figma 548:6520)"], ["product", "#/producto/corset-saturno", "Producto con colores y poco stock"],
+    ["product", "#/producto/sombrero-sol", "Producto sin precio"], ["search", "#/buscar?q=saco", "Resultados de búsqueda"], ["search", "#/buscar?q=zzz", "Búsqueda sin resultados"],
     ["cart", "#/carrito", "Página de carrito"], ["contact", "#/contacto", "Contacto"], ["login", "#/cuenta/login", "Login"], ["register", "#/cuenta/registro", "Registro"],
     ["page", "#/pagina/terminos", "Página de contenido"], ["404", "#/no-existe", "404"]];
   const map = $("[data-sim-map]");
@@ -689,7 +731,7 @@ function initEvents() {
     if (target.closest("[data-sim-map-toggle]")) { const map = $("[data-sim-map]"); map.dataset.open = map.dataset.open === "true" ? "false" : "true"; renderMap(currentRoute().name); }
     if (target.closest("[data-sim-search-open]")) { event.stopPropagation(); hideNotification(); $(".js-search-trigger").click(); }
     if (target.closest("[data-sim-menu]")) { event.stopPropagation(); $("[data-altar-menu-toggle]").click(); }
-    if (target.closest("[data-sim-fill]")) writeCart([{ slug: "orbita", variant: "Natural", qty: 1 }, { slug: "fuego", variant: "", qty: 2 }]);
+    if (target.closest("[data-sim-fill]")) writeCart([{ slug: "corset-saturno", variant: "Arena", qty: 1 }, { slug: "velo-neptuno", variant: "", qty: 2 }]);
     if (target.closest("[data-sim-empty]")) writeCart([]);
   });
 
@@ -699,6 +741,8 @@ function initEvents() {
       event.preventDefault();
       const root = $("[data-sim-product]");
       const product = productBySlug(root.dataset.simProduct);
+      // Tiendanube's "contact" state sends the customer to the contact form (data-contact-url).
+      if ($("[data-sim-contact]", root)) { location.hash = "#/contacto"; return; }
       const variant = selectedVariant(root);
       const qty = Math.max(1, Number($("[data-sim-qty-input]").value) || 1);
       const add = $("[data-sim-add]");

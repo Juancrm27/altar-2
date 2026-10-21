@@ -44,7 +44,7 @@
     <link rel="icon" href="{{ 'images/favicon.svg' | static_url }}" type="image/svg+xml">
     <link rel="icon" href="{{ 'images/favicon-32.png' | static_url }}" sizes="32x32" type="image/png">
     <link rel="apple-touch-icon" href="{{ 'images/apple-touch-icon.png' | static_url }}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <style id="altar-theme-tokens">
       :root {
         --altar-space: {{ settings.altar_space_color | default('#2d2838') }};

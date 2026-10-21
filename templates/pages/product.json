@@ -15,7 +15,7 @@
             "thumbnail_position": "left",
             "format": "grid",
             "columns": "1",
-            "gap": 8
+            "gap": 7
           }
         },
         "product_info": {
@@ -96,7 +96,7 @@
         "complementary_heading": {
           "type": "heading",
           "settings": {
-            "title": "t:defaults.heading",
+            "title": "Productos relacionados",
             "size": "h2"
           }
         },
@@ -126,7 +126,7 @@
         "alternative_heading": {
           "type": "heading",
           "settings": {
-            "title": "t:defaults.heading",
+            "title": "Productos relacionados",
             "size": "h2"
           }
         },

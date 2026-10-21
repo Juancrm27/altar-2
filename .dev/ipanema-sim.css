@@ -45,10 +45,8 @@ body[data-sim]:is(.template-product, .template-contact) { background: transparen
 .section-main-product .sim-section { padding-top: 0; padding-bottom: 48px; }
 .product-stock-alert:empty { display: none; }
 .sim-related { padding-bottom: 64px; }
-.sim-related-grid { margin-top: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 20px; }
-.sim-related-grid > .product-item { margin: 0; }
-.sim-related-grid .sim-product-image { aspect-ratio: 310 / 423; }
-@media (max-width: 767px) { .sim-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; } }
+/* In the theme the heading and recommendations are two blocks 16px apart (Figma 528:3674). */
+.sim-related .altar-related-grid { margin-top: 16px; }
 .sim-product { display: grid; gap: 32px; }
 @media (min-width: 768px) { .sim-product { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
 .sim-gallery { display: grid; gap: 8px; }

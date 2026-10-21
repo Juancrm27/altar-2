@@ -158,7 +158,9 @@
 		{% endfor %}
 		<div class="altar-product-head">
 			<div class="altar-product-head-price">
-				<span class="altar-product-marker" aria-hidden="true"></span>
+				{% if product.display_price %}
+					<span class="altar-product-marker" aria-hidden="true"></span>
+				{% endif %}
 				{{ product_price_markup }}
 			</div>
 			{% if altar_category %}
@@ -249,7 +251,8 @@
 			{% include "snippets/product/product-variants.tpl" with {
 				show_size_guide: show_size_guide,
 				bullet_variants: show_bullet_variants,
-				image_color_variants: show_color_images,
+				image_color_variants: home_main_product ? show_color_images : false,
+				text_color_variants: not home_main_product,
 				size_guide_url: size_guide
 			} %}
 		{% endif %}
@@ -411,4 +414,3 @@
 	{# Product payments details #}
 	{% include 'snippets/product/product-payment-details.tpl' %}
 {% endif %}
-

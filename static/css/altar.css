@@ -518,21 +518,36 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-shop-grid .product-item-image-container > div[style*="padding-bottom"] { position: absolute; inset: 0; padding-bottom: 0 !important; }
 .altar-shop-grid .js-product-item-image-link-private { position: absolute; inset: 0; display: block; }
 .altar-shop-grid .product-item-image { width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center; }
-/* Card information is a stable 120px slot. Dynamic price, transfer and stock
-   lines remain data-driven, but cannot change the editorial row geometry. */
+/* Card information is a 120px slot (Figma 438:637). With every optional line
+   (transfer, stock, variants) it grows instead of overlapping the next row. */
 :is(.altar-shop-grid, .section-related-products) .product-item-information { min-height: 80.5px; padding: 8px 0 0; }
-.altar-shop-grid .product-item-information { height: 120px; min-height: 120px; padding-top: 16px; overflow: hidden; text-align: center; }
+.altar-shop-grid .product-item-information { height: auto; min-height: 120px; padding-top: 16px; text-align: center; }
 .altar-shop-grid .product-item-information-inner,
 .altar-shop-grid .product-item-link { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 6px; }
+/* Empty app slots are zero-height flex children; hiding only the empty ones
+   prevents phantom 6px gaps while preserving any content injected by apps. */
+.altar-shop-grid .product-item-link > .js-nubesdk-slot:empty { display: none; }
 :is(.altar-shop-grid, .section-related-products) .product-item-name { margin: 0; font-size: 14px; line-height: 17px; }
 :is(.altar-shop-grid, .section-related-products) .product-item-price-container { display: flex; flex-direction: column; align-items: flex-start; padding-top: 7px; }
 .altar-shop-grid .product-item-price-container { align-items: center; padding-top: 0; }
 :is(.altar-shop-grid, .section-related-products) .product-item-price { font-size: 16px; font-weight: 500; line-height: 19.5px; }
 :is(.altar-shop-grid, .section-related-products) .product-item-price-compare { order: -1; margin: 0; color: #777771; font-size: 12px; font-weight: 500; line-height: 17px; text-decoration: none; opacity: 1; }
-:is(.altar-shop-grid, .section-related-products) .product-item-installments { margin: 0; color: rgba(0, 0, 0, .65); font-size: 10px; line-height: 12px; opacity: 1; }
+/* Card / Producto has no installments line; cuotas stay in the Ficha's payment details. */
+:is(.altar-shop-grid, .section-related-products) .product-item-installments { display: none; }
+/* Card / Producto (Figma 438:657) exposes one price line. The former price
+   and percentage badge belong to Ipanema's native card, not this variant. */
+:is(.altar-shop-grid, .section-related-products) :is(.product-item-price-compare, .product-item-discount) { display: none !important; }
 /* Payment discount, low stock and inline discounts use one restrained family of grays. */
-.altar-shop-grid :is(.product-item-payment-discount, .product-item-stock-notice, .product-item-discount) { color: #777771; }
-.altar-shop-grid .product-item-payment-discount { font-weight: 500; }
+:is(.altar-shop-grid, .section-related-products) :is(.product-item-payment-discount, .product-item-stock-notice, .product-item-discount) { color: #777771; }
+:is(.altar-shop-grid, .section-related-products) :is(.product-item-payment-discount, .product-item-stock-notice) { margin: 0; font-size: 12px; line-height: 15px; }
+:is(.altar-shop-grid, .section-related-products) .product-item-payment-discount { font-weight: 500; }
+/* Ipanema marks color variants as order-first and adds a 16px bottom margin.
+   The Altar card keeps them last: name → price → transfer → stock → variants,
+   shown as a 16px swatch and "+N" 8px apart. */
+:is(.altar-shop-grid, .section-related-products) .product-item-colors-container { order: 0; display: flex; align-items: center; padding-bottom: 6px; overflow: hidden; }
+:is(.altar-shop-grid, .section-related-products) .product-item-colors { display: flex; margin-bottom: 0; align-items: center; gap: 8px; }
+:is(.altar-shop-grid, .section-related-products) .product-item-colors-bullet { width: 16px; height: 16px; margin: 0; border: 0; border-radius: 50%; cursor: default; }
+:is(.altar-shop-grid, .section-related-products) .product-item-colors-bullet-text { color: currentColor; font-size: 10px; font-weight: 400; line-height: 12px; cursor: default; }
 /* Badges sit 8px from the image's bottom-left corner, square, without the shipping icon. */
 :is(.altar-shop-grid, .section-related-products) .product-labels { top: auto; bottom: 8px; left: 8px; gap: 4px; }
 :is(.altar-shop-grid, .section-related-products) .label { margin: 0; padding: 3px 6px; font-size: 10px; line-height: 12px; border-radius: 0; }
@@ -567,61 +582,79 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .section-main-product :is(button, input, select, textarea, .btn, .form-control),
 .section-related-products { font-family: "Inter", sans-serif; }
 .section-main-product { --ficha-rule: 1px solid rgba(0, 0, 0, .2); }
-/* Figma 363:308 on the 8-col grid: 12px page margins, gallery and info take 4 columns each, 20px gutter */
+/* Figma 548:6520: gallery and information share the product grid exactly. */
 @media (min-width: 768px) {
-  :is(.section-main-product, .section-related-products) .container { max-width: none; padding-right: var(--grid-margin, 12px); padding-left: var(--grid-margin, 12px); }
-  .section-main-product .product-columns { column-gap: var(--grid-gutter, 20px) !important; }
-  .section-main-product .product-images { flex: 0 0 calc((100% - var(--grid-gutter, 20px)) / 2); width: auto; }
+  :is(.section-main-product, .section-related-products) .container { max-width: none; padding-right: 24px; padding-left: 21px; }
+  .section-main-product .product-columns { column-gap: 24px !important; }
+  .section-main-product .product-images { flex: 0 0 calc((100% - 24px) / 2); width: auto; }
   .section-main-product .product-info { flex: 1 1 0; width: auto; min-width: 0; }
   /* The info column stays in view while the gallery scrolls, right under the sticky header (its 32px padding keeps the gap), until the images end */
   .section-main-product .product-info { position: sticky; top: var(--altar-header-height, 99px); align-self: flex-start; }
 }
-/* Figma: gallery ends flush; 48px to the related products */
+@media (min-width: 1200px) {
+  .section-main-product .product-columns { column-gap: 32px !important; }
+  .section-main-product .product-images { flex-basis: calc((100% - 32px) / 2); }
+}
+/* Figma desktop: gallery ends flush; 48px to the related products. */
 .section-main-product .product-images-slider { margin-bottom: 0; }
 #single-product { padding-top: 0 !important; padding-bottom: 48px !important; }
-/* Gallery figures carry a [ FIG 0X ] tag */
-.section-main-product .swiper-wrapper { counter-reset: altar-fig; }
-.section-main-product .product-slide-link { position: relative; counter-increment: altar-fig; }
-.section-main-product .product-slide-link::after { content: "[ FIG " counter(altar-fig, decimal-leading-zero) " ]"; position: absolute; top: 12px; left: 12px; z-index: 2; padding: 2px 4px; color: #000; background: var(--altar-commerce-background); font: 500 10px/12px "Inter", sans-serif; letter-spacing: .6px; opacity: .6; pointer-events: none; }
+.section-main-product .product-images-grid .swiper-wrapper { gap: 7px !important; }
+.section-main-product .product-slide-link { padding-bottom: 0 !important; overflow: hidden; }
+.section-main-product .product-slide-link .product-slider-image { width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center; }
+@media (min-width: 1200px) {
+  .section-main-product .product-slide-link { aspect-ratio: 681.5 / 1028; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .section-main-product .product-slide-link { aspect-ratio: 349.5 / 530; }
+}
+/* Figma 548:6520: gallery images carry no overlay tag. */
+.section-main-product .product-slide-link { position: relative; }
 
 /* The form wrapper dissolves so each part becomes a flex item of the info column and can be ordered:
-   head, name, form, specs → details (description) → envío (shipping) → cambios (purchase info). */
+   head, name, form → description → payment methods → purchase information. */
 /* Figma: the gallery starts flush under the header; the info column keeps 32px of top padding */
-.altar-product-info { gap: 0 !important; padding-top: 32px !important; }
+.altar-product-info { gap: 0 !important; padding-top: 32px !important; padding-bottom: 0 !important; }
 .altar-product { display: contents; }
 .altar-product-info > .product-info-description { order: 1; }
-.altar-product-info .altar-product-shipping { order: 2; }
+.altar-product-info .altar-product-specs { order: 2; }
+.altar-product-info .altar-product-shipping { display: none !important; }
 .altar-product-info > .product-purchase-info { order: 3; }
 
-.altar-product-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.altar-product-head-price { display: flex; min-width: 0; align-items: center; gap: 5px; }
-.altar-product-marker { width: 10px; height: 10px; flex: 0 0 10px; background: currentColor; border-radius: 1px; }
-.altar-product .product-price { margin: 0; }
+.altar-product-head { display: flex; min-height: 52px; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.altar-product-head-price { display: flex; min-width: 0; align-items: flex-start; gap: 5px; }
+.altar-product-marker { width: 10px; height: 10px; flex: 0 0 10px; margin-top: 5px; background: currentColor; border-radius: 1px; }
+/* Figma 528:3512: price row (price · % OFF · compare) over the transfer price. */
+.altar-product .product-price { display: flex; min-height: 52px; flex-direction: column; align-items: flex-start; gap: 0; margin: 0; }
 .altar-product .product-price-main { display: flex; flex-wrap: nowrap; align-items: baseline; column-gap: 8px; }
 .altar-product .product-price-row { display: flex; align-items: baseline; gap: 8px; }
 .altar-product .product-price-display { font-size: 14px; font-weight: 600; line-height: 21px; letter-spacing: -.36px; }
 .altar-product .product-price-compare { order: 2; width: auto; margin: 0; white-space: nowrap; font-size: 12px; font-weight: 500; line-height: 21px; text-decoration: line-through; opacity: .4; }
+.altar-product .product-payment-discount-price { display: flex; height: 31px; align-items: center; margin: 0; padding: 1px 0; box-sizing: border-box; color: #54544f; white-space: nowrap; font-size: 12px; font-weight: 400; line-height: 16px; }
+.altar-product .product-payment-discount-price .payment-discount-price-product { margin-right: 4px; font-family: "Inter", sans-serif; font-size: 24px; font-weight: 400; line-height: 29px; }
+.altar-product .product-payment-discount-price .js-payment-discount-name-product { margin-left: 3px; }
 .altar-product .product-offer-label,
 .altar-product-category,
 .altar-spec-label { font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
 .altar-product-category, .altar-spec-label { opacity: .4; }
-.altar-product .product-name { margin: 0; padding: 16px 0; font-family: "Inter", sans-serif; font-size: 32px; font-weight: 600; line-height: 30.4px; letter-spacing: -.96px; text-transform: uppercase; }
+.altar-product .product-name { margin: 0; padding: 24px 0 12px; font-family: "Inter", sans-serif; font-size: 32px; font-weight: 500; line-height: 30.4px; letter-spacing: -.96px; text-transform: uppercase; }
 
 /* Variants: 42px chips, bold 12 caps. Selected = 20% fill + black rule; no stock = faded, struck. */
 /* Figma: variants block 16/16 padding, label → chips 12, chips 4 apart; form follows with its own 16/16 */
 .altar-product .product-form { margin: 0; }
 .altar-product .product-detail-variants { display: block; margin: 0; padding: 16px 0; }
-.altar-product .product-detail-variants-group { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; }
+.altar-product .product-detail-variants-group { display: flex; width: calc(100% - 24px); flex-wrap: wrap; gap: 2px; margin: 0; }
+.altar-product .product-detail-variants-group.js-color-variants-container { gap: 3px; }
 .altar-product .product-detail-variants-group + .product-detail-variants-group { margin-top: 16px; }
-.altar-product .product-detail-variants-group .form-label { flex: 0 0 100%; margin: 0 0 8px; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
+.altar-product .product-detail-variants-group .form-label { flex: 0 0 100%; margin: 0 0 10px; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
+.altar-product .product-detail-variants-group.js-color-variants-container .form-label { margin-bottom: 9px; }
 .altar-product .product-detail-variants-group .form-label strong { display: none; }
-.altar-product .btn-variant { display: inline-flex; align-items: center; justify-content: center; min-width: 0; height: 42px; margin: 0; padding: 0 14px; color: currentColor; background: transparent; border: var(--ficha-rule); border-radius: 4px; font-size: 12px; font-weight: 700; line-height: 12px; letter-spacing: -.36px; text-transform: uppercase; }
+.altar-product .btn-variant { display: inline-flex; align-items: center; justify-content: center; min-width: 0; height: 42px; margin: 0; padding: 0 14px; color: currentColor; background: transparent; border: var(--ficha-rule); border-radius: 4px; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: -.36px; text-transform: uppercase; }
 .altar-product .btn-variant .btn-variant-content { min-height: 0; margin: 0; padding: 0; font: inherit; line-height: 12px; }
 .altar-product .btn-variant.selected { background: rgba(0, 0, 0, .08); border-color: currentColor; }
 .altar-product .btn-variant.btn-variant-no-stock { opacity: .4; text-decoration: line-through; }
 
 /* Quantity + add to cart (out of stock: grey "Sin stock" block) */
-.altar-product .product-actions { display: flex; align-items: stretch; gap: 4px; margin: 0; padding: 16px 0; }
+.altar-product .product-actions { display: flex; min-height: 115px; align-items: flex-start; gap: 4px; margin: 0; padding: 16px 0; box-sizing: border-box; }
 .altar-product .form-quantity-container { flex: 0 0 96px; margin: 0; }
 .altar-product .form-quantity-container .form-group { margin: 0; }
 .altar-product .form-quantity { display: grid; height: 42px; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; border: var(--ficha-rule); border-radius: 4px; }
@@ -632,13 +665,15 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-product .product-quantity-stock { display: none; }
 .altar-product .product-stock-alert { margin: 0 0 4px; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
 .altar-product .buy-button-container { flex: 1 1 auto; min-width: 0; }
-.altar-product .js-addtocart { width: 100%; height: 42px; padding: 0 14px; color: var(--altar-commerce-background); background: var(--altar-commerce-foreground); border: 0; border-radius: 4px; font-size: 12px; font-weight: 700; line-height: 12px; letter-spacing: -.36px; text-transform: uppercase; }
+.altar-product .js-addtocart { width: 100%; height: 42px; padding: 0 14px; color: var(--altar-commerce-background); background: var(--altar-commerce-foreground); border: 0; border-radius: 4px; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: -.36px; text-transform: uppercase; }
 /* Out of stock: same block as the CTA, greyed out */
 .altar-product .js-addtocart.nostock,
 .altar-product .js-addtocart.nostock:disabled { width: 100%; color: rgba(0, 0, 0, .45); background: rgba(0, 0, 0, .08); border: 0; opacity: 1; cursor: not-allowed; }
 
-/* Spec table: ⅓ – ⅔ cells, hairlines top/bottom, between rows and between cells */
-.altar-product-specs { border-top: var(--ficha-rule); border-bottom: var(--ficha-rule); }
+/* Native product data remains in the DOM, but Figma's final Ficha only exposes
+   payment methods after the description. Maker, SKU, installments and stock
+   stay managed by Tiendanube and can still feed other native surfaces. */
+.altar-product-specs { padding-bottom: 2px; border-top: var(--ficha-rule); border-bottom: var(--ficha-rule); }
 .altar-spec-row, .altar-spec-row[style*="display: block"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); margin: 0; padding: 0; gap: 0; }
 .altar-spec-row ~ .altar-spec-row { border-top: var(--ficha-rule); }
 .altar-spec { display: flex; min-width: 0; flex-direction: column; gap: 10px; margin: 0; padding: 10px 10px 10px 0; }
@@ -659,10 +694,22 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-product-info:has(.js-addtocart.nostock) .altar-stock-available { display: none; }
 .altar-product-info:has(.js-addtocart.nostock) .altar-stock-none { display: block; }
 
+.section-main-product .altar-product-specs > .altar-spec-row:not(.js-product-payments-container) { display: none !important; }
+.section-main-product .altar-product-specs:not(:has(.js-product-payments-container:not([style*="display: none"]))) { display: none; }
+.section-main-product .altar-product-specs .js-product-payments-container:not([style*="display: none"]) { display: block !important; padding: 10px 0; border-top: 0 !important; }
+.section-main-product .js-product-payments-container > .altar-spec:first-child { display: none; }
+.section-main-product .js-product-payments-container > .altar-spec:last-child { display: grid; grid-template-columns: max-content minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 10px; padding: 0; border: 0; }
+.section-main-product .js-product-payments-container > .altar-spec:last-child > .altar-spec-label { grid-column: 1; grid-row: 1 / span 2; opacity: 1; }
+.section-main-product .js-product-payments-container > .altar-spec:last-child > .product-payment-discount { grid-column: 2; grid-row: 1; margin: 0; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: .6px; opacity: .4; }
+.section-main-product .js-product-payments-container > .altar-spec:last-child > .product-payments-link { grid-column: 2; grid-row: 2; }
+
 /* Detalles (description): label over text */
-.altar-product-info > .product-info-description { margin: 0; padding-top: 40px; }
-.altar-product-info .product-description-heading { margin: 0; padding: 10px 0 4px; font-family: "Inter", sans-serif; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; opacity: .4; }
-.altar-product-info .product-description-content { padding-bottom: 10px; font-size: 12px; line-height: 16px; letter-spacing: -.12px; opacity: .75; }
+.altar-product-info > .product-info-description { margin: 0; padding: 12px 0; border-top: var(--ficha-rule); }
+/* Without visible payment methods (no price) the description closes the ruled panel itself. */
+.altar-product-info:not(:has(.js-product-payments-container:not([style*="display: none"]))) > .product-info-description { border-bottom: var(--ficha-rule); }
+.altar-product-info .product-description-heading { margin: 0; padding: 10px 0 4px; font-family: "Inter", sans-serif; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; opacity: 1; }
+.altar-product-info .product-description-heading::after { content: ":"; }
+.altar-product-info .product-description-content { padding-bottom: 10px; font-size: 10px; line-height: 16px; letter-spacing: -.12px; opacity: .75; }
 .altar-product-info .product-description-content :is(p, li, span) { margin: 0 0 15px; font-size: inherit; line-height: inherit; }
 .altar-product-info .product-description-content p:last-child { margin-bottom: 0; }
 
@@ -682,17 +729,82 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-product-shipping .input-append .js-calculate-shipping,
 .altar-product-shipping .input-append .js-calculate-shipping:hover { flex: 0 0 auto; height: 42px; padding: 0 14px; color: var(--altar-commerce-background); background: var(--altar-commerce-foreground); border: 0; border-radius: 4px; font-size: 12px; font-weight: 700; line-height: 12px; letter-spacing: -.36px; text-transform: uppercase; }
 .altar-product-shipping .btn-link { color: currentColor; font-size: 10px; font-weight: 500; letter-spacing: .6px; text-transform: uppercase; opacity: .4; }
-.altar-product-info > .product-purchase-info { display: flex; flex-direction: column; gap: 0 !important; padding-top: 40px; }
+.altar-product-info > .product-purchase-info { display: flex; width: 100%; flex-direction: column; gap: 12px !important; margin-bottom: 0 !important; padding-top: 40px; }
+.altar-product-info > .product-purchase-info .icon-text-item { width: 100%; }
 .altar-product-info > .product-purchase-info .icon-text-item-icon { display: none; }
 .altar-product-info > .product-purchase-info .icon-text-item-content { display: contents; }
-.altar-product-info > .product-purchase-info .icon-text-item-title { margin: 0; padding: 10px 0; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
-.altar-product-info > .product-purchase-info .icon-text-item-description { margin: 0; padding: 10px 0; font-size: 12px; line-height: 16px; opacity: .75; }
+.altar-product-info > .product-purchase-info .icon-text-item-title { margin: 0; padding: 10px 0; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
+.altar-product-info > .product-purchase-info .icon-text-item-title::after { content: ":"; }
+.altar-product-info > .product-purchase-info .icon-text-item-description { margin: 0; padding: 10px 0; font-size: 10px !important; line-height: 16px; letter-spacing: -.12px; opacity: .75; }
 
 /* Related products: label row with a hairline (cards share the shop typography) */
-.section-related-products .heading-block { width: 100%; margin: 0; padding-top: 10px; border-top: 1px solid rgba(0, 0, 0, .2); font-family: "Inter", sans-serif; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
+.section-related-products .heading-block { width: 100%; margin: 0; padding-top: 10px; border-top: 1px solid rgba(0, 0, 0, .2); font-family: "Inter", sans-serif; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
 
-/* Figma 363:308 desktop: quantity 269px, spec labels 167px, Envío/Cambios 167px + 14px + content */
+/* Figma 548:6520: recommendations are a responsive grid, not a nested
+   carousel. The column controls remain editable in Tiendanube. */
+.section-related-products .products-section-container { display: grid; grid-template-columns: repeat(var(--altar-related-columns, 4), minmax(0, 1fr)); gap: 24px 20px; padding-bottom: 35px; }
+.section-related-products .product-item { min-width: 0; margin: 0; }
+.section-related-products :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 288 / 379; max-height: none; }
+.section-related-products .product-item-image-container > div[style*="padding-bottom"] { position: absolute; inset: 0; padding-bottom: 0 !important; }
+.section-related-products .js-product-item-image-link-private { position: absolute; inset: 0; display: block; }
+.section-related-products .product-item-image { width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center; }
+.section-related-products .product-item-information { height: auto; min-height: 0; padding-top: 16px; overflow: visible; text-align: center; }
+.section-related-products .product-item-information-inner,
+.section-related-products .product-item-link { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 6px; }
+.section-related-products .product-item-link > .js-nubesdk-slot:empty { display: none; }
+.section-related-products .product-item-price-container { align-items: center; padding-top: 0; }
+.section-related-products .is-altar-editorial-card { position: relative; cursor: pointer; }
+.section-related-products .altar-editorial-card-hitarea { position: absolute; inset: 0; z-index: 1; }
+.section-related-products .is-altar-editorial-card :is(.product-item-image-container, .product-item-information) { position: relative; z-index: 2; }
+
+/* Mobile follows the Figma content width (390 - 24px - 24px), keeps the
+   gallery clipped to one swipeable image and lets every text block grow. */
+@media (max-width: 767px) {
+  :is(.section-main-product, .section-related-products) .container { width: 100%; max-width: none; padding-right: 24px; padding-left: 24px; }
+  .section-main-product .product-columns { display: flex; flex-direction: column; gap: 12px; }
+  /* Ipanema adds .d-flex (display:flex!important) to product-info. Override it
+     here so the mobile composition can share one ordering context with the
+     gallery: title → price → images → form and supporting content. */
+  .section-main-product .product-info,
+  .section-main-product .altar-product { display: contents !important; }
+  /* Empty native app slots must not become independent flex items. Otherwise
+     every slot adds another 12px gap to the composed mobile layout. */
+  .section-main-product .js-nubesdk-slot:empty { display: none !important; }
+  .section-main-product .altar-product .product-name { order: -4; padding-top: 12px; padding-bottom: 8px; font-size: 24px; line-height: 30.4px; }
+  .section-main-product .altar-product-head { order: -3; }
+  .section-main-product .product-images { order: -2; width: 100%; min-width: 0; overflow: hidden; }
+  .section-main-product .product-images-slider,
+  .section-main-product .js-product-slider { width: 100%; min-width: 0; overflow: hidden; }
+  .section-main-product .js-product-slider .swiper-wrapper { flex-wrap: nowrap; }
+  .section-main-product .product-slide-link { aspect-ratio: 342 / 508; }
+  .section-main-product :is(.swiper-product-arrow, .swiper-fractions) { display: none !important; }
+  .section-main-product .altar-product-category { display: none; }
+  #single-product { padding-bottom: 40px !important; }
+
+  /* display:contents places these blocks in the page-level mobile flow, whose
+     12px gap is cancelled so Description + Payment stays one ruled panel. */
+  .section-main-product .altar-product-info > .product-info-description { margin-top: -12px; }
+  .section-main-product .altar-product-specs { order: 2; margin-top: -12px; }
+  .section-main-product .altar-product-info > .product-purchase-info { order: 3; margin-top: -12px; margin-bottom: 0 !important; }
+  .section-main-product .altar-product-info > .product-info-description,
+  .section-main-product .altar-product-info > .product-purchase-info,
+  .section-main-product .altar-product-section { min-width: 0; }
+  .section-main-product :is(.product-description-content, .icon-text-item-description, .altar-section-note) { overflow-wrap: anywhere; }
+  .section-related-products .products-section-container { grid-template-columns: repeat(var(--altar-related-columns-mobile, 2), minmax(0, 1fr)); gap: 24px 12px; }
+  .section-related-products :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 152 / 200; }
+  .section-related-products .product-item-information { padding-top: 12px; }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .section-main-product .altar-product-category { display: none; }
+  .section-main-product .altar-product .product-name { font-size: 28px; }
+  .altar-product-info > .product-purchase-info .icon-text-item { grid-template-columns: 120px minmax(0, 1fr) !important; column-gap: 0 !important; }
+  .section-related-products .products-section-container { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 20px; }
+}
+
+/* Desktop: the action group is 517px and policy copy starts 181px from the left. */
 @media (min-width: 768px) {
+  .altar-product .product-name { min-height: 67px; box-sizing: border-box; }
   /* Quantity + CTA: a 517px block (176 + 4 + 337), aligned with the content column below */
   .altar-product .product-actions { max-width: 517px; }
   .altar-product .form-quantity-container { flex-basis: 176px; }
@@ -700,7 +812,8 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
   .altar-product-shipping .input-append { max-width: 338px; gap: 6px; }
   .altar-spec-row, .altar-spec-row[style*="display: block"] { grid-template-columns: 167px minmax(0, 1fr); }
   .altar-product-section,
-  .altar-product-info > .product-purchase-info .icon-text-item { grid-template-columns: 167px minmax(0, 1fr); column-gap: 14px !important; }
+  .altar-product-info > .product-purchase-info .icon-text-item { grid-template-columns: 181px minmax(0, 1fr); column-gap: 0 !important; }
+  .section-related-products .product-item-information { min-height: 120px; }
 }
 .altar-product-specs .altar-spec-row--single { grid-template-columns: minmax(0, 1fr); }
 

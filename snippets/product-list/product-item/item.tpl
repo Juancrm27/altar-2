@@ -24,6 +24,7 @@
 {% set show_image_slider = 
     (template == 'category' or template == 'search')
     and settings.product_item_slider 
+    and not altar_editorial_card
     and not reduced_item
     and not slide_item
     and not has_filters

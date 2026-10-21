@@ -1,21 +1,29 @@
 {# Product Recommendations Block #}
 {% set columns = block.settings.columns | default('4') %}
 {% set columns_mobile = block.settings.columns_mobile | default('2') %}
+{# The Figma composition intentionally contains one set of four cards. Keep
+   the products dynamic/editable, but cap this visual block to that set. #}
+{% set displayed_products = section_products | take(4) %}
 
 <div
-	class="products-list-slider"
+	class="products-list-slider altar-related-grid"
 	{{ block | block_attributes }}
 	data-columns-desktop="{{ columns }}"
 	data-columns-mobile="{{ columns_mobile }}"
 	data-store="product-recommendations-{{ block.id }}"
+	style="--altar-related-columns: {{ columns }}; --altar-related-columns-mobile: {{ columns_mobile }};"
 >
 	{% include 'snippets/product-list/products-section.tpl' with {
 		id: section_id,
 		data_component: data_component,
-		products_amount: section_products | length,
-		products_array: section_products,
+		products_amount: displayed_products | length,
+		products_array: displayed_products,
 		product_template_path: 'snippets/product-list/product-item/item.tpl',
-		product_template_params: {'slide_item': true},
+		product_template_params: {
+			'slide_item': false,
+			'altar_editorial_card': true
+		},
+		slider: false,
 		slider_controls_position: 'bottom',
 		slider_pagination: true,
 		section_classes: {

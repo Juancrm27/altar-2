@@ -1,5 +1,8 @@
-// Fake catalog for the Ipanema simulation (.dev/ipanema.html). Images are Ipanema's own placeholders.
-const img = (n) => `../static/images/placeholders/products/product-${n}.webp`;
+// Catalog for the Ipanema simulation (.dev/ipanema.html), taken from Figma:
+// Tienda 438:670 (names, prices, stock, variants) and Producto 548:6520 (Test producto).
+// Images were exported from those frames into data/figma/.
+const img = (name) => `./data/figma/${name}.jpg`;
+const description = "Descripcion del text test, descripcion del text test, descripcion del text test, descripcion del text test, descripcion del text test, descripcion del text test, descripcion del text test, descripcion del text test.";
 
 export const store = {
   name: "Altar",
@@ -7,30 +10,39 @@ export const store = {
   locale: "es-AR",
   freeShippingFrom: 150000,
   installments: 6,
+  transferDiscount: 0.1,
+  transferName: "Efectivo/transferencia",
   categories: [
-    { slug: "objetos", name: "Objetos" },
-    { slug: "amuletos", name: "Amuletos" },
-    { slug: "ediciones", name: "Ediciones" },
+    { slug: "productos", name: "Productos" },
   ],
 };
 
+// Order matches the Figma grid, so positions 3 and 10 are the featured cards.
+// displayPrice: false = Tiendanube's "Mostrar precio" off (Figma cards with name only).
 export const products = [
-  { slug: "orbita", name: "Órbita", category: "objetos", price: 68000, images: [img(1), img(2)],
-    description: "Pieza tallada a mano. Cada unidad es distinta.", options: { Color: ["Natural", "Negro"] }, stock: { "Natural": 4, "Negro": 2 } },
-  { slug: "eclipse", name: "Eclipse", category: "objetos", price: 82000, comparePrice: 96000, images: [img(3), img(4)],
-    description: "Con variante agotada para ver el estado sin stock.", options: { Metal: ["Cobre", "Plata"] }, stock: { "Cobre": 3, "Plata": 0 } },
-  { slug: "tierra", name: "Tierra", category: "ediciones", price: 54000, images: [img(5)],
-    description: "Producto sin variantes.", options: {}, stock: { "": 6 } },
-  { slug: "piedra-luna", name: "Piedra luna", category: "amuletos", price: 39000, images: [img(6), img(7)],
-    description: "Dos ejes de variantes: talle y color.", options: { Talle: ["S", "M", "L"], Color: ["Rosa", "Gris"] }, stock: null },
-  { slug: "fuego", name: "Fuego", category: "amuletos", price: 45000, freeShipping: true, images: [img(7)],
-    description: "Con etiqueta de envío gratis.", options: {}, stock: { "": 3 } },
-  { slug: "agua", name: "Agua", category: "amuletos", price: 45000, images: [img(8)],
-    description: "Producto agotado: no se puede agregar al carrito.", options: {}, stock: { "": 0 } },
-  { slug: "aire", name: "Aire", category: "objetos", price: 120000, comparePrice: 150000, images: [img(2), img(1)],
-    description: "Con precio promocional.", options: {}, stock: { "": 5 } },
-  { slug: "altar-mini", name: "Altar mini", category: "ediciones", price: 28000, images: [img(4)],
-    description: "Pieza chica para completar el carrito.", options: {}, stock: { "": 10 } },
+  { slug: "sombrero-sol", name: "Sombrero Sol", category: "productos", price: 0, displayPrice: false, images: [img("sombrero-sol")], description, options: {}, stock: null },
+  { slug: "saco-crisantelmo", name: "Saco Crisantelmo", category: "productos", price: 0, displayPrice: false, images: [img("saco-crisantelmo")], description, options: {}, stock: null },
+  { slug: "bolso-cauce", name: "Bolso Cauce", category: "productos", price: 0, displayPrice: false, images: [img("bolso-cauce")], description, options: {}, stock: null },
+  { slug: "anillo-onix", name: "Anillo Ónix", category: "productos", price: 0, displayPrice: false, images: [img("anillo-onix")], description, options: {}, stock: null },
+  { slug: "vestido-duna", name: "Vestido Duna X Madeo Knits", category: "productos", price: 200000, images: [img("vestido-duna")], description, options: {}, stock: { "": 2 } },
+  { slug: "corset-saturno", name: "Corset Saturno", category: "productos", price: 100000, images: [img("corset-saturno")], description,
+    options: { Color: ["Arena", "Negro"] }, swatches: { Arena: "#c2b280" }, stock: { "Arena": 2, "Negro": 2 } },
+  { slug: "camisa-jade", name: "Camisa Jade", category: "productos", price: 300000, images: [img("camisa-jade")], description,
+    options: { Color: ["Arena", "Negro"] }, swatches: { Arena: "#c2b280" }, stock: { "Arena": 2, "Negro": 2 } },
+  { slug: "velo-neptuno", name: "Velo Neptuno", category: "productos", price: 15000, images: [img("velo-neptuno")], description, options: {}, stock: null },
+  { slug: "kimono-luna", name: "Kimono Luna", category: "productos", price: 250000, images: [img("kimono-luna")], description,
+    options: { Color: ["Hueso", "Negro"] }, swatches: { Hueso: "#eae0c8" }, stock: { "Hueso": 2, "Negro": 2 } },
+  { slug: "top-obsidiana", name: "Top Obsidiana", category: "productos", price: 50000, images: [img("top-obsidiana")], description, options: {}, stock: null },
+  { slug: "parachute-mercurio", name: "Parachute Mercurio", category: "productos", price: 300000, images: [img("parachute-mercurio")], description,
+    options: { Color: ["Verde", "Negro"] }, stock: null },
+  { slug: "saco-alba", name: "Saco Alba", category: "productos", price: 400000, images: [img("saco-alba")], description,
+    options: { Color: ["Blanco", "Negro"] }, stock: null },
+  { slug: "cargo-magma", name: "Cargo Magma", category: "productos", price: 70000, images: [img("cargo-magma")], description, options: {}, stock: null },
+  // Ficha de producto (Figma 548:6520). Not part of the shop grid, reachable at #/producto/test-producto.
+  { slug: "test-producto", name: "Test producto", category: "productos", price: 100000, comparePrice: 120000, hidden: true,
+    images: [1, 2, 3, 4, 5].map((n) => img(`test-producto-${n}`)), description,
+    options: { Color: ["Celeste", "Gris", "Bordó", "Beige", "Amarillo", "Verde agua"], Talle: ["37", "36", "38", "39", "40", "41", "42", "43"] }, stock: null,
+    related: ["parachute-mercurio", "corset-saturno", "velo-neptuno", "sombrero-sol"] },
 ];
 
 // Stock for a variant label ("" when the product has no variants). null stock = unlimited.
