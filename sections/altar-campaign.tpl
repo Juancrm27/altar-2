@@ -23,7 +23,7 @@
       <p>{{ campaign.note | default('Hecho despacio, a mano y con intención. Para quien sabe mirar más allá.') }}</p>
     </div>
   </div>
-  <div class="altar-collection__continuation" aria-hidden="true"></div>
+  <a class="altar-collection__continuation" href="{{ store.products_url }}" tabindex="-1" aria-hidden="true" data-cursor-label="{{ 'Ver colección' | translate }}"></a>
   <div class="altar-collection__gallery">
     {% for block in section.blocks %}
       {% set fallback_image = loop.index == 1 ? ('images/altar-v2-editorial-1.png' | static_url) : (loop.index == 2 ? ('images/altar-v2-editorial-2.png' | static_url) : (loop.index == 3 ? ('images/altar-v2-editorial-3.png' | static_url) : ('images/altar-v2-editorial-4.png' | static_url))) %}

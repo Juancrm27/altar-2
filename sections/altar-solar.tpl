@@ -19,7 +19,7 @@
     {% endfor %}
   </div>
   <div class="altar-solar__stage" data-solar-stage>
-    <div class="altar-hero-v2__campaign" id="altar-hero-campaign" role="group" aria-label="{{ solar_settings.campaign_label | default('Campaña Altar') }}">
+    <a class="altar-hero-v2__campaign" id="altar-hero-campaign" href="{{ solar_settings.hero_link | default(store.products_url) }}" aria-label="{{ solar_settings.campaign_label | default('Campaña Altar') }} · Ver colección" data-cursor-label="{{ 'Ver colección' | translate }}">
       {% if solar_settings.hero_media_compact %}
         {% include 'snippets/image.tpl' with { image_src: solar_settings.hero_media_compact, image_alt: solar_settings.hero_media_alt | default('Campaña Altar'), image_classes: 'altar-hero-v2__media altar-hero-v2__media--compact', image_priority_high: true } %}
       {% else %}
@@ -30,7 +30,7 @@
       {% else %}
         <img class="altar-hero-v2__media altar-hero-v2__media--expanded" src="{{ 'images/altar-v2-hero-expanded.png' | static_url }}" alt="" width="1536" height="1006">
       {% endif %}
-    </div>
+    </a>
     <div class="altar-solar__sky" aria-hidden="true">
       <i class="altar-solar__glow altar-solar__glow--rose"></i>
       <i class="altar-solar__glow altar-solar__glow--cyan"></i>
@@ -213,6 +213,7 @@
     { "type": "setting", "setting_type": "image_picker", "id": "hero_media_compact", "label": "Imagen compacta · Layout A" },
     { "type": "setting", "setting_type": "image_picker", "id": "hero_media_expanded", "label": "Imagen ampliada · Layout B" },
     { "type": "setting", "setting_type": "text", "id": "hero_media_alt", "label": "Descripción de la imagen", "default": "Campaña Altar" },
+    { "type": "setting", "setting_type": "url", "id": "hero_link", "label": "Enlace de la imagen (vacío: lleva a la colección)" },
     { "type": "header", "content": "Contenido" },
     { "type": "setting", "setting_type": "text", "id": "scroll_label", "label": "Texto de desplazamiento", "default": "" },
     { "type": "setting", "setting_type": "text", "id": "accessible_label", "label": "Descripción accesible", "default": "Sistema solar interactivo" },

@@ -51,6 +51,9 @@ body.template-home:has(.altar-nav--v2) .altar-solar__player { position: fixed; t
 
 /* Hero V2: UI layer only. The existing 3D scene and its geometry are preserved. */
 .altar-hero-v2__campaign { display: none; }
+a.altar-hero-v2__campaign { color: inherit; cursor: pointer; }
+/* Cursor badge ("Ver colección →") in the nav colors: gray background, near-black text. */
+:is(.altar-cursor-badge__label, .altar-cursor-badge__arrow) { color: #0f0f0f; background: #91938f; }
 body.template-home:has(.altar-nav--v2) .altar-hero-v2__campaign {
   display: block; position: absolute; z-index: 4; left: 13.194444vw;
   top: calc(50svh - 11.041667vw); width: 33.333333vw; aspect-ratio: 480 / 318;

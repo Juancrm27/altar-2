@@ -12,9 +12,11 @@
   {% endif %}
 {% endif %}
 
-<{% if campaign_image.link %}a{% else %}div{% endif %}
+{# Every photo opens the collection; a block link (editor) sends that photo somewhere else instead. #}
+<a
   class="altar-collection__photo"
-  {% if campaign_image.link %}href="{{ campaign_image.link }}" data-cursor-label="{{ 'Ver producto' | translate }}"{% endif %}
+  href="{{ campaign_image.link | default(store.products_url) }}"
+  data-cursor-label="{{ campaign_image.link ? ('Ver producto' | translate) : ('Ver colección' | translate) }}"
   {{ block | block_attributes }}
 >
   <img
@@ -24,7 +26,7 @@
     height="543"
     loading="lazy"
   >
-</{% if campaign_image.link %}a{% else %}div{% endif %}>
+</a>
 
 {% schema %}
 {
@@ -41,7 +43,7 @@
       "type": "setting",
       "setting_type": "url",
       "id": "link",
-      "label": "Enlace"
+      "label": "Enlace (vacío: lleva a la colección)"
     },
     {
       "type": "setting",
