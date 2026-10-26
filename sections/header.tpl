@@ -467,6 +467,18 @@
       "id": "text_color",
       "label": "t:settings.text",
       "default_setting": "text_color"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "altar_collection_url",
+      "label": "V2 · Enlace Collection"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "altar_star_url",
+      "label": "V2 · Enlace The Star"
     }
   ],
   "default": {

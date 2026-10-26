@@ -14,6 +14,8 @@
 {% set footer_theme_class = is_altar_commerce ? 'altar-footer--light' : 'altar-footer--color' %}
 
 {{ component('nubesdk-slot', { type: "before_footer" }) }}
+{% if template == 'home' %}
+<div class="altar-closing-v2" id="closing" style="--closing-bg-a: {{ footer_settings.background_color | default('#c6ca9f') }}; --closing-fg-a: {{ footer_settings.text_color | default('#091e2b') }}; --closing-bg-b: {{ footer_settings.alternate_background | default('#091e2b') }}; --closing-fg-b: {{ footer_settings.alternate_text | default('#c6ca9f') }};"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>{% endif %}
 
 <div
   class="altar-footer {{ footer_theme_class }} js-hide-footer-while-scrolling"
@@ -156,6 +158,7 @@
   {% endif %}
 </div>
 
+{% if template == 'home' %}</div>{% endif %}
 {{ component('nubesdk-slot', { type: "after_footer" }) }}
 
 {% schema %}
@@ -173,6 +176,8 @@
     }
   ],
   "settings": [
+    { "type": "setting", "setting_type": "color", "id": "alternate_background", "label": "Home B · Fondo", "default": "#091e2b" },
+    { "type": "setting", "setting_type": "color", "id": "alternate_text", "label": "Home B · Texto", "default": "#c6ca9f" },
     {
       "type": "header",
       "content": "Tema color (inicio)"
@@ -182,14 +187,14 @@
       "setting_type": "color",
       "id": "background_color",
       "label": "Fondo",
-      "default": "#fff3a9"
+      "default": "#c6ca9f"
     },
     {
       "type": "setting",
       "setting_type": "color",
       "id": "text_color",
       "label": "Texto",
-      "default": "#601e2a"
+      "default": "#091e2b"
     },
     {
       "type": "header",

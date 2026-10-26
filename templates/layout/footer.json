@@ -5,8 +5,8 @@
     "altar_footer": {
       "type": "altar-footer",
       "settings": {
-        "background_color": "#fff3a9",
-        "text_color": "#601e2a",
+        "background_color": "#c6ca9f",
+        "text_color": "#091e2b",
         "commerce_background_color": "#FBF7E7",
         "commerce_text_color": "#000000",
         "show_newsletter": true,

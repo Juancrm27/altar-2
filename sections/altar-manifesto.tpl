@@ -1,10 +1,10 @@
 {% set manifesto = section.settings %}
 
 <section
-  class="altar-page-section altar-closing"
+  class="altar-page-section altar-closing altar-manifesto-v2"
   id="about"
   aria-label="Manifiesto de Altar"
-  style="--closing-bg: {{ manifesto.background_color | default('#601e2a') }};"
+  style="--manifesto-bg-b: {{ manifesto.alternate_background | default('#091e2b') }}; --manifesto-text-a: {{ manifesto.text_color | default('#091e2b') }}; --manifesto-text-b: {{ manifesto.alternate_text | default('#c6ca9f') }}; --manifesto-bg-a: {{ manifesto.background_color | default('#c6ca9f') }};"
 >
   <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
     <filter id="altar-grain-closing-{{ section.id }}" x="0" y="0" width="100%" height="100%">
@@ -15,6 +15,7 @@
   </svg>
   <img class="altar-closing__symbol" src="{{ 'images/altar-symbol-large.svg' | static_url }}" alt="" width="698" height="673" loading="lazy">
   <div class="altar-closing__content">
+    <div class="altar-manifesto__oracle">{% include 'snippets/altar-fortune-card.tpl' with { fortune_settings: manifesto } %}</div>
     <div class="altar-closing__note">
       <span>{{ manifesto.note_label | default('El tejido') }}</span>
       <p>{{ manifesto.note | default('Formas únicas que cuentan historias, entrelazadas con paciencia y cariño.') }}</p>
@@ -36,12 +37,17 @@
 
 {% schema %}
 {
-  "name": "Manifiesto Altar",
+  "name": "03 · Manifiesto y carta",
   "icon": "TextSizeIcon",
   "class": "section-altar-manifesto",
   "limit": 1,
   "enabled_on": { "page_templates": ["home"] },
   "settings": [
+    { "type": "header", "content": "Carta y paletas" },
+    { "type": "setting", "setting_type": "textarea", "id": "fortune_message", "label": "Frase de respaldo", "default": "Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar." },
+    { "type": "setting", "setting_type": "color", "id": "alternate_background", "label": "Fondo · Layout B", "default": "#091e2b" },
+    { "type": "setting", "setting_type": "color", "id": "text_color", "label": "Texto · Layout A", "default": "#091e2b" },
+    { "type": "setting", "setting_type": "color", "id": "alternate_text", "label": "Texto · Layout B", "default": "#c6ca9f" },
     { "type": "header", "content": "Manifiesto" },
     { "type": "setting", "setting_type": "text", "id": "season", "label": "Temporada", "default": "SS 27" },
     { "type": "setting", "setting_type": "text", "id": "line", "label": "Línea", "default": "101 couture" },
@@ -52,10 +58,10 @@
     { "type": "setting", "setting_type": "textarea", "id": "body", "label": "Texto del manifiesto", "default": "Me inspiran los altares paganos y populares: un santo local, una piedra del río y una diosa india. Los cuatro elementos representados. Un registro físico del universo interior y los arquetipos que resuenan. La libertad de armar un rincón y verlo crecer. Vincularse con lo divino sin culpa, miedo o manual heredado. Decido cómo juego las cartas que me tocan. El cielo y el infierno se sintonizan en lo cotidiano. Diseño sistemas para ofrendar más de lo que extraigo. Bailo entre el marco moral y lo salvaje. Practico rituales que ordenan el misterio de lo oculto. Una búsqueda humana, sensible, comercial e imperfecta. No pretende ser sagrada. Busca los puntos donde lo divino y lo mundano se encuentran. Escenas donde todos los que participan ganan. De esta curiosidad nace altar. Objetos que funcionan como amuletos para anclar quién soy, dónde habito y quién quiero ser. Piezas que se llevan en el cuerpo y evolucionan en cada colección." },
     { "type": "setting", "setting_type": "text", "id": "author", "label": "Firma", "default": "Sofía Guevara" },
     { "type": "setting", "setting_type": "text", "id": "final_line", "label": "Línea final", "default": "Un archivo de objetos para mundos interiores." },
-    { "type": "setting", "setting_type": "color", "id": "background_color", "label": "Color de fondo", "default": "#601e2a" }
+    { "type": "setting", "setting_type": "color", "id": "background_color", "label": "Fondo · Layout A", "default": "#c6ca9f" }
   ],
   "presets": [
-    { "name": "Manifiesto Altar", "category": "Marca" }
+    { "name": "03 · Manifiesto y carta", "category": "Marca" }
   ]
 }
 {% endschema %}

@@ -9,7 +9,7 @@
         "setting_type": "color",
         "id": "altar_space_color",
         "label": "Color del espacio",
-        "default": "#2d2838"
+        "default": "#080808"
       },
       {
         "type": "setting",

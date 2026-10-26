@@ -6,7 +6,7 @@
         "scroll_label": "",
         "accessible_label": "Sistema solar interactivo",
         "paragraph_text": "Objetos con alma hechos por manos. Un canal en sintonía con el ambiente, un cable a tierra. Un ritmo más consciente de consumo. Fuego, tierra, agua, aire. 10% de las ganancias aportan a @unarbol_ong. Magia, sutileza, fantasía, analógico & digital. Amuletos. Ambient aware. Solar punk. Slow fashion. Buenos Aires, 23 Junio 2025, 17 grados. 20:58. Contact 1157991078. fire, earth, air & water. Altar 2025.",
-        "space_color": "#2d2838",
+        "space_color": "#080808",
         "horizon_color": "#ff9c71",
         "sky_color": "#aebfc0"
       },
@@ -40,24 +40,24 @@
         "note": "Hecho despacio, a mano y con intención. Para quien sabe mirar más allá.",
         "materia_label": "La materia",
         "materia": "Cada material guarda una forma posible. El cuerpo termina de revelarla.",
-        "background_color": "#601e2a"
+        "background_color": "#0f0f0f"
       },
       "blocks": {
         "photo_1": {
           "type": "altar-campaign-image",
-          "settings": { "alt_text": "Modelo con vestido satinado en un escenario floral" }
+          "settings": { "alt_text": "Retrato con vestido negro y detalle floral" }
         },
         "photo_2": {
           "type": "altar-campaign-image",
-          "settings": { "alt_text": "Modelo con vestido negro transparente" }
+          "settings": { "alt_text": "Composición de flores de la campaña Altar" }
         },
         "photo_3": {
           "type": "altar-campaign-image",
-          "settings": { "alt_text": "Modelo con vestido escultural blanco" }
+          "settings": { "alt_text": "Vestido azul y verde de la colección Altar" }
         },
         "photo_4": {
           "type": "altar-campaign-image",
-          "settings": { "alt_text": "Modelo con guantes negros y vestido drapeado" }
+          "settings": { "alt_text": "Retrato con flores y tejido verde" }
         }
       },
       "block_order": ["photo_1", "photo_2", "photo_3", "photo_4"]
@@ -73,7 +73,7 @@
         "place": "Argentina",
         "author": "Sofía Guevara",
         "final_line": "Un archivo de objetos para mundos interiores.",
-        "background_color": "#601e2a"
+        "background_color": "#c6ca9f"
       }
     }
   },

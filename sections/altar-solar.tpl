@@ -5,7 +5,7 @@
   data-section-id="{{ section.id }}"
   data-model-url="{{ 'models/solar-system.glb' | static_url }}"
   data-stones-url="{{ 'models/planet-stones.glb' | static_url }}"
-  style="--space-color: {{ solar_settings.space_color | default('#2d2838') }}; --horizon-color: {{ solar_settings.horizon_color | default('#ff9a70') }}; --sky-color: {{ solar_settings.sky_color | default('#aebfc0') }}; --ground-color: {{ solar_settings.ground_color | default('#f4f0e8') }};"
+  style="--space-color: {{ solar_settings.space_color | default('#080808') }}; --horizon-color: {{ solar_settings.horizon_color | default('#ff9a70') }}; --sky-color: {{ solar_settings.sky_color | default('#aebfc0') }}; --ground-color: {{ solar_settings.ground_color | default('#f4f0e8') }};"
 >
   <div class="altar-solar__marquee" data-solar-marquee>
     <div class="altar-solar__marquee-track">
@@ -19,6 +19,18 @@
     {% endfor %}
   </div>
   <div class="altar-solar__stage" data-solar-stage>
+    <div class="altar-hero-v2__campaign" id="altar-hero-campaign" role="group" aria-label="{{ solar_settings.campaign_label | default('Campaña Altar') }}">
+      {% if solar_settings.hero_media_compact %}
+        {% include 'snippets/image.tpl' with { image_src: solar_settings.hero_media_compact, image_alt: solar_settings.hero_media_alt | default('Campaña Altar'), image_classes: 'altar-hero-v2__media altar-hero-v2__media--compact', image_priority_high: true } %}
+      {% else %}
+        <img class="altar-hero-v2__media altar-hero-v2__media--compact" src="{{ 'images/altar-v2-hero-compact.png' | static_url }}" alt="{{ solar_settings.hero_media_alt | default('Campaña Altar') }}" width="1526" height="1008" fetchpriority="high">
+      {% endif %}
+      {% if solar_settings.hero_media_expanded %}
+        {% include 'snippets/image.tpl' with { image_src: solar_settings.hero_media_expanded, image_alt: '', image_classes: 'altar-hero-v2__media altar-hero-v2__media--expanded' } %}
+      {% else %}
+        <img class="altar-hero-v2__media altar-hero-v2__media--expanded" src="{{ 'images/altar-v2-hero-expanded.png' | static_url }}" alt="" width="1536" height="1006">
+      {% endif %}
+    </div>
     <div class="altar-solar__sky" aria-hidden="true">
       <i class="altar-solar__glow altar-solar__glow--rose"></i>
       <i class="altar-solar__glow altar-solar__glow--cyan"></i>
@@ -39,64 +51,7 @@
       </div>
     </section>
     <div class="altar-solar__sticky-track altar-solar__sticky-track--content">
-      <div class="altar-solar__fortune-cards is-open" id="altar-fortune-card" role="group" aria-label="Mensaje de Altar" aria-hidden="false">
-        <span class="altar-solar__fortune-cta-frame" aria-hidden="true"></span>
-        <p class="altar-solar__fortune-cta-text">
-          <img class="altar-solar__fortune-cta-icon" src="{{ 'images/altar-arrow-up-right.svg' | static_url }}" alt="" width="12" height="12">
-          <span>{% if solar_settings.card_cta %}{{ solar_settings.card_cta | nl2br }}{% else %}Toca la carta.<br>Hay algo esperándote{% endif %}</span>
-        </p>
-        <div class="altar-solar__fortune-flip" data-fortune-flip role="button" tabindex="-1" aria-pressed="false" aria-label="Dar vuelta la carta" data-cursor-label="{{ 'Revelar carta' | translate }}" data-cursor-label-pressed="{{ 'Cerrar carta' | translate }}">
-          <div class="altar-solar__fortune-inner">
-            <div
-              class="altar-solar__fortune-card altar-solar__fortune-card--artwork altar-solar__fortune-face altar-solar__fortune-face--front"
-              data-foil-card
-              data-foil-art
-              data-foil-base="{{ 'images/altar-card-front.png' | static_url }}"
-              data-foil-map="{{ 'images/altar-card-front-foil.png' | static_url }}"
-              data-channel-base-2="{{ 'images/altar-card-front-2.png' | static_url }}"
-              data-channel-map-2="{{ 'images/altar-card-front-foil-2.png' | static_url }}"
-              data-channel-base-3="{{ 'images/altar-card-front-3.png' | static_url }}"
-              data-channel-map-3="{{ 'images/altar-card-front-foil-3.png' | static_url }}"
-              data-channel-base-4="{{ 'images/altar-card-front-4.png' | static_url }}"
-              data-channel-map-4="{{ 'images/altar-card-front-foil-4.png' | static_url }}"
-              aria-hidden="true"
-            >
-              <canvas class="altar-solar__foil-canvas" width="236" height="358"></canvas>
-              <img src="{{ 'images/altar-card-front.png' | static_url }}" alt="" width="236" height="358" draggable="false">
-            </div>
-            <article
-              class="altar-solar__fortune-card altar-solar__fortune-card--message altar-solar__fortune-face altar-solar__fortune-face--back"
-              aria-hidden="true"
-              data-foil-card
-              data-foil-base="{{ 'images/altar-card-base.png' | static_url }}"
-              data-foil-frame="{{ 'images/altar-card-message-frame.png' | static_url }}"
-              data-fortune-font="{{ 'fonts/gestura-text-regular.otf' | static_url }}"
-              data-channel-frame-2="{{ 'images/altar-card-message-frame-2.png' | static_url }}"
-              data-channel-frame-3="{{ 'images/altar-card-message-frame-3.png' | static_url }}"
-              data-channel-frame-4="{{ 'images/altar-card-message-frame-4.png' | static_url }}"
-            >
-              <canvas class="altar-solar__foil-canvas" width="236" height="358" aria-hidden="true"></canvas>
-              <div class="altar-solar__fortune-message-fallback">
-                <img
-                  class="altar-solar__fortune-symbol"
-                  src="{{ 'images/altar-fortune-symbol.svg' | static_url }}"
-                  alt=""
-                >
-                <div class="altar-solar__fortune-copy">
-                  <span aria-hidden="true">*</span>
-                  <p>{{ solar_settings.fortune_message | default('Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar.') }}</p>
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
-        <aside class="altar-solar__fortune-share" data-fortune-share data-share-handle="@altarmundi" aria-hidden="true">
-          <img class="altar-solar__fortune-share-dot" src="{{ 'images/altar-status-dot.svg' | static_url }}" alt="" width="7" height="7">
-          <p>Consulta<br>tu suerte cada vez que lo necesites</p>
-          <button type="button" data-fortune-share-button tabindex="-1"><img src="{{ 'images/altar-share.svg' | static_url }}" alt="" width="12" height="12">Compartir</button>
-        </aside>
-        <button type="button" class="altar-solar__fortune-close" data-fortune-close tabindex="-1" aria-label="{{ 'Cerrar carta' | translate }}"><img src="{{ 'images/altar-close.svg' | static_url }}" alt="" width="14" height="14"></button>
-      </div>
+
     </div>
     <div class="altar-solar__sticky-track altar-solar__sticky-track--content">
       <aside class="altar-solar__campaign" aria-label="{{ solar_settings.campaign_label | default('ELEMENTAL / SS 27') }}">
@@ -252,6 +207,10 @@
     { "type": "altar-channel", "limit": 4 }
   ],
   "settings": [
+    { "type": "header", "content": "Hero V2 · Campaña" },
+    { "type": "setting", "setting_type": "image_picker", "id": "hero_media_compact", "label": "Imagen compacta · Layout A" },
+    { "type": "setting", "setting_type": "image_picker", "id": "hero_media_expanded", "label": "Imagen ampliada · Layout B" },
+    { "type": "setting", "setting_type": "text", "id": "hero_media_alt", "label": "Descripción de la imagen", "default": "Campaña Altar" },
     { "type": "header", "content": "Contenido" },
     { "type": "setting", "setting_type": "text", "id": "scroll_label", "label": "Texto de desplazamiento", "default": "" },
     { "type": "setting", "setting_type": "text", "id": "accessible_label", "label": "Descripción accesible", "default": "Sistema solar interactivo" },
@@ -270,7 +229,7 @@
     { "type": "setting", "setting_type": "textarea", "id": "fortune_message", "label": "Mensaje de la carta", "default": "Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar." },
     { "type": "setting", "setting_type": "textarea", "id": "paragraph_text", "label": "Texto de marquesina", "default": "Objetos con alma hechos por manos. Un canal en sintonía con el ambiente, un cable a tierra. Un ritmo más consciente de consumo. Fuego, tierra, agua, aire. 10% de las ganancias aportan a @unarbol_ong. Magia, sutileza, fantasía, analógico & digital. Amuletos. Ambient aware. Solar punk. Slow fashion. Buenos Aires, 23 Junio 2025, 17 grados. 20:58. Contact 1157991078. fire, earth, air & water. Altar 2025." },
     { "type": "header", "content": "Colores" },
-    { "type": "setting", "setting_type": "color", "id": "space_color", "label": "Espacio", "default": "#2d2838" },
+    { "type": "setting", "setting_type": "color", "id": "space_color", "label": "Espacio", "default": "#080808" },
     { "type": "setting", "setting_type": "color", "id": "horizon_color", "label": "Degradado inferior", "default": "#ff9c71" },
     { "type": "setting", "setting_type": "color", "id": "sky_color", "label": "Reserva de color", "default": "#aebfc0" },
     { "type": "setting", "setting_type": "color", "id": "ground_color", "label": "Tierra 3D · Off white", "default": "#f4f0e8" }

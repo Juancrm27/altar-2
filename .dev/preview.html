@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="../static/css/style-utilities.css">
     <link rel="stylesheet" href="../static/css/style-async.css">
     <link rel="stylesheet" href="../static/css/altar.css">
+<link rel="stylesheet" href="../static/css/altar-header-v2.css">
     <link rel="stylesheet" href="../static/css/altar-footer.css">
     <link rel="stylesheet" href="./ipanema-sim.css">
   </head>
@@ -23,7 +24,7 @@
     <div data-sim-icons></div>
     <!-- Header Altar: same markup as sections/altar-header.tpl and .dev/ipanema.html; behaviour from src/ipanema-sim.js -->
     <header class="js-header header site-header">
-      <div class="altar-nav" data-altar-page="home">
+      <div class="altar-nav altar-nav--v2" data-altar-page="home">
         <div class="altar-nav__rule altar-nav__rule--top" aria-hidden="true"></div>
         <div class="altar-nav__content">
           <div class="altar-nav__brand">
@@ -39,11 +40,10 @@
             <div class="altar-nav__metadata"><time data-live-date>SEP/23/26</time><span>C.A.B.A. (ARG)</span></div>
             <span class="altar-nav__divider altar-nav__divider--navigation" aria-hidden="true"></span>
           </div>
-          <nav class="altar-nav__menu" aria-label="Navegación principal">
-            <a class="is-active" href="./preview.html" aria-current="page">Home</a>
-            <a href="./ipanema.html#/tienda">Shop</a>
-            <a href="#">Contacto</a>
-          </nav>
+          <div class="altar-nav__experience" aria-label="Controles de experiencia">
+<button type="button" class="altar-nav__layout-switch" data-altar-layout-toggle aria-controls="altar-hero-campaign" role="switch" aria-checked="false" aria-label="Usar layout alternativo"><span aria-hidden="true"></span></button>
+<button type="button" class="altar-nav__spotify" data-altar-spotify-toggle aria-controls="altar-player" aria-expanded="false">PLAY</button>
+</div><span class="altar-nav__experience-divider" aria-hidden="true"></span><nav class="altar-nav__menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><span class="altar-nav__pending" aria-disabled="true" title="Página The Star pendiente de configurar">The Star</span><a href="./ipanema.html#/contacto">Contact</a></nav>
           <div class="altar-nav__actions">
             <div class="js-search-container altar-nav__action altar-nav__search-container">
               <button type="button" class="js-search-trigger altar-nav__search" aria-label="Buscar" aria-expanded="false">
@@ -53,7 +53,7 @@
             </div>
             <span class="altar-nav__divider altar-nav__divider--actions" aria-hidden="true"></span>
             <div class="altar-nav__action-stack">
-              <a class="altar-nav__account" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Login</span></a>
+              <a class="altar-nav__account" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
               <span id="ajax-cart" class="js-cart-container altar-nav__action" data-component="cart-button">
                 <button type="button" class="js-modal-open-private altar-nav__cart" data-target="#modal-cart" aria-label="Carrito de compras">
                   <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span>
@@ -65,16 +65,12 @@
         </div>
         <div class="altar-nav__menu-rule" aria-hidden="true"></div>
         <div class="altar-nav__panel" id="altar-nav-panel" data-altar-menu-panel hidden>
-          <nav class="altar-nav__panel-menu" aria-label="Navegación principal">
-            <a class="is-active" href="./preview.html" aria-current="page">Home</a>
-            <a href="./ipanema.html#/tienda">Shop</a>
-            <a href="#">Contacto</a>
-          </nav>
+          <nav class="altar-nav__panel-menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><span class="altar-nav__pending" aria-disabled="true" title="Página The Star pendiente de configurar">The Star</span><a href="./ipanema.html#/contacto">Contact</a></nav>
           <div class="altar-nav__panel-rule" aria-hidden="true"></div>
           <div class="altar-nav__panel-utilities">
             <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span></button>
             <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span></button>
-            <a class="altar-nav__panel-item" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Login</span></a>
+            <a class="altar-nav__panel-item" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
           </div>
         </div>
         <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
@@ -83,7 +79,7 @@
     <div class="js-alert-add-to-cart-private js-notification-cart notification-cart-container notification-hidden" style="display: none;" data-sim-notification></div>
     <main class="main-content">
       <section class="section-altar-solar">
-        <div class="altar-solar" data-altar-solar data-lighting-controls data-model-url="../static/models/solar-system.glb" data-stones-url="../static/models/planet-stones.glb" style="--space-color:#2d2838;--horizon-color:#ff9a70;--sky-color:#aebfc0;--ground-color:#f4f0e8">
+        <div class="altar-solar" data-altar-solar data-lighting-controls data-model-url="../static/models/solar-system.glb" data-stones-url="../static/models/planet-stones.glb" style="--space-color:#080808;--horizon-color:#ff9a70;--sky-color:#aebfc0;--ground-color:#f4f0e8">
           <div class="altar-solar__marquee" data-solar-marquee>
             <div class="altar-solar__marquee-track">
               <p>Objetos con alma hechos por manos. Un canal en sintonía con el ambiente, un cable a tierra. Un ritmo más consciente de consumo. Fuego, tierra, agua, aire. 10% de las ganancias aportan a @unarbol_ong. Magia, sutileza, fantasía, analógico &amp; digital. Amuletos. Ambient aware. Solar punk. Slow fashion. Buenos Aires, 23 Junio 2025, 17 grados. 20:58. Contact 1157991078. fire, earth, air &amp; water. Altar 2025.</p>
@@ -91,6 +87,10 @@
             </div>
           </div>
           <div class="altar-solar__stage" data-solar-stage>
+            <div class="altar-hero-v2__campaign" id="altar-hero-campaign" role="group" aria-label="Campaña Altar">
+              <img class="altar-hero-v2__media altar-hero-v2__media--compact" src="../static/images/altar-v2-hero-compact.png" alt="Detalle de la colección Altar en tejido azul y verde" width="1526" height="1008" fetchpriority="high">
+              <img class="altar-hero-v2__media altar-hero-v2__media--expanded" src="../static/images/altar-v2-hero-expanded.png" alt="" aria-hidden="true" width="1536" height="1006">
+            </div>
             <div class="altar-solar__sky" aria-hidden="true">
               <i class="altar-solar__glow altar-solar__glow--rose"></i>
               <i class="altar-solar__glow altar-solar__glow--cyan"></i>
@@ -111,47 +111,7 @@
               </div>
             </section>
             <div class="altar-solar__sticky-track altar-solar__sticky-track--content">
-              <div class="altar-solar__fortune-cards is-open" id="altar-fortune-card" role="group" aria-label="Mensaje de Altar" aria-hidden="false">
-                <span class="altar-solar__fortune-cta-frame" aria-hidden="true"></span>
-                <p class="altar-solar__fortune-cta-text"><img class="altar-solar__fortune-cta-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Toca la carta.<br>Hay algo esperándote</span></p>
-                <div class="altar-solar__fortune-flip" data-fortune-flip role="button" tabindex="-1" aria-pressed="false" aria-label="Dar vuelta la carta" data-cursor-label="Revelar carta" data-cursor-label-pressed="Cerrar carta">
-                  <div class="altar-solar__fortune-inner">
-                    <div
-                      class="altar-solar__fortune-card altar-solar__fortune-card--artwork altar-solar__fortune-face altar-solar__fortune-face--front"
-                      data-foil-card
-                      data-foil-art
-                      data-foil-base="../static/images/altar-card-front.png"
-                      data-foil-map="../static/images/altar-card-front-foil.png"
-                      data-channel-base-2="../static/images/altar-card-front-2.png"
-                      data-channel-map-2="../static/images/altar-card-front-foil-2.png"
-                      data-channel-base-3="../static/images/altar-card-front-3.png"
-                      data-channel-map-3="../static/images/altar-card-front-foil-3.png"
-                      data-channel-base-4="../static/images/altar-card-front-4.png"
-                      data-channel-map-4="../static/images/altar-card-front-foil-4.png"
-                      aria-hidden="true"
-                    >
-                      <canvas class="altar-solar__foil-canvas" width="236" height="358"></canvas>
-                      <img src="../static/images/altar-card-front.png" alt="" width="236" height="358" draggable="false">
-                    </div>
-                    <article class="altar-solar__fortune-card altar-solar__fortune-card--message altar-solar__fortune-face altar-solar__fortune-face--back" aria-hidden="true" data-foil-card data-foil-base="../static/images/altar-card-base.png" data-foil-frame="../static/images/altar-card-message-frame.png" data-fortune-font="../static/fonts/gestura-text-regular.otf" data-channel-frame-4="../static/images/altar-card-message-frame-4.png" data-channel-frame-3="../static/images/altar-card-message-frame-3.png" data-channel-frame-2="../static/images/altar-card-message-frame-2.png">
-                      <canvas class="altar-solar__foil-canvas" width="236" height="358" aria-hidden="true"></canvas>
-                      <div class="altar-solar__fortune-message-fallback">
-                        <img class="altar-solar__fortune-symbol" src="../static/images/altar-fortune-symbol.svg" alt="">
-                        <div class="altar-solar__fortune-copy">
-                          <span aria-hidden="true">*</span>
-                          <p>Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar.</p>
-                        </div>
-                      </div>
-                    </article>
-                  </div>
-                </div>
-                <aside class="altar-solar__fortune-share" data-fortune-share data-share-handle="@altarmundi" aria-hidden="true">
-                  <img class="altar-solar__fortune-share-dot" src="../static/images/altar-status-dot.svg" alt="" width="7" height="7">
-                  <p>Consulta<br>tu suerte cada vez que lo necesites</p>
-                  <button type="button" data-fortune-share-button tabindex="-1"><img src="../static/images/altar-share.svg" alt="" width="12" height="12">Compartir</button>
-                </aside>
-                <button type="button" class="altar-solar__fortune-close" data-fortune-close tabindex="-1" aria-label="Cerrar carta"><img src="../static/images/altar-close.svg" alt="" width="14" height="14"></button>
-              </div>
+
             </div>
             <div class="altar-solar__sticky-track altar-solar__sticky-track--content">
               <aside class="altar-solar__campaign" aria-label="ELEMENTAL / SS 27">
@@ -253,18 +213,19 @@
                 <p>Hecho despacio, a mano y con intención. Para quien sabe mirar más allá.</p>
               </div>
             </div>
+            <div class="altar-collection__continuation" aria-hidden="true"></div>
             <div class="altar-collection__gallery">
-              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-1.jpg" alt="Modelo con vestido satinado en un escenario floral" width="339" height="472" loading="lazy"></a>
-              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-2.jpg" alt="Modelo con vestido negro transparente" width="339" height="472" loading="lazy"></a>
-              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-3.jpg" alt="Modelo con vestido escultural blanco" width="339" height="472" loading="lazy"></a>
-              <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver producto"><img src="../static/images/altar-collection-4.jpg" alt="Modelo con guantes negros y vestido drapeado" width="339" height="472" loading="lazy"></a>
+              <div class="altar-collection__photo"><img src="../static/images/altar-v2-editorial-1.png" alt="Retrato con vestido negro y detalle floral" width="339" height="472" loading="lazy"></div>
+              <div class="altar-collection__photo"><img src="../static/images/altar-v2-editorial-2.png" alt="Composición de flores de la campaña Altar" width="339" height="472" loading="lazy"></div>
+              <div class="altar-collection__photo"><img src="../static/images/altar-v2-editorial-3.png" alt="Vestido azul y verde de la colección Altar" width="339" height="472" loading="lazy"></div>
+              <div class="altar-collection__photo"><img src="../static/images/altar-v2-editorial-4.png" alt="Retrato con flores y tejido verde" width="339" height="472" loading="lazy"></div>
             </div>
             <div class="altar-collection__materia">
               <span>La materia</span>
               <p>Cada material guarda una forma posible. El cuerpo termina de revelarla.</p>
             </div>
           </section>
-          <section class="altar-closing" id="about" aria-label="Manifiesto de Altar">
+          <section class="altar-closing altar-manifesto-v2" id="about" aria-label="Manifiesto de Altar">
             <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
               <filter id="altar-grain-closing-preview" x="0" y="0" width="100%" height="100%">
                 <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
@@ -274,6 +235,40 @@
             </svg>
             <img class="altar-closing__symbol" src="../static/images/altar-symbol-large.svg" alt="" width="698" height="673" loading="lazy">
             <div class="altar-closing__content">
+<div class="altar-manifesto__oracle"><div class="altar-solar__fortune-cards is-open" id="altar-fortune-card" role="group" aria-label="Mensaje de Altar" aria-hidden="false">
+                <span class="altar-solar__fortune-cta-frame" aria-hidden="true"></span>
+                <p class="altar-solar__fortune-cta-text"><img class="altar-solar__fortune-cta-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Toca la carta.<br>Hay algo esperándote</span></p>
+                <button type="button" class="altar-solar__fortune-flip" data-fortune-flip tabindex="-1" aria-pressed="false" aria-label="Dar vuelta la carta" data-cursor-label="Revelar carta" data-cursor-label-pressed="Cerrar carta">
+                  <div class="altar-solar__fortune-inner">
+                    <div
+                      class="altar-solar__fortune-card altar-solar__fortune-card--artwork altar-solar__fortune-face altar-solar__fortune-face--front"
+                      data-foil-card
+                      data-foil-base="../static/images/altar-card-base.png"
+                      data-foil-map="../static/images/altar-card-front-map.png"
+                      aria-hidden="true"
+                    >
+                      <canvas class="altar-solar__foil-canvas" width="236" height="358"></canvas>
+                      <img src="../static/images/altar-card-front-map.png" alt="" width="236" height="358" draggable="false">
+                    </div>
+                    <article class="altar-solar__fortune-card altar-solar__fortune-card--message altar-solar__fortune-face altar-solar__fortune-face--back" aria-hidden="true" data-foil-card data-foil-base="../static/images/altar-card-base.png" data-foil-frame="../static/images/altar-card-message-frame.png" data-fortune-font="../static/fonts/gestura-text-regular.otf" data-channel-frame-4="../static/images/altar-card-message-frame-4.png" data-channel-frame-3="../static/images/altar-card-message-frame-3.png" data-channel-frame-2="../static/images/altar-card-message-frame-2.png">
+                      <canvas class="altar-solar__foil-canvas" width="236" height="358" aria-hidden="true"></canvas>
+                      <div class="altar-solar__fortune-message-fallback">
+                        <img class="altar-solar__fortune-symbol" src="../static/images/altar-fortune-symbol.svg" alt="">
+                        <div class="altar-solar__fortune-copy">
+                          <span aria-hidden="true">*</span>
+                          <p>Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar.</p>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+                </button>
+                <aside class="altar-solar__fortune-share" data-fortune-share data-share-handle="@altarmundi" aria-hidden="true">
+                  <img class="altar-solar__fortune-share-dot" src="../static/images/altar-status-dot.svg" alt="" width="7" height="7">
+                  <p>Consulta<br>tu suerte cada vez que lo necesites</p>
+                  <button type="button" data-fortune-share-button tabindex="-1"><img src="../static/images/altar-share.svg" alt="" width="12" height="12">Compartir</button>
+                </aside>
+                <button type="button" class="altar-solar__fortune-close" data-fortune-close tabindex="-1" aria-label="Cerrar carta"><img src="../static/images/altar-close.svg" alt="" width="14" height="14"></button>
+              </div></div>
               <div class="altar-closing__note">
                 <span>El tejido</span>
                 <p>Formas únicas que cuentan historias, entrelazadas con paciencia y cariño.</p>
@@ -304,7 +299,7 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer">
+    <footer class="site-footer"><div class="altar-closing-v2" id="closing"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>
       <!-- Same structure as sections/altar-footer.tpl (Figma Footer / Site). -->
       <div class="altar-footer altar-footer--color" data-header-theme="light" style="--footer-background:#FFF3A9;--footer-foreground:#601E2A;">
         <div class="altar-footer__top">
@@ -362,7 +357,7 @@
           </div>
         </div>
       </div>
-    </footer>
+    </div></footer>
     <script>
       // Footer placeholders (#) open their simulation pages. Store links point to ipanema.html in the markup itself:
       // Netlify's pretty URLs rewrite hrefs on deploy, so they can't be matched by their original value here.

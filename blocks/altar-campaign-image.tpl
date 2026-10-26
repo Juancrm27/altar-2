@@ -12,20 +12,19 @@
   {% endif %}
 {% endif %}
 
-<a
+<{% if campaign_image.link %}a{% else %}div{% endif %}
   class="altar-collection__photo"
-  href="{{ campaign_image.link | default(store.products_url) }}"
-  data-cursor-label="{{ 'Ver producto' | translate }}"
+  {% if campaign_image.link %}href="{{ campaign_image.link }}" data-cursor-label="{{ 'Ver producto' | translate }}"{% endif %}
   {{ block | block_attributes }}
 >
   <img
     src="{{ image_url }}"
     alt="{{ campaign_image.alt_text | default('Imagen de la campaña') }}"
-    width="339"
-    height="472"
+    width="360"
+    height="543"
     loading="lazy"
   >
-</a>
+</{% if campaign_image.link %}a{% else %}div{% endif %}>
 
 {% schema %}
 {

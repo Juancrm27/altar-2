@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <style id="altar-theme-tokens">
       :root {
-        --altar-space: {{ settings.altar_space_color | default('#2d2838') }};
+        --altar-space: {{ settings.altar_space_color | default('#080808') }};
         --altar-horizon: {{ settings.altar_horizon_color | default('#ff9a70') }};
         --altar-sky: {{ settings.altar_sky_color | default('#aebfc0') }};
         --altar-text: {{ settings.altar_text_color | default('#f7f2ec') }};
@@ -164,6 +164,7 @@
     </script>
 
     {# Lightweight shared behaviour; the heavy 3D bundle is exclusive to the home. #}
+    {% if template == 'home' %}<link rel="stylesheet" href="{{ 'css/altar-header-v2.css' | static_url }}">{% endif %}
     <script src="{{ 'js/altar-header.js' | static_url }}" defer></script>
     <script src="{{ 'js/altar-site.js' | static_url }}" defer></script>
     {% if template == 'home' %}

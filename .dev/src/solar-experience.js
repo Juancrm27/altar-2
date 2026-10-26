@@ -25,7 +25,7 @@ function writeStorage(key, value) {
     // Storage can be unavailable (private mode, blocked site data); the GUI still works in memory.
   }
 }
-const LIGHTING_PRESET_VERSION = 5;
+const LIGHTING_PRESET_VERSION = 6;
 
 const TONE_MAPPINGS = {
   ACES: THREE.ACESFilmicToneMapping,
@@ -34,69 +34,72 @@ const TONE_MAPPINGS = {
   Reinhard: THREE.ReinhardToneMapping,
 };
 
+// Hero palette tuned against Figma 604:2468: near-black sky, subdued planets, coral sun.
 const DEFAULT_LIGHTING = {
   hemisphereSky: "#000000",
   hemisphereGround: "#3f12e2",
   hemisphereIntensity: 0,
   keyColor: "#f8d4b7",
-  keyIntensity: 6,
+  keyIntensity: 0.12,
   keyX: -15,
   keyY: -15,
   keyZ: -15,
   rimColor: "#6f71f7",
-  rimIntensity: 1.1,
+  rimIntensity: 0.48,
   rimX: -15,
   rimY: 15,
   rimZ: -4.2,
-  exposure: 2.55,
+  exposure: 0.9,
   toneMapping: "Linear",
   effectBlur: 0,
-  grainOpacity: 0.25,
+  grainOpacity: 0.075,
   grainFrequency: 0.5,
   grainSpeed: 10,
   sectionGrainOpacity: 0.16,
   orbitSpeed: 0.1,
   orbitKepler: 1.6,
   orbitTilt: 69,
-  orbitScale: 1.45,
+  orbitScale: 0.65,
   orbitDirection: "Horario",
   moonSpeed: 1.25,
-  spinSpeed: 3.5,
-  orbitLineOpacity: 0.2,
+  spinSpeed: 2.6,
+  orbitLineOpacity: 0,
   orbitLineColor: "#fffb00",
+  // V2 header switch wave (band and front glow).
+  layoutWaveColor: "#767d73",
   starCount: 700,
-  starSize: 1.6,
-  starBrightness: 4,
+  starSize: 1.35,
+  starBrightness: 3,
   starColor: "#fff3a9",
   starColorVariation: 1,
   twinkleSpeed: 7.95,
   twinkleAmount: 0.5,
   bloomSize: 5.1,
-  bloomIntensity: 0.35,
+  bloomIntensity: 0.25,
   starDrift: 0.9,
-  sunSize: 0.2,
-  sunEmissive: 1.4,
-  sunEmissiveColor: "#ffffff",
+  sunSize: 0.31,
+  sunEmissive: 2.1,
+  sunEmissiveColor: "#ff9294",
   sunSpin: 1,
-  sunGlowSize: 2.75,
-  sunGlowIntensity: 0.9,
-  sunGlowColor: "#ffb45c",
-  sunLightIntensity: 1.4,
-  sunLightColor: "#ffd9a8",
-  system1X: 13.8,
-  system1Y: 7.25,
-  system1Z: -79.8,
-  system1RotX: -2,
-  system1RotY: 162,
-  system1RotZ: 14,
-  system1Scale: 6.45,
-  system2X: -33.8,
-  system2Y: 15.3,
-  system2Z: -66.25,
-  system2RotX: 3,
+  sunGlowSize: 3.8,
+  sunGlowIntensity: 0.4,
+  sunGlowColor: "#ffbc80",
+  sunLightIntensity: 0.25,
+  sunLightColor: "#ffb3a0",
+  system1X: 24.7,
+  system1Y: -14.15,
+  system1Z: -84.85,
+  system1RotX: 59,
+  system1RotY: 180,
+  system1RotZ: -19,
+  system1Scale: 7.05,
+  system2X: -21.8,
+  system2Y: 18.7,
+  system2Z: -100,
+  system2RotX: 15,
   system2RotY: 16,
   system2RotZ: 13,
-  system2Scale: 12.45,
+  system2Scale: 11,
   system3X: -13.1,
   system3Y: 17.9,
   system3Z: -82.95,
@@ -601,15 +604,15 @@ const DEFAULT_LIGHTING = {
   foilTintAmount: 0,
   foilBrushed: 0,
   foilBrushedAngle: 0,
-  spaceColor: "#2d2838",
+  spaceColor: "#080808",
   uiPrimaryColor: "#fff3a9",
   uiSecondaryColor: "#601e2a",
   glowRoseColor: "#2d1a60",
-  glowRoseIntensity: 5,
+  glowRoseIntensity: 0,
   glowCyanColor: "#7b41e6",
-  glowCyanIntensity: 0.8,
+  glowCyanIntensity: 0,
   glowTealColor: "#5a2020",
-  glowTealIntensity: 20,
+  glowTealIntensity: 0,
   showHorizonGradient: false,
   showHorizonFloor: true,
   floorColor: "#ff9c71",
@@ -1267,6 +1270,9 @@ class SolarExperience {
     this.root = root;
     this.stage = root.querySelector("[data-solar-stage]");
     this.canvas = root.querySelector(".altar-solar__canvas");
+    // V2 home: the stage's lower half is plain sky behind the gallery; the stones live in the closing scene.
+    this.isV2Home = Boolean(document.querySelector(".altar-nav--v2"));
+    this.gallery = this.isV2Home ? root.querySelector(".altar-collection") : null;
     // Every grain on the page (hero, sections 3·4 and the footer, which lives outside this root).
     this.grainLayers = Array.from(document.querySelectorAll("[data-grain-turbulence]")).map((node) => ({
       node,
@@ -1289,6 +1295,7 @@ class SolarExperience {
     this.smoothPointer = new THREE.Vector2();
     this.timer = new THREE.Timer();
     this.visible = true;
+    this.cardRoot = document.querySelector(".altar-manifesto__oracle") || this.root;
     this.setupFoilCards();
     this.setupFortuneFlip();
     this.setupFortuneShare();
@@ -1308,6 +1315,7 @@ class SolarExperience {
     this.setupStones();
     if (root.hasAttribute("data-lighting-controls")) this.setupLightingControls();
     this.bindEvents();
+    this.setupClosingScene();
     this.loadModel();
     this.render();
   }
@@ -1816,32 +1824,6 @@ class SolarExperience {
           <label class="is-color">Primario <input type="color" data-lighting="uiPrimaryColor"></label>
           <label class="is-color">Secundario <input type="color" data-lighting="uiSecondaryColor"></label>
         </details>
-        <details><summary>Manifiesto</summary>
-          <label>Bloque X px <span><input type="range" min="-800" max="800" step="1" data-lighting="manifestoX"><output></output></span></label>
-          <label>Bloque Y px <span><input type="range" min="-800" max="800" step="1" data-lighting="manifestoY"><output></output></span></label>
-          <label>Escala <span><input type="range" min="0.3" max="2" step="0.01" data-lighting="manifestoScale"><output></output></span></label>
-          <label>Opacidad <span><input type="range" min="0" max="1" step="0.01" data-lighting="manifestoOpacity"><output></output></span></label>
-          <label>Titular X px <span><input type="range" min="-800" max="800" step="1" data-lighting="manifestoTitleX"><output></output></span></label>
-          <label>Titular Y px <span><input type="range" min="-400" max="400" step="1" data-lighting="manifestoTitleY"><output></output></span></label>
-          <label>Nota X px <span><input type="range" min="-1200" max="400" step="1" data-lighting="manifestoNoteX"><output></output></span></label>
-          <label>Nota Y px <span><input type="range" min="-400" max="400" step="1" data-lighting="manifestoNoteY"><output></output></span></label>
-        </details>
-        <details><summary>Layout</summary>
-          <label>Carta escala <span><input type="range" min="0.3" max="3" step="0.005" data-lighting="cardScale"><output></output></span></label>
-          <label>Carta abierta escala <span><input type="range" min="0.5" max="3" step="0.05" data-lighting="cardFocusScale"><output></output></span></label>
-          <label>Carta X px <span><input type="range" min="-1400" max="1400" step="1" data-lighting="layoutCardX"><output></output></span></label>
-          <label>Carta Y px <span><input type="range" min="-900" max="300" step="1" data-lighting="layoutCardY"><output></output></span></label>
-          <label>Elemental X centro <span><input type="range" min="-800" max="800" step="1" data-lighting="layoutCampaignCenterX"><output></output></span></label>
-          <label>Elemental Y px <span><input type="range" min="-600" max="600" step="1" data-lighting="layoutCampaignY"><output></output></span></label>
-          <label>Elemental X carta abierta <span><input type="range" min="-1400" max="600" step="1" data-lighting="layoutCampaignOpenX"><output></output></span></label>
-          <label>Elemental Y carta abierta <span><input type="range" min="-600" max="600" step="1" data-lighting="layoutCampaignOpenY"><output></output></span></label>
-          <label>Elemental escala <span><input type="range" min="0.5" max="3" step="0.01" data-lighting="layoutCampaignScale"><output></output></span></label>
-          <label>Elemental tierra X px <span><input type="range" min="-1400" max="400" step="1" data-lighting="groundCampaignX"><output></output></span></label>
-          <label>Elemental tierra Y px <span><input type="range" min="-500" max="500" step="1" data-lighting="groundCampaignY"><output></output></span></label>
-          <label>Elemental tierra escala <span><input type="range" min="0.3" max="3" step="0.05" data-lighting="groundCampaignScale"><output></output></span></label>
-          <label>Elemental tierra X carta abierta <span><input type="range" min="-1400" max="600" step="1" data-lighting="groundCampaignOpenX"><output></output></span></label>
-          <label>Elemental tierra Y carta abierta <span><input type="range" min="-600" max="600" step="1" data-lighting="groundCampaignOpenY"><output></output></span></label>
-        </details>
         <details><summary>Carta</summary>
           <label>Vuelve en s <span><input type="range" min="0" max="120" step="1" data-lighting="cardReturnSeconds"><output></output></span></label>
           <label>Giro ms <span><input type="range" min="200" max="3000" step="50" data-lighting="cardFlipDuration"><output></output></span></label>
@@ -1870,11 +1852,6 @@ class SolarExperience {
           <label>Grano <span><input type="range" min="0" max="0.5" step="0.01" data-lighting="foilGrain"><output></output></span></label>
           <label>Grano frecuencia <span><input type="range" min="200" max="6000" step="50" data-lighting="foilGrainFrequency"><output></output></span></label>
         </details>
-        <details><summary>Carta mapeo</summary>
-          <label>Zona X <span><input type="range" min="-0.354" max="0.354" step="0.001" data-lighting="foilZoneX"><output></output></span></label>
-          <label>Zona Y <span><input type="range" min="-0.5" max="0.9" step="0.001" data-lighting="foilZoneY"><output></output></span></label>
-          <label>Tamaño zona <span><input type="range" min="0.05" max="1.5" step="0.001" data-lighting="foilZoneScale"><output></output></span></label>
-        </details>
         <details><summary>Carta extras</summary>
           <label>Inclinación 3D ° <span><input type="range" min="0" max="25" step="0.5" data-lighting="foilTilt"><output></output></span></label>
           <label>Curvatura <span><input type="range" min="0" max="1" step="0.01" data-lighting="foilCurl"><output></output></span></label>
@@ -1893,86 +1870,18 @@ class SolarExperience {
           <label class="is-color">Luz verde agua <input type="color" data-lighting="glowTealColor"></label>
           <label>Verde agua intensidad <span><input type="range" min="0" max="20" step="0.1" data-lighting="glowTealIntensity"><output></output></span></label>
         </details>
-        <details><summary>Horizonte</summary>
-          <label class="is-boolean">Degradado tramo 2 <input type="checkbox" data-lighting="showHorizonGradient"></label>
-          <label class="is-boolean">Piso <input type="checkbox" data-lighting="showHorizonFloor"></label>
-          <label>Alto piso px <span><input type="range" min="0" max="600" step="1" data-lighting="floorHeight"><output></output></span></label>
-          <label>Inclinación ° <span><input type="range" min="0" max="89" step="0.5" data-lighting="floorTilt"><output></output></span></label>
-          <label>Perspectiva px <span><input type="range" min="50" max="1500" step="10" data-lighting="floorPerspective"><output></output></span></label>
-          <label>Textura <span><input type="range" min="0" max="1" step="0.01" data-lighting="floorTexture"><output></output></span></label>
-          <label>Escala ruido <span><input type="range" min="0.005" max="0.2" step="0.005" data-lighting="floorTextureScale"><output></output></span></label>
-          <label>Relieve <span><input type="range" min="0" max="20" step="0.1" data-lighting="floorRelief"><output></output></span></label>
-          <label>Luz relieve ° <span><input type="range" min="0" max="360" step="1" data-lighting="floorLightAngle"><output></output></span></label>
-          <label class="is-color">Color mix <input type="color" data-lighting="mixColor"></label>
-          <label>Mix cantidad <span><input type="range" min="0" max="1" step="0.01" data-lighting="mixAmount"><output></output></span></label>
-          <label>Mix cobertura <span><input type="range" min="0" max="1" step="0.01" data-lighting="mixCoverage"><output></output></span></label>
-          <label>Mix escala <span><input type="range" min="0.002" max="0.08" step="0.001" data-lighting="mixScale"><output></output></span></label>
-          <label>Mix suavidad <span><input type="range" min="0.02" max="1" step="0.01" data-lighting="mixSoftness"><output></output></span></label>
-          <label>Sombra cerca <span><input type="range" min="0" max="1" step="0.01" data-lighting="floorShade"><output></output></span></label>
-          <label>Bruma lejos <span><input type="range" min="0" max="1" step="0.01" data-lighting="floorHaze"><output></output></span></label>
-          <label>Bloom alto px <span><input type="range" min="0" max="1800" step="1" data-lighting="horizonBloomHeight"><output></output></span></label>
-          <label>Bloom desenfoque <span><input type="range" min="0" max="320" step="1" data-lighting="horizonBloomBlur"><output></output></span></label>
-          <label>Bloom parejo <span><input type="range" min="0" max="1" step="0.01" data-lighting="horizonBloomFlat"><output></output></span></label>
-          <label>Bloom forma <span><input type="range" min="0" max="1" step="0.01" data-lighting="horizonBloomRound"><output></output></span></label>
-          <label>Bloom centro X <span><input type="range" min="0" max="1" step="0.01" data-lighting="horizonBloomCenterX"><output></output></span></label>
-          <label>Bloom ancho px <span><input type="range" min="100" max="3000" step="10" data-lighting="horizonBloomWidth"><output></output></span></label>
-          <label>Línea horizonte <span><input type="range" min="0" max="1" step="0.01" data-lighting="horizonLine"><output></output></span></label>
-        </details>
-        <details><summary>Tierra · canal 1</summary>
-          <label class="is-color">Piso 3D color <input type="color" data-lighting="tierra1Ground"></label>
-          <label class="is-color">Horizonte / bloom <input type="color" data-lighting="tierra1Horizon"></label>
+        <details><summary>Piedras · luces</summary>
           <label>Ambiente <span><input type="range" min="0" max="3" step="0.05" data-lighting="tierra1Ambient"><output></output></span></label>
           <label class="is-color">Luz 1 color <input type="color" data-lighting="tierra1Light1Color"></label>
           <label>Luz 1 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra1Light1Intensity"><output></output></span></label>
           <label class="is-color">Luz 2 color <input type="color" data-lighting="tierra1Light2Color"></label>
           <label>Luz 2 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra1Light2Intensity"><output></output></span></label>
-          <label>Bloom intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra1BloomIntensity"><output></output></span></label>
 ${stonePositionsMarkup(1)}
         </details>
-        <details><summary>Tierra · canal 2</summary>
-          <label class="is-color">Piso 3D color <input type="color" data-lighting="tierra2Ground"></label>
-          <label class="is-color">Horizonte / bloom <input type="color" data-lighting="tierra2Horizon"></label>
-          <label>Ambiente <span><input type="range" min="0" max="3" step="0.05" data-lighting="tierra2Ambient"><output></output></span></label>
-          <label class="is-color">Luz 1 color <input type="color" data-lighting="tierra2Light1Color"></label>
-          <label>Luz 1 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra2Light1Intensity"><output></output></span></label>
-          <label class="is-color">Luz 2 color <input type="color" data-lighting="tierra2Light2Color"></label>
-          <label>Luz 2 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra2Light2Intensity"><output></output></span></label>
-          <label>Bloom intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra2BloomIntensity"><output></output></span></label>
-${stonePositionsMarkup(2)}
-        </details>
-        <details><summary>Tierra · canal 3</summary>
-          <label class="is-color">Piso 3D color <input type="color" data-lighting="tierra3Ground"></label>
-          <label class="is-color">Horizonte / bloom <input type="color" data-lighting="tierra3Horizon"></label>
-          <label>Ambiente <span><input type="range" min="0" max="3" step="0.05" data-lighting="tierra3Ambient"><output></output></span></label>
-          <label class="is-color">Luz 1 color <input type="color" data-lighting="tierra3Light1Color"></label>
-          <label>Luz 1 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra3Light1Intensity"><output></output></span></label>
-          <label class="is-color">Luz 2 color <input type="color" data-lighting="tierra3Light2Color"></label>
-          <label>Luz 2 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra3Light2Intensity"><output></output></span></label>
-          <label>Bloom intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra3BloomIntensity"><output></output></span></label>
-${stonePositionsMarkup(3)}
-        </details>
-        <details><summary>Tierra · canal 4</summary>
-          <label class="is-color">Piso 3D color <input type="color" data-lighting="tierra4Ground"></label>
-          <label class="is-color">Horizonte / bloom <input type="color" data-lighting="tierra4Horizon"></label>
-          <label>Ambiente <span><input type="range" min="0" max="3" step="0.05" data-lighting="tierra4Ambient"><output></output></span></label>
-          <label class="is-color">Luz 1 color <input type="color" data-lighting="tierra4Light1Color"></label>
-          <label>Luz 1 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra4Light1Intensity"><output></output></span></label>
-          <label class="is-color">Luz 2 color <input type="color" data-lighting="tierra4Light2Color"></label>
-          <label>Luz 2 intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra4Light2Intensity"><output></output></span></label>
-          <label>Bloom intensidad <span><input type="range" min="0" max="10" step="0.05" data-lighting="tierra4BloomIntensity"><output></output></span></label>
-${stonePositionsMarkup(4)}
-        </details>
-        <details><summary>Piso 3D</summary>
+        <details><summary>Piso sombras</summary>
           <label class="is-boolean">Visible <input type="checkbox" data-lighting="showGround3d"></label>
-          <label>Relieve <span><input type="range" min="0" max="30" step="0.1" data-lighting="ground3dRelief"><output></output></span></label>
-          <label>Escala textura <span><input type="range" min="0.002" max="0.1" step="0.001" data-lighting="ground3dTextureScale"><output></output></span></label>
-          <label>Rugosidad <span><input type="range" min="0" max="1" step="0.01" data-lighting="ground3dRoughness"><output></output></span></label>
           <label class="is-boolean">Recibe sombras <input type="checkbox" data-lighting="ground3dShadows"></label>
           <label>Sombra contacto <span><input type="range" min="0" max="1" step="0.01" data-lighting="ground3dContactShadows"><output></output></span></label>
-          <label>Difuminado lados <span><input type="range" min="0" max="0.5" step="0.01" data-lighting="ground3dFadeSides"><output></output></span></label>
-          <label>Difuminado fondo <span><input type="range" min="0" max="0.8" step="0.01" data-lighting="ground3dFadeFar"><output></output></span></label>
-          <label>Difuminado frente <span><input type="range" min="0" max="0.5" step="0.01" data-lighting="ground3dFadeNear"><output></output></span></label>
-          <label>Suavidad bordes <span><input type="range" min="0.2" max="4" step="0.05" data-lighting="ground3dFadeSoftness"><output></output></span></label>
           <label>Posición X <span><input type="range" min="-30" max="30" step="0.05" data-lighting="groundX"><output></output></span></label>
           <label>Posición Y <span><input type="range" min="-40" max="5" step="0.05" data-lighting="groundY"><output></output></span></label>
           <label>Posición Z <span><input type="range" min="-30" max="20" step="0.05" data-lighting="groundZ"><output></output></span></label>
@@ -2076,7 +1985,10 @@ ${stonePositionsMarkup(4)}
           <label>Vel. flotación <span><input type="range" min="0" max="3" step="0.05" data-lighting="systemFloatSpeed"><output></output></span></label>
           <label>Parallax mouse ° <span><input type="range" min="0" max="30" step="0.5" data-lighting="systemParallax"><output></output></span></label>
         </details>
-        <details><summary>Sistema · canal 1</summary>
+        <details><summary>Onda layout</summary>
+          <label class="is-color">Color <input type="color" data-lighting="layoutWaveColor"></label>
+        </details>
+        <details><summary>Sistema · layout A</summary>
           <label>Posición X <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system1X"><output></output></span></label>
           <label>Posición Y <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system1Y"><output></output></span></label>
           <label>Posición Z <span><input type="range" min="-100" max="10" step="0.05" data-lighting="system1Z"><output></output></span></label>
@@ -2085,7 +1997,7 @@ ${stonePositionsMarkup(4)}
           <label>Rotación Z <span><input type="range" min="-180" max="180" step="1" data-lighting="system1RotZ"><output></output></span></label>
           <label>Escala <span><input type="range" min="0.2" max="100" step="0.05" data-lighting="system1Scale"><output></output></span></label>
         </details>
-        <details><summary>Sistema · canal 2</summary>
+        <details><summary>Sistema · layout B</summary>
           <label>Posición X <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system2X"><output></output></span></label>
           <label>Posición Y <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system2Y"><output></output></span></label>
           <label>Posición Z <span><input type="range" min="-100" max="10" step="0.05" data-lighting="system2Z"><output></output></span></label>
@@ -2093,24 +2005,6 @@ ${stonePositionsMarkup(4)}
           <label>Rotación Y <span><input type="range" min="-180" max="180" step="1" data-lighting="system2RotY"><output></output></span></label>
           <label>Rotación Z <span><input type="range" min="-180" max="180" step="1" data-lighting="system2RotZ"><output></output></span></label>
           <label>Escala <span><input type="range" min="0.2" max="100" step="0.05" data-lighting="system2Scale"><output></output></span></label>
-        </details>
-        <details><summary>Sistema · canal 3</summary>
-          <label>Posición X <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system3X"><output></output></span></label>
-          <label>Posición Y <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system3Y"><output></output></span></label>
-          <label>Posición Z <span><input type="range" min="-100" max="10" step="0.05" data-lighting="system3Z"><output></output></span></label>
-          <label>Rotación X <span><input type="range" min="-180" max="180" step="1" data-lighting="system3RotX"><output></output></span></label>
-          <label>Rotación Y <span><input type="range" min="-180" max="180" step="1" data-lighting="system3RotY"><output></output></span></label>
-          <label>Rotación Z <span><input type="range" min="-180" max="180" step="1" data-lighting="system3RotZ"><output></output></span></label>
-          <label>Escala <span><input type="range" min="0.2" max="100" step="0.05" data-lighting="system3Scale"><output></output></span></label>
-        </details>
-        <details><summary>Sistema · canal 4</summary>
-          <label>Posición X <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system4X"><output></output></span></label>
-          <label>Posición Y <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system4Y"><output></output></span></label>
-          <label>Posición Z <span><input type="range" min="-100" max="10" step="0.05" data-lighting="system4Z"><output></output></span></label>
-          <label>Rotación X <span><input type="range" min="-180" max="180" step="1" data-lighting="system4RotX"><output></output></span></label>
-          <label>Rotación Y <span><input type="range" min="-180" max="180" step="1" data-lighting="system4RotY"><output></output></span></label>
-          <label>Rotación Z <span><input type="range" min="-180" max="180" step="1" data-lighting="system4RotZ"><output></output></span></label>
-          <label>Escala <span><input type="range" min="0.2" max="100" step="0.05" data-lighting="system4Scale"><output></output></span></label>
         </details>
         <details><summary>Estrellas</summary>
           <label>Cantidad <span><input type="range" min="0" max="5000" step="50" data-lighting="starCount"><output></output></span></label>
@@ -2138,14 +2032,6 @@ ${stonePositionsMarkup(4)}
       {
         label: "02 · 3D",
         groups: [
-          "Horizonte",
-          "Tierra · canal 1",
-          "Tierra · canal 2",
-          "Tierra · canal 3",
-          "Tierra · canal 4",
-          "Piso 3D",
-          "Piedras",
-          "Iluminación suelo",
           "Ambiente",
           "Principal cálida",
           "Contraluz violeta",
@@ -2154,15 +2040,19 @@ ${stonePositionsMarkup(4)}
           "Órbitas",
           "Sol",
           "Sistema",
-          "Sistema · canal 1",
-          "Sistema · canal 2",
-          "Sistema · canal 3",
-          "Sistema · canal 4",
+          "Sistema · layout A",
+          "Sistema · layout B",
+          "Onda layout",
           "Render",
         ],
       },
-      { label: "03 · Grainy blur", groups: ["Grainy blur"] },
-      { label: "04 · UI", groups: ["Layout", "Manifiesto", "Carta", "Carta foil", "Carta mapeo", "Carta extras"] },
+      // The stones only show in the closing scene (footer); their ground is a shadow catcher there.
+      {
+        label: "03 · Piedras (cierre)",
+        groups: ["Piedras", "Piedras · luces", "Iluminación suelo", "Piso sombras"],
+      },
+      { label: "04 · Grainy blur", groups: ["Grainy blur"] },
+      { label: "05 · Carta", groups: ["Carta", "Carta foil", "Carta extras"] },
     ];
     const panelBody = panel.querySelector(".lighting-panel__body");
     const resetButton = panel.querySelector("[data-lighting-reset]");
@@ -2234,7 +2124,12 @@ ${stonePositionsMarkup(4)}
         const key = input.dataset.lighting;
         settings[key] = input.type === "checkbox" ? input.checked : input.type === "range" ? Number(input.value) : input.value;
         const channelPose = key.match(/^system([1-4])(X|Y|Z|RotX|RotY|RotZ|Scale)$/);
-        if (channelPose) this.showChannel?.(Number(channelPose[1]) - 1);
+        // V2: the channel 1·2 poses are layouts A·B, so the header switch follows the edited pose.
+        const layout = this.isV2Home && channelPose && { 1: "a", 2: "b" }[channelPose[1]];
+        if (layout) {
+          const toggle = document.querySelector("[data-altar-layout-toggle]");
+          if (toggle && (toggle.getAttribute("aria-checked") === "true") !== (layout === "b")) toggle.click();
+        } else if (channelPose) this.showChannel?.(Number(channelPose[1]) - 1);
         const channelGround = key.match(/^tierra([1-4])/);
         if (channelGround) this.showChannel?.(Number(channelGround[1]) - 1);
         updateOutputs();
@@ -2315,7 +2210,7 @@ ${stonePositionsMarkup(4)}
 
           node.position.set(...slot.position);
           node.rotation.set(0.08, Math.random() * Math.PI, key === "saturn" ? -0.28 : 0);
-          fitMeshToRadius(node, slot.radius);
+          fitMeshToRadius(node, slot.radius * (key === "sun" ? 1 : 0.38));
           node.userData.basePosition = node.position.clone();
           node.userData.spinSpeed = 0.035 + Math.random() * 0.07;
           this.spinners.push(node);
@@ -2327,7 +2222,7 @@ ${stonePositionsMarkup(4)}
         pendingRing.forEach((ring) => {
           ring.position.copy(saturnPosition || new THREE.Vector3(...PLANET_LAYOUT.saturn.position));
           ring.rotation.set(0.08, 0, -0.28);
-          fitMeshToRadius(ring, 1.02);
+          fitMeshToRadius(ring, 1.02 * 0.38);
           ring.userData.basePosition = ring.position.clone();
           this.spinners.push(ring);
         });
@@ -2387,6 +2282,23 @@ ${stonePositionsMarkup(4)}
   setupSun() {
     const materials = Array.isArray(this.sun.material) ? this.sun.material : [this.sun.material];
     this.sunMaterials = materials.filter((material) => material && "emissiveIntensity" in material);
+    // Keep the existing solar texture as relief, recolored by the GUI emission color.
+    // Its baked orange previously overpowered the salmon palette.
+    this.sunMaterials.forEach((material) => {
+      material.color.set(0x000000);
+      material.onBeforeCompile = (shader) => {
+        shader.fragmentShader = shader.fragmentShader.replace(
+          "#include <emissivemap_fragment>",
+          `#ifdef USE_EMISSIVEMAP
+            vec4 solarTexture = texture2D(emissiveMap, vEmissiveMapUv);
+            float solarRelief = dot(solarTexture.rgb, vec3(0.2126, 0.7152, 0.0722));
+            totalEmissiveRadiance *= 0.3 + 0.9 * solarRelief;
+          #endif`
+        );
+      };
+      material.customProgramCacheKey = () => "altar-salmon-sun-v1";
+      material.needsUpdate = true;
+    });
     this.sunBaseScale = this.sun.scale.x;
     this.sunRadius = PLANET_LAYOUT.sun.radius;
 
@@ -2493,7 +2405,7 @@ ${stonePositionsMarkup(4)}
 
   // Each channel has its own pose for the solar system; switching glides to it with the reveal wave.
   currentSystemPose(settings) {
-    const target = this.systemPoseFor(this.channelIndex ?? 0, settings);
+    const target = this.systemPoseFor(this.systemPoseIndex ?? this.channelIndex ?? 0, settings);
     const move = this.systemMove;
     if (!move) return target;
     const t = Math.min((performance.now() - move.start) / CHANNEL_REVEAL_MS, 1);
@@ -2509,7 +2421,18 @@ ${stonePositionsMarkup(4)}
     const settings = this.effectSettings ?? DEFAULT_LIGHTING;
     const from = this.system ? this.currentSystemPose(settings) : null;
     this.channelIndex = index;
+    this.systemPoseIndex = index;
     this.systemMove = animate && from ? { from, start: performance.now() } : null;
+  }
+
+  // V2 header switch: glides the system to channel 1's pose (layout A) or channel 2's (layout B)
+  // without touching the channel's colours, photos or ground.
+  moveSystemToPose(index) {
+    if (index === (this.systemPoseIndex ?? this.channelIndex ?? 0)) return;
+    const settings = this.effectSettings ?? DEFAULT_LIGHTING;
+    const from = this.system ? this.currentSystemPose(settings) : null;
+    this.systemPoseIndex = index;
+    this.systemMove = from && !REDUCED_MOTION.matches ? { from, start: performance.now() } : null;
   }
 
   updateSystem(time, delta) {
@@ -2603,11 +2526,11 @@ ${stonePositionsMarkup(4)}
 
   setupFoilCards() {
     this.foilCards = [];
-    // One deck for every channel: the front is always the star; the revealed face is one of the figures, at random.
+    // One deck for every channel: the front is always the Artwork card; the revealed face is one of the figures, at random.
     this.cardVariantIndex = pickCardVariant();
     if (!window.WebGLRenderingContext) return;
 
-    this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
+    this.cardRoot.querySelectorAll("[data-foil-card]").forEach((card) => {
       const canvas = card.querySelector(".altar-solar__foil-canvas");
       const baseUrl = card.dataset.foilBase;
       const foilUrl = card.dataset.foilMap;
@@ -2819,6 +2742,16 @@ ${stonePositionsMarkup(4)}
       this.moveSystemToChannel(current, false);
       this.moveGroundToChannel(current, false);
     };
+    // V2 header switch: the channel reveal wave, repainting the current background so colours stay,
+    // plus its rings pass over the 3D scene (still under the hero photo and the gallery).
+    // Every flip plays it; a flip mid-wave restarts it from the beginning.
+    this.playLayoutWave = (source) => {
+      if (REDUCED_MOTION.matches || !source) return;
+      const color = this.effectSettings?.layoutWaveColor ?? DEFAULT_LIGHTING.layoutWaveColor;
+      const colors = { bandColor: color, edgeColor: color };
+      this.channelReveal?.play(backgroundFor(current), source, () => {}, { edgeColor: color });
+      this.channelRings?.play(backgroundFor(current), source, () => {}, colors);
+    };
     this.playCardWave = (source) => {
       if (REDUCED_MOTION.matches || busy) return;
       this.channelRings?.play(backgroundFor(current), source, () => {}, { bandColor: CARD_WAVE_COLOR });
@@ -2867,7 +2800,7 @@ ${stonePositionsMarkup(4)}
   }
 
   // Ground palette of a channel (section 2): colors of the 3D ground and horizon, plus the
-  // stone lights. Each channel has its own set in the GUI ("Tierra · canal N").
+  // stone lights. Each channel has its own set; v2 stays on channel 1, edited in the GUI as "Piedras · luces".
   groundPaletteFor(index, settings = this.lightingBase ?? DEFAULT_LIGHTING) {
     const value = (key) => settings[`tierra${index + 1}${key}`];
     return {
@@ -3018,7 +2951,7 @@ ${stonePositionsMarkup(4)}
     makeDraggable(this.root.querySelector(".altar-solar__campaign"));
     makeDraggable(this.root.querySelector("[data-ground-campaign]"));
     // Touch keeps scrolling the page over the card; mouse and pen can drag it.
-    makeDraggable(this.root.querySelector(".altar-solar__fortune-cards"), { allowTouch: false });
+    if (this.cardRoot === this.root) makeDraggable(this.cardRoot.querySelector(".altar-solar__fortune-cards"), { allowTouch: false });
     const player = this.root.querySelector(".altar-solar__player");
     makeDraggable(player, { handle: player?.querySelector("[data-drag-handle]") });
   }
@@ -3075,7 +3008,7 @@ ${stonePositionsMarkup(4)}
 
 
   setupFortuneFlip() {
-    const flip = this.root.querySelector("[data-fortune-flip]");
+    const flip = this.cardRoot.querySelector("[data-fortune-flip]");
     if (!flip) return;
     const front = flip.querySelector(".altar-solar__fortune-face--front");
     const back = flip.querySelector(".altar-solar__fortune-face--back");
@@ -3084,6 +3017,7 @@ ${stonePositionsMarkup(4)}
 
     // Flipped cards travel to the viewport center and grow; flipping back returns them to their spot.
     const setFocused = (focused) => {
+      if (this.cardRoot !== this.root) return; // V2 reveals the phrase in place within the manifesto.
       if (!cardsContainer || focused === cardsContainer.classList.contains("is-focused")) return;
       clearTimeout(this.fortuneFocusTimer);
       cardsContainer.classList.add("is-animating-focus");
@@ -3138,6 +3072,7 @@ ${stonePositionsMarkup(4)}
       setFocused(flipped);
       flip.classList.toggle("is-flipped", flipped);
       flip.setAttribute("aria-pressed", String(flipped));
+      flip.setAttribute("aria-label", flipped ? "Volver al frente de la carta" : "Revelar frase");
       front?.setAttribute("aria-hidden", String(flipped));
       back?.setAttribute("aria-hidden", String(!flipped));
       if (!flipped) return;
@@ -3157,7 +3092,7 @@ ${stonePositionsMarkup(4)}
       // Revealing the message sends a pulse of light out from the card.
       if (opening) {
         this.revealFortunePhrase();
-        this.playCardWave?.(flip);
+        if (this.cardRoot === this.root) this.playCardWave?.(flip);
       }
       setFlipped(opening);
     };
@@ -3178,11 +3113,12 @@ ${stonePositionsMarkup(4)}
 
     flip.addEventListener("click", toggle);
     flip.addEventListener("keydown", (event) => {
+      if (flip.tagName === "BUTTON") return;
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
       toggle();
     });
-    const cards = this.root.querySelector(".altar-solar__fortune-cards");
+    const cards = this.cardRoot.querySelector(".altar-solar__fortune-cards");
     const revealButton = this.root.querySelector(".altar-solar__reveal-card");
     const setOpen = (open) => {
       this.fortuneOpen = open;
@@ -3197,7 +3133,10 @@ ${stonePositionsMarkup(4)}
     // The card starts open (markup ships with .is-open) so the CTA is visible right away.
     setOpen(Boolean(cards?.classList.contains("is-open")));
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && this.fortuneOpen) setOpen(false);
+      if (event.key === "Escape" && this.fortuneOpen) {
+        if (this.cardRoot !== this.root) setFlipped(false);
+        else setOpen(false);
+      }
     });
   }
 
@@ -3205,7 +3144,7 @@ ${stonePositionsMarkup(4)}
   // The image is composed as soon as the card has landed, so the tap can open the share sheet right away
   // (Safari only allows it straight from the tap). Phones get the share sheet, desktops a download.
   setupFortuneShare() {
-    const panel = this.root.querySelector("[data-fortune-share]");
+    const panel = this.cardRoot.querySelector("[data-fortune-share]");
     const button = panel?.querySelector("[data-fortune-share-button]");
     const cards = panel?.closest(".altar-solar__fortune-cards");
     if (!panel || !button || !cards) return;
@@ -3364,7 +3303,7 @@ ${stonePositionsMarkup(4)}
   // The front artwork never changes.
   setCardVariant(index) {
     this.cardVariantIndex = index;
-    this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
+    this.cardRoot.querySelectorAll("[data-foil-card]").forEach((card) => {
       const frameUrl = messageFrameUrl(card, index);
       if (!frameUrl) return;
       const message = card.querySelector(".altar-solar__fortune-copy p");
@@ -3461,7 +3400,7 @@ ${stonePositionsMarkup(4)}
 
   // Warms the image cache for a figure so revealing it never waits on the network.
   preloadCardVariant(index) {
-    this.root.querySelectorAll("[data-foil-card]").forEach((card) => {
+    this.cardRoot.querySelectorAll("[data-foil-card]").forEach((card) => {
       const frameUrl = messageFrameUrl(card, index);
       if (frameUrl) loadImage(frameUrl).catch(() => {});
     });
@@ -3531,8 +3470,19 @@ ${stonePositionsMarkup(4)}
     window.addEventListener("pointermove", (event) => {
       this.pointer.set((event.clientX / window.innerWidth) * 2 - 1, (event.clientY / window.innerHeight) * 2 - 1);
     }, { passive: true });
+    if (this.isV2Home) {
+      document.addEventListener("altar:home-layout", (event) => {
+        this.moveSystemToPose(event.detail.layout === "b" ? 1 : 0);
+        // The layout swap resizes the gallery and so the stage: size it now, before the wave measures it,
+        // or the reveal canvas gets stretched and the circle turns into an oval.
+        this.resize();
+        // The wave grows as a circle from the centre of the hero photo.
+        this.playLayoutWave?.(document.getElementById("altar-hero-campaign") ?? document.querySelector("[data-altar-layout-toggle]"));
+      });
+    }
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.stage);
+    if (this.gallery) this.resizeObserver.observe(this.gallery);
     this.intersectionObserver = new IntersectionObserver(([entry]) => {
       this.visible = entry.isIntersecting;
     }, { rootMargin: "20%" });
@@ -3585,15 +3535,81 @@ ${stonePositionsMarkup(4)}
     this.tramoHud.textContent = `Tramo ${index + 1} de ${this.tramoBounds.length} · ${tramo.name} · ${progress}%`;
   }
 
+  // V2 hands the same canvas, scene and stone objects to the closing section.
+  // A separate view camera leaves the hero camera and its composition unchanged.
+  setupClosingScene() {
+    this.closingStage = document.querySelector("[data-altar-closing-stage]");
+    if (!this.closingStage) return;
+    this.canvasHome = { parent: this.canvas.parentNode, next: this.canvas.nextSibling };
+    this.closingCamera = this.camera.clone();
+    this.closingShadowMaterial = new THREE.ShadowMaterial({ color: 0x091e2b, opacity: 0.22 });
+    this.closingObserver = new IntersectionObserver(([entry]) => {
+      const active = entry.isIntersecting;
+      if (active === Boolean(this.closingActive)) return;
+      this.closingActive = active;
+      if (active) {
+        this.closingStage.appendChild(this.canvas);
+        this.closingGroundColor = this.groundMaterial?.color.clone();
+      } else {
+        this.canvasHome.parent.insertBefore(this.canvas, this.canvasHome.next);
+        if (this.closingGroundColor) this.groundMaterial?.color.copy(this.closingGroundColor);
+        this.canvas.style.removeProperty("translate");
+      }
+      this.resize();
+    }, { rootMargin: "15%" });
+    this.closingObserver.observe(this.closingStage);
+    this.resizeObserver.observe(this.closingStage);
+  }
+
+  resizeClosingScene() {
+    const { width, height } = this.closingStage.getBoundingClientRect();
+    if (!width || !height) return;
+    this.renderer.setPixelRatio(clampDpr());
+    this.renderer.setSize(width, height, false);
+    this.closingCamera.copy(this.camera);
+    this.closingCamera.aspect = width / height;
+    const zoom = 1.8 * Math.min(1, (width / height) / 3);
+    this.closingCamera.zoom = zoom;
+    this.closingCamera.setViewOffset(width, height, 0, height * (0.05 + 1.17 * zoom), width, height);
+    this.closingCamera.updateProjectionMatrix();
+  }
+
+  drawClosingScene() {
+    const style = getComputedStyle(this.closingStage);
+    const color = style.backgroundColor;
+    const oldClear = this.renderer.getClearColor(new THREE.Color());
+    const oldAlpha = this.renderer.getClearAlpha();
+    const oldMapping = this.renderer.toneMapping;
+    const oldExposure = this.renderer.toneMappingExposure;
+    this.renderer.setClearColor(color, 1);
+    this.renderer.autoClear = true;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = Number(this.effectSettings?.ground3dExposure ?? DEFAULT_LIGHTING.ground3dExposure);
+    const groundMaterial = this.ground?.material;
+    if (this.ground) this.ground.material = this.closingShadowMaterial;
+    this.closingCamera.layers.set(STONE_LAYER);
+    this.renderer.render(this.scene, this.closingCamera);
+    if (this.ground) this.ground.material = groundMaterial;
+    this.renderer.setClearColor(oldClear, oldAlpha);
+    this.renderer.toneMapping = oldMapping;
+    this.renderer.toneMappingExposure = oldExposure;
+    const bounds = this.closingStage.getBoundingClientRect();
+    const progress = THREE.MathUtils.clamp((window.innerHeight - bounds.top) / Math.min(bounds.height, window.innerHeight), 0, 1);
+    this.canvas.style.translate = `0 ${REDUCED_MOTION.matches ? 0 : -60 * (1 - progress)}px`;
+  }
+
   resize() {
+    if (this.closingActive) return this.resizeClosingScene();
     this.updateSectionGuide();
+    // V2: the stage reaches down behind the whole gallery, whatever its height.
+    if (this.gallery) this.root.style.setProperty("--altar-gallery-height", `${this.gallery.offsetHeight}px`);
     const { width, height } = this.stage.getBoundingClientRect();
     if (!width || !height || !this.renderer) return;
     this.renderer.setPixelRatio(clampDpr());
     this.renderer.setSize(width, height, false);
     this.horizonMaterial?.uniforms.uResolution.value.set(width, height);
     // The stage spans sections 1 and 2; frame the scene on the first screen and extend the view downward.
-    const screenHeight = height / 2;
+    const screenHeight = this.gallery ? height - this.gallery.offsetHeight : height / 2;
     this.camera.aspect = width / screenHeight;
     this.camera.setViewOffset(width, screenHeight, 0, 0, width, height);
     this.camera.updateProjectionMatrix();
@@ -3615,7 +3631,7 @@ ${stonePositionsMarkup(4)}
         }
       });
     }
-    if (!this.visible || !this.renderer) return;
+    if ((!this.visible && !this.closingActive) || !this.renderer) return;
     this.updateStars(REDUCED_MOTION.matches ? 0 : this.timer.getElapsed(), REDUCED_MOTION.matches ? 0 : delta);
     this.updateSystem(this.timer.getElapsed(), delta);
     if (!REDUCED_MOTION.matches) this.updateShootingStars(this.timer.getElapsed(), delta);
@@ -3628,13 +3644,14 @@ ${stonePositionsMarkup(4)}
   // One full frame of the 3D layer (sky scene, horizon, ground stones). Also called right before the
   // share image reads the canvas, which is only valid in the same task as the draw.
   drawScene() {
+    if (this.closingActive) return this.drawClosingScene();
     this.camera.layers.set(0);
     this.renderer.autoClear = true;
     this.renderer.render(this.scene, this.camera);
     this.renderer.autoClear = false;
     this.renderer.clearDepth();
-    if (this.horizonMesh?.visible) this.renderer.render(this.horizonScene, this.horizonCamera);
-    if (this.stonesReady) {
+    if (this.horizonMesh?.visible && !this.isV2Home) this.renderer.render(this.horizonScene, this.horizonCamera);
+    if (this.stonesReady && !this.isV2Home) {
       const toneMapping = this.renderer.toneMapping;
       const exposure = this.renderer.toneMappingExposure;
       // The stage spans sections 1 and 2; the physical ground and stones belong to section 2 only.
@@ -3767,6 +3784,7 @@ const CHANNELS = [
 const CHANNEL_REVEAL_MS = 2100;
 const CHANNEL_ZOOM_MS = 2200;
 const CARD_WAVE_COLOR = "#f6e9a5";
+const WAVE_EDGE_COLOR = "#fff3a9";
 
 // Fortune card message: the relief map is the channel's textless frame plus one of these phrases,
 // drawn at 3× the 236 × 358 card. Layout follows Figma's "Fortune message" text block.
@@ -3815,8 +3833,9 @@ const FORTUNE_PHRASES = [
 const MESSAGE_MAP_WIDTH = 708;
 const MESSAGE_MAP_HEIGHT = 1074;
 const MESSAGE_FONT_FAMILY = "Altar Fortune";
-// Figma's text block starts a little higher on each channel's card, following its symbol.
-const MESSAGE_TOPS = [196.894, 192.517, 185.983, 185.357];
+// Figma (Fortune card / Message, 611:2655): every symbol sits in a 150px frame, so the text block starts at
+// the same height on all four cards (the dots frame is 0.248px taller).
+const MESSAGE_TOPS = [199.357, 199.357, 199.481, 199.357];
 const MESSAGE_LAYOUT = { x: 21.752, width: 192.496, fontSize: 14, lineHeight: 1.1, minFontSize: 11, maxLines: 5, color: "#8c8c8c", baselineNudge: -5 / 3 };
 const FORTUNE_SEEN_KEY = "altar-fortune-seen";
 
@@ -4073,7 +4092,7 @@ function createChannelReveal(stage, { ringsOnly = false } = {}) {
     uSpace: { value: new THREE.Vector3() },
     uGlowColors: { value: [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()] },
     uGlowShapes: { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] },
-    uEdgeColor: { value: new THREE.Vector3(...hexToRgbArray("#fff3a9")) },
+    uEdgeColor: { value: new THREE.Vector3(...hexToRgbArray(WAVE_EDGE_COLOR)) },
     uRingsOnly: { value: ringsOnly ? 1 : 0 },
     uBand: { value: 1 },
     uEdgeGain: { value: 1 },
@@ -4130,9 +4149,10 @@ function createChannelReveal(stage, { ringsOnly = false } = {}) {
 
   return {
     // bandColor: sweep a band of that flat color instead of the next sky (the fortune card pulse);
-    // the scene underneath is left untouched once the wave has passed.
-    play(background, source, onDone, { bandColor = null } = {}) {
+    // the scene underneath is left untouched once the wave has passed. edgeColor: the front's glow.
+    play(background, source, onDone, { bandColor = null, edgeColor = WAVE_EDGE_COLOR } = {}) {
       uniforms.uBand.value = 1;
+      uniforms.uEdgeColor.value.set(...hexToRgbArray(edgeColor));
       uniforms.uBandTint.value = bandColor ? 1 : 0;
       if (bandColor) uniforms.uBandColor.value.set(...hexToRgbArray(bandColor));
       if (frame) complete();
