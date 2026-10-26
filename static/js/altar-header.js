@@ -35,8 +35,10 @@
     }
     var spotify = event.target.closest("[data-altar-spotify-toggle]");
     if (spotify) {
-      var original = document.querySelector(".altar-solar__open-player");
-      if (original) original.click();
+      // PLAY opens the track of the current moment of the day straight in Spotify (app or web), in a new tab.
+      var player = document.querySelector(".altar-solar__open-player");
+      var url = player && (player.dataset.currentSpotifyUrl || player.dataset.spotifyUrl);
+      if (url) window.open(url, "_blank", "noopener");
       return;
     }
     var toggle = event.target.closest("[data-altar-menu-toggle]");
@@ -52,18 +54,6 @@
     if (event.key === "Escape") closeAll();
   });
 
-  function syncSpotify() {
-    var player = document.getElementById("altar-player");
-    if (!player || player.dataset.headerObserved) return;
-    player.dataset.headerObserved = "true";
-    var sync = function () {
-      document.querySelectorAll("[data-altar-spotify-toggle]").forEach(function (button) {
-        button.setAttribute("aria-expanded", String(player.classList.contains("is-open")));
-      });
-    };
-    new MutationObserver(sync).observe(player, { attributes: true, attributeFilter: ["class"] });
-    sync();
-  }
   // Share the hero's actual media with its continuation, including editor updates.
   function syncHeroMedia() {
     var image = document.querySelector(".altar-hero-v2__media--expanded");
@@ -81,8 +71,6 @@
   }
   syncHeroMedia();
   document.addEventListener("section:load", syncHeroMedia);
-  syncSpotify();
-  document.addEventListener("section:load", syncSpotify);
 
   DESKTOP.addEventListener("change", function (query) {
     if (query.matches) closeAll();

@@ -52,10 +52,10 @@ const DEFAULT_LIGHTING = {
   exposure: 0.9,
   toneMapping: "Linear",
   effectBlur: 0,
-  grainOpacity: 0.075,
-  grainFrequency: 0.5,
+  grainOpacity: 0.01,
+  grainFrequency: 0.65,
   grainSpeed: 10,
-  sectionGrainOpacity: 0.16,
+  sectionGrainOpacity: 0.05,
   orbitSpeed: 0.1,
   orbitKepler: 1.6,
   orbitTilt: 69,
@@ -2976,6 +2976,8 @@ ${stonePositionsMarkup(1)}
       }
       if (next !== slot) {
         slot = next;
+        // The header PLAY opens this same track in Spotify.
+        button.dataset.currentSpotifyUrl = slot.url;
         const iframe = player.querySelector("iframe");
         if (iframe && embedUrl()) iframe.src = embedUrl();
       }
@@ -3575,13 +3577,12 @@ ${stonePositionsMarkup(1)}
   }
 
   drawClosingScene() {
-    const style = getComputedStyle(this.closingStage);
-    const color = style.backgroundColor;
     const oldClear = this.renderer.getClearColor(new THREE.Color());
     const oldAlpha = this.renderer.getClearAlpha();
     const oldMapping = this.renderer.toneMapping;
     const oldExposure = this.renderer.toneMappingExposure;
-    this.renderer.setClearColor(color, 1);
+    // Transparent: the section's own background and its grain show under the stones.
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.autoClear = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = Number(this.effectSettings?.ground3dExposure ?? DEFAULT_LIGHTING.ground3dExposure);
@@ -4324,18 +4325,46 @@ function playIntro() {
   splitChars($(".altar-solar__fortune-cta-text span"), { base: 1460, stagger: 20 });
   splitChars($(".altar-nav__metadata > span"), { base: 1550, stagger: 35 });
   introAnimate($(".altar-solar__fortune-cta-icon"), fade(200, 1440));
-  // Menu and actions type in left to right, each arrow icon just ahead of its label.
-  document.querySelectorAll(".altar-nav__menu a").forEach((link, index) => splitChars(link, { base: 1000 + index * 120, stagger: 35 }));
-  // Only the actions on screen take a turn. On tablet / mobile the bar shows just the brand and Menu, so Menu types in
-  // right after the wordmark instead of waiting behind the hidden Cart, Search and Login.
   const isShown = (element) => element && getComputedStyle(element).display !== "none" && element.getClientRects().length > 0;
-  // Desktop actions follow the screen order (Search, then Login over Cart) as soon as the frame has drawn.
-  [".altar-nav__search", ".altar-nav__account", ".altar-nav__cart"].map((selector) => $(selector)).filter(isShown).forEach((link, index) => {
-    introAnimate(link.querySelector(".altar-nav__action-icon"), fade(200, 650 + index * 120));
-    link.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 700 + index * 120 + partIndex * 140, stagger: 35 }));
-  });
-  const menuToggle = $(".altar-nav__menu-toggle");
-  if (isShown(menuToggle)) menuToggle.querySelectorAll(":scope > span").forEach((part) => splitChars(part, { base: 600, stagger: 35 }));
+  const navV2 = $(".altar-nav--v2");
+  // V2 hero photo: unveiled from the bottom up right after the logo, its picture settling from a slight zoom.
+  const heroCampaign = $(".altar-hero-v2__campaign");
+  if (navV2 && isShown(heroCampaign)) {
+    introAnimate(heroCampaign, "altar-intro-image 1200ms cubic-bezier(0.16, 1, 0.3, 1) 500ms both");
+    heroCampaign.querySelectorAll(".altar-hero-v2__media").forEach((media) => media.animate(
+      [{ transform: "scale(1.12)" }, { transform: "scale(1)" }],
+      { duration: 1800, delay: 500, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "backwards" },
+    ));
+  }
+  if (navV2) {
+    // V2 bar: after the logo, every item on screen comes in strictly left to right
+    // (switch, PLAY, divider, menu, Search, Log in, cart count; on mobile just switch, PLAY and Menu).
+    const items = [...navV2.querySelectorAll(
+      ".altar-nav__layout-switch, .altar-nav__spotify, .altar-nav__experience-divider, .altar-nav__menu > *, .altar-nav__search, .altar-nav__account, .altar-nav__cart, .altar-nav__menu-toggle",
+    )].filter(isShown);
+    items.forEach((item, index) => {
+      const base = 350 + index * 110;
+      if (item.matches(".altar-nav__layout-switch")) introAnimate(item, fade(250, base));
+      else if (item.matches(".altar-nav__experience-divider")) introAnimate(item, `altar-intro-divider 300ms ease-out ${base}ms both`);
+      // The count's parentheses are pseudo-elements, so the whole "(0)" fades in as one.
+      else if (item.matches(".altar-nav__cart")) introAnimate(item.querySelector(".altar-nav__count"), fade(250, base));
+      // Buttons type in only their label span: splitting the whole button would turn its markup
+      // whitespace into visible letters and widen it.
+      else splitChars(item.querySelector(":scope > span") ?? item, { base, stagger: 35 });
+    });
+  } else {
+    // Menu and actions type in left to right, each arrow icon just ahead of its label.
+    document.querySelectorAll(".altar-nav__menu a").forEach((link, index) => splitChars(link, { base: 1000 + index * 120, stagger: 35 }));
+    // Only the actions on screen take a turn. On tablet / mobile the bar shows just the brand and Menu, so Menu types in
+    // right after the wordmark instead of waiting behind the hidden Cart, Search and Login.
+    // Desktop actions follow the screen order (Search, then Login over Cart) as soon as the frame has drawn.
+    [".altar-nav__search", ".altar-nav__account", ".altar-nav__cart"].map((selector) => $(selector)).filter(isShown).forEach((link, index) => {
+      introAnimate(link.querySelector(".altar-nav__action-icon"), fade(200, 650 + index * 120));
+      link.querySelectorAll(":scope > span").forEach((part, partIndex) => splitChars(part, { base: 700 + index * 120 + partIndex * 140, stagger: 35 }));
+    });
+    const menuToggle = $(".altar-nav__menu-toggle");
+    if (isShown(menuToggle)) menuToggle.querySelectorAll(":scope > span").forEach((part) => splitChars(part, { base: 600, stagger: 35 }));
+  }
   document.querySelectorAll(".altar-solar__manifesto-ids > span").forEach((part, index) => splitChars(part, { base: 2200 + index * 300, stagger: 35 }));
 
   // 1.7–3 s · controls load in; the ticker is unmasked left to right.
@@ -4352,9 +4381,9 @@ function playIntro() {
   html.classList.add("altar-intro--play");
   setTimeout(() => {
     html.classList.remove("altar-intro", "altar-intro--play");
-    document.querySelectorAll("[data-intro-split], .altar-nav__logo, .altar-nav__action-icon, .altar-solar__fortune-cta-icon, .altar-nav__divider, .altar-nav__rule, [data-fortune-flip], .altar-solar__campaign, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player, .altar-solar__marquee")
+    document.querySelectorAll("[data-intro-split], .altar-hero-v2__campaign, .altar-nav__logo, .altar-nav__layout-switch, .altar-nav__experience-divider, .altar-nav__count, .altar-nav__action-icon, .altar-solar__fortune-cta-icon, .altar-nav__divider, .altar-nav__rule, [data-fortune-flip], .altar-solar__campaign, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player, .altar-solar__marquee")
       .forEach((element) => {
-        if (element.style.animation.startsWith("altar-intro")) element.style.animation = "";
+        if (element.style.animation.includes("altar-intro")) element.style.animation = "";
       });
   }, INTRO_END);
 }

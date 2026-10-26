@@ -10,7 +10,7 @@
 {% set altar_date = section.settings.altar_metadata_date %}
 {% set altar_location = section.settings.altar_metadata_location | default('C.A.B.A. (ARG)') %}
 {% set altar_search_label = section.settings.altar_search_label | default('Search') %}
-{% set altar_login_label = template == 'home' ? 'Log in' : (section.settings.altar_login_label | default('Login')) %}
+{% set altar_login_label = 'Log in' %}
 {% set altar_account_label = section.settings.altar_account_label | default('Account') %}
 {% set altar_cart_label = section.settings.altar_cart_label | default('Cart') %}
 {% set altar_menu_label = section.settings.altar_menu_label | default('Menu') %}
@@ -27,9 +27,17 @@
 {% elseif template == 'contact' %}
 	{% set altar_page = 'contacto' %}
 {% endif %}
+{# V2 navigation on every page: Collection · The Star · Contact. The Star is active on its own category page. #}
+{% set altar_collection_url = section.settings.altar_collection_url | default(store.products_url) %}
+{% set altar_star_url = section.settings.altar_star_url %}
+{% set altar_star_active = altar_star_url and template == 'category' and category is defined and category.url
+	and (category.url == altar_star_url or category.url in altar_star_url or altar_star_url in category.url) %}
+{% set altar_menu_links %}<a href="{{ altar_collection_url }}"{% if altar_page == 'shop' and not altar_star_active %} class="is-active" aria-current="page"{% endif %}>Collection</a>
+{% if altar_star_url %}<a href="{{ altar_star_url }}"{% if altar_star_active %} class="is-active" aria-current="page"{% endif %}>The Star</a>{% else %}<span class="altar-nav__pending" aria-disabled="true" title="Página The Star pendiente de configurar">The Star</span>{% endif %}
+<a href="{{ store.contact_url }}"{% if altar_page == 'contacto' %} class="is-active" aria-current="page"{% endif %}>Contact</a>{% endset %}
 
 <div
-	class="js-head-main head-main head-main--altar altar-nav {% if template == 'home' %}altar-nav--v2{% endif %} {{ header_with_categories_classes }}"
+	class="js-head-main head-main head-main--altar altar-nav altar-nav--v2 {{ header_with_categories_classes }}"
 	data-store="head"
 	data-section-id="{{ section.id }}"
 	data-section-type="header"
@@ -82,26 +90,14 @@
 
 		{% if template == 'home' %}<div class="altar-nav__experience" aria-label="Controles de experiencia">
 <button type="button" class="altar-nav__layout-switch" data-altar-layout-toggle aria-controls="altar-hero-campaign" role="switch" aria-checked="false" aria-label="Usar layout alternativo"><span aria-hidden="true"></span></button>
-<button type="button" class="altar-nav__spotify" data-altar-spotify-toggle aria-controls="altar-player" aria-expanded="false">PLAY</button>
+<button type="button" class="altar-nav__spotify" data-altar-spotify-toggle aria-label="Escuchar en Spotify (abre una pestaña nueva)">PLAY</button>
 </div><span class="altar-nav__experience-divider" aria-hidden="true"></span>{% endif %}
 		<nav
 			class="altar-nav__menu"
 			aria-label="{{ 'Navegación principal' | translate }}"
 			{% if navigation_block %}{{ navigation_block | block_attributes }}{% endif %}
 		>
-			{% if template == 'home' %}
-<a href="{{ section.settings.altar_collection_url | default(store.products_url) }}">Collection</a>
-{% if section.settings.altar_star_url %}<a href="{{ section.settings.altar_star_url }}">The Star</a>{% else %}<span class="altar-nav__pending" aria-disabled="true" title="Página The Star pendiente de configurar">The Star</span>{% endif %}
-<a href="{{ store.contact_url }}">Contact</a>
-{% else %}{% for item in navigation %}
-				{% set altar_item_name = item.name | lower | trim %}
-				{% set altar_item_active = item.current
-					or (altar_page == 'home' and item.url == store.url)
-					or (altar_page == 'shop' and (item.url == store.products_url or altar_item_name in ['shop', 'tienda', 'store']))
-					or (altar_page == 'contacto' and (item.url == store.contact_url or altar_item_name in ['contacto', 'contact']))
-				%}
-				<a href="{{ item.url }}"{% if altar_item_active %} class="is-active" aria-current="page"{% endif %}{% if item.url | is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
-			{% endfor %}{% endif %}
+			{{ altar_menu_links }}
 		</nav>
 
 		<div class="altar-nav__actions" {% if utilities_block %}{{ utilities_block | block_attributes }}{% endif %}>
@@ -161,19 +157,7 @@
 	<div class="altar-nav__menu-rule" aria-hidden="true"></div>
 	<div class="altar-nav__panel" id="altar-nav-panel-{{ section.id }}" data-altar-menu-panel hidden>
 		<nav class="altar-nav__panel-menu" aria-label="{{ 'Navegación principal' | translate }}">
-			{% if template == 'home' %}
-<a href="{{ section.settings.altar_collection_url | default(store.products_url) }}">Collection</a>
-{% if section.settings.altar_star_url %}<a href="{{ section.settings.altar_star_url }}">The Star</a>{% else %}<span class="altar-nav__pending" aria-disabled="true" title="Página The Star pendiente de configurar">The Star</span>{% endif %}
-<a href="{{ store.contact_url }}">Contact</a>
-{% else %}{% for item in navigation %}
-				{% set altar_item_name = item.name | lower | trim %}
-				{% set altar_item_active = item.current
-					or (altar_page == 'home' and item.url == store.url)
-					or (altar_page == 'shop' and (item.url == store.products_url or altar_item_name in ['shop', 'tienda', 'store']))
-					or (altar_page == 'contacto' and (item.url == store.contact_url or altar_item_name in ['contacto', 'contact']))
-				%}
-				<a href="{{ item.url }}"{% if altar_item_active %} class="is-active" aria-current="page"{% endif %}{% if item.url | is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
-			{% endfor %}{% endif %}
+			{{ altar_menu_links }}
 		</nav>
 		<div class="altar-nav__panel-rule" aria-hidden="true"></div>
 		<div class="altar-nav__panel-utilities">

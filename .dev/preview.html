@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Altar — preview</title>
     <script>(function(d){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("altar-intro");setTimeout(function(){d.classList.remove("altar-intro")},4000)})(document.documentElement)</script>
-    <link rel="icon" href="../static/images/favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="../static/images/favicon-32.png" sizes="32x32" type="image/png">
-    <link rel="apple-touch-icon" href="../static/images/apple-touch-icon.png">
+    <link rel="icon" href="../static/images/altar-favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../static/images/altar-favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="../static/images/altar-apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Zalando+Sans:wght@400;700&family=Zalando+Sans+Expanded:wght@400;700&display=swap">
@@ -42,8 +42,8 @@
           </div>
           <div class="altar-nav__experience" aria-label="Controles de experiencia">
 <button type="button" class="altar-nav__layout-switch" data-altar-layout-toggle aria-controls="altar-hero-campaign" role="switch" aria-checked="false" aria-label="Usar layout alternativo"><span aria-hidden="true"></span></button>
-<button type="button" class="altar-nav__spotify" data-altar-spotify-toggle aria-controls="altar-player" aria-expanded="false">PLAY</button>
-</div><span class="altar-nav__experience-divider" aria-hidden="true"></span><nav class="altar-nav__menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><span class="altar-nav__pending" aria-disabled="true" title="Página The Star pendiente de configurar">The Star</span><a href="./ipanema.html#/contacto">Contact</a></nav>
+<button type="button" class="altar-nav__spotify" data-altar-spotify-toggle aria-label="Escuchar en Spotify (abre una pestaña nueva)">PLAY</button>
+</div><span class="altar-nav__experience-divider" aria-hidden="true"></span><nav class="altar-nav__menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><a href="./ipanema.html#/the-star">The Star</a><a href="./ipanema.html#/contacto">Contact</a></nav>
           <div class="altar-nav__actions">
             <div class="js-search-container altar-nav__action altar-nav__search-container">
               <button type="button" class="js-search-trigger altar-nav__search" aria-label="Buscar" aria-expanded="false">
@@ -65,7 +65,7 @@
         </div>
         <div class="altar-nav__menu-rule" aria-hidden="true"></div>
         <div class="altar-nav__panel" id="altar-nav-panel" data-altar-menu-panel hidden>
-          <nav class="altar-nav__panel-menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><span class="altar-nav__pending" aria-disabled="true" title="Página The Star pendiente de configurar">The Star</span><a href="./ipanema.html#/contacto">Contact</a></nav>
+          <nav class="altar-nav__panel-menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><a href="./ipanema.html#/the-star">The Star</a><a href="./ipanema.html#/contacto">Contact</a></nav>
           <div class="altar-nav__panel-rule" aria-hidden="true"></div>
           <div class="altar-nav__panel-utilities">
             <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span></button>
@@ -96,6 +96,7 @@
               <i class="altar-solar__glow altar-solar__glow--cyan"></i>
               <i class="altar-solar__glow altar-solar__glow--teal"></i>
             </div>
+            <svg class="altar-solar__grain altar-section-grain altar-solar__stage-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-stage-preview" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-stage-preview)"></rect></svg>
             <canvas class="altar-solar__canvas" aria-label="Sistema solar interactivo"></canvas>
             <section class="altar-solar__manifesto" aria-label="Manifiesto">
               <div class="altar-solar__manifesto-headline">
@@ -198,7 +199,7 @@
           <section class="altar-solar__ground altar-collection" id="coleccion" aria-label="Colección ELEMENTAL">
             <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
               <filter id="altar-grain-collection-preview" x="0" y="0" width="100%" height="100%">
-                <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
+                <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
                 <feColorMatrix type="saturate" values="0"></feColorMatrix>
               </filter>
               <rect width="100%" height="100%" filter="url(#altar-grain-collection-preview)"></rect>
@@ -228,7 +229,7 @@
           <section class="altar-closing altar-manifesto-v2" id="about" aria-label="Manifiesto de Altar">
             <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
               <filter id="altar-grain-closing-preview" x="0" y="0" width="100%" height="100%">
-                <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
+                <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
                 <feColorMatrix type="saturate" values="0"></feColorMatrix>
               </filter>
               <rect width="100%" height="100%" filter="url(#altar-grain-closing-preview)"></rect>
@@ -290,7 +291,7 @@
           <div class="altar-solar__effect" data-solar-effect aria-hidden="true">
             <svg class="altar-solar__grain" width="100%" height="100%" preserveAspectRatio="none">
               <filter id="altar-grain-preview" x="-20%" y="-20%" width="140%" height="140%">
-                <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
+                <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
                 <feColorMatrix type="saturate" values="0"></feColorMatrix>
               </filter>
               <rect width="100%" height="100%" filter="url(#altar-grain-preview)"></rect>
@@ -299,9 +300,9 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer"><div class="altar-closing-v2" id="closing"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>
+    <footer class="site-footer"><div class="altar-closing-v2" id="closing"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div><svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-closing-footer" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-closing-footer)"></rect></svg>
       <!-- Same structure as sections/altar-footer.tpl (Figma Footer / Site). -->
-      <div class="altar-footer altar-footer--color" data-header-theme="light" style="--footer-background:#FFF3A9;--footer-foreground:#601E2A;">
+      <div class="altar-footer altar-footer--v2 altar-footer--color" data-header-theme="light" style="--footer-background:#FFF3A9;--footer-foreground:#601E2A;">
         <div class="altar-footer__top">
           <div class="altar-footer__newsletter">
             <div class="altar-footer__newsletter-copy">

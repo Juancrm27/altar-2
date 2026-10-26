@@ -15,10 +15,10 @@
 
 {{ component('nubesdk-slot', { type: "before_footer" }) }}
 {% if template == 'home' %}
-<div class="altar-closing-v2" id="closing" style="--closing-bg-a: {{ footer_settings.background_color | default('#c6ca9f') }}; --closing-fg-a: {{ footer_settings.text_color | default('#091e2b') }}; --closing-bg-b: {{ footer_settings.alternate_background | default('#091e2b') }}; --closing-fg-b: {{ footer_settings.alternate_text | default('#c6ca9f') }};"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>{% endif %}
+<div class="altar-closing-v2" id="closing" style="--closing-bg-a: {{ footer_settings.background_color | default('#c6ca9f') }}; --closing-fg-a: {{ footer_settings.text_color | default('#091e2b') }}; --closing-bg-b: {{ footer_settings.alternate_background | default('#091e2b') }}; --closing-fg-b: {{ footer_settings.alternate_text | default('#c6ca9f') }};"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>{% include 'snippets/altar-grain.tpl' with { grain_id: 'closing-footer', grain_class: '' } %}{% endif %}
 
 <div
-  class="altar-footer {{ footer_theme_class }} js-hide-footer-while-scrolling"
+  class="altar-footer altar-footer--v2 {{ footer_theme_class }} js-hide-footer-while-scrolling"
   data-store="footer"
   data-section-id="{{ section.id }}"
   data-header-theme="light"

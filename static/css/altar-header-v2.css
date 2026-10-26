@@ -1,6 +1,13 @@
 /* Home V2 navigation · Figma Navigation / Site / Desktop (587:666). */
 .altar-nav.altar-nav--v2 { --altar-nav-color: #91938f; color: #91938f; padding: 0; background: #0f0f0f; font: 400 12px/24px Inter, Arial, sans-serif; letter-spacing: 0; }
 body.template-home .site-header:has(.altar-nav--v2), body.template-home .altar-nav.altar-nav--v2 { background: transparent; }
+/* Shop, product, contact and other pages: the same bar with no background of its own, in the commerce foreground
+   (black), and no hover effect on its words (the active page keeps its underline). */
+body.is-altar-commerce .altar-nav.altar-nav--v2 { --altar-nav-color: var(--altar-commerce-foreground, #000); color: var(--altar-commerce-foreground, #000); background: transparent; }
+body.is-altar-commerce .site-header:has(.altar-nav--v2), body.is-altar-commerce .head-main--altar.altar-nav--v2 { background: transparent !important; }
+body.is-altar-commerce .altar-nav--v2 > .altar-nav__grain { display: none; }
+body.is-altar-commerce .altar-nav--v2 :is(a, button):hover { color: inherit; }
+body.is-altar-commerce .altar-nav--v2 :is(a, button):not(.is-active):hover { text-decoration: none; }
 .altar-nav--v2 .altar-nav__content { display: flex; height: 99px; padding: 30px 32px; gap: 40px; }
 .altar-nav--v2 .altar-nav__brand { width: 40px; height: 39px; flex: 0 0 40px; margin-right: auto; overflow: visible; }
 .altar-nav--v2 .altar-nav__logo, .altar-nav--v2 .altar-nav__logo img { width: 40px; height: 39px; }
@@ -21,7 +28,6 @@ body.template-home .site-header:has(.altar-nav--v2), body.template-home .altar-n
 .altar-nav--v2 :is(a,button):focus-visible { outline: 1px solid currentColor; outline-offset: 5px; }
 .altar-nav--v2 :is(a,button):hover { color: #fbf7e7; }
 .altar-nav--v2 .altar-nav__pending { cursor: default; }
-.altar-nav--v2 .altar-nav__spotify[aria-expanded="true"] { color: #fbf7e7; text-decoration: underline; text-underline-offset: 4px; }
 .altar-nav--v2 .altar-nav__search-panel { top: 99px; right: 32px; }
 body.template-home:has(.altar-nav--v2) .altar-solar__bottom-controls > .altar-solar__open-player { visibility: hidden; pointer-events: none; }
 body.template-home:has(.altar-nav--v2) .altar-solar__player { position: fixed; top: auto; right: 30px; bottom: 30px; z-index: 120; color: #91938f; }
@@ -32,6 +38,7 @@ body.template-home:has(.altar-nav--v2) .altar-solar__player { position: fixed; t
   .altar-nav--v2 .altar-nav__actions { width: auto; }
   .altar-nav--v2 .altar-nav__menu-toggle { display: block; }
   .altar-nav--v2.is-menu-open .altar-nav__panel { padding: 24px; background: #0f0f0f; color: #91938f; }
+  body.is-altar-commerce .altar-nav--v2.is-menu-open .altar-nav__panel { background: var(--altar-commerce-background, #fbf7e7); color: var(--altar-commerce-foreground, #000); }
   .altar-nav--v2.is-menu-open .altar-nav__panel-menu { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
   .altar-nav--v2.is-menu-open .altar-nav__panel-utilities { display: flex; flex-wrap: wrap; gap: 24px; }
 }
@@ -101,7 +108,7 @@ body.template-home .altar-manifesto-v2 {
   padding: 100px 7.152778vw 100px 13.333333vw; color: var(--manifesto-text); background: var(--manifesto-bg);
 }
 html[data-altar-home-layout="b"] body.template-home .altar-manifesto-v2 { --manifesto-bg: var(--manifesto-bg-b,#091e2b); --manifesto-text: var(--manifesto-text-b,#c6ca9f); }
-.altar-manifesto-v2 > :is(.altar-closing__symbol,.altar-section-grain), .altar-manifesto-v2 .altar-closing__note, .altar-manifesto-v2 .altar-closing__head .altar-collection__meta { display: none; }
+.altar-manifesto-v2 > .altar-closing__symbol, .altar-manifesto-v2 .altar-closing__note, .altar-manifesto-v2 .altar-closing__head .altar-collection__meta { display: none; }
 .altar-manifesto-v2 .altar-closing__content { display: grid; width: 100%; grid-template-columns: 21.531414vw minmax(0,48.402778vw); gap: 9.579141vw; align-items: center; }
 .altar-manifesto-v2 .altar-closing__identity { width: 100%; max-width: none; gap: 24px; }
 .altar-manifesto-v2 .altar-closing__wordmark { color: inherit; font-family: 'Altar Gestura',Georgia,serif; font-size: 88.324px; line-height: 85.4px; letter-spacing: 4.6486px; }
@@ -142,9 +149,19 @@ body.template-home .altar-manifesto-v2 .altar-manifesto__oracle .altar-solar__fo
 /* 04 / Closing — persistent 3D stones and native footer content. */
 .altar-closing-v2 { --closing-bg: var(--closing-bg-a,#c6ca9f); --closing-fg: var(--closing-fg-a,#091e2b); position: relative; background: var(--closing-bg); color: var(--closing-fg); }
 html[data-altar-home-layout="b"] .altar-closing-v2 { --closing-bg: var(--closing-bg-b,#091e2b); --closing-fg: var(--closing-fg-b,#c6ca9f); }
+/* Film grain on the home, always over the backgrounds and under images and text:
+   01·02 between the sky and the 3D scene (planets, hero photo and gallery above it); 03 under the card and text;
+   04 under the stones (transparent 3D canvas) and the footer text. Screen lifts dark grounds, multiply marks light ones. */
+.altar-solar__stage > .altar-solar__stage-grain { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+:is(.altar-manifesto-v2, .altar-closing-v2) > .altar-section-grain { position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply; }
+html[data-altar-home-layout="b"] :is(.altar-manifesto-v2, .altar-closing-v2) > .altar-section-grain { mix-blend-mode: screen; }
+.altar-closing-v2 { isolation: isolate; }
+.altar-closing-v2__scene .altar-solar__canvas { z-index: 2; }
 .altar-closing-v2__scene { position: relative; width: 100%; height: 33.333333vw; min-height: 280px; overflow: hidden; background: var(--closing-bg); }
 .altar-closing-v2__scene .altar-solar__canvas { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; opacity: 1; pointer-events: none; }
-.site-footer .altar-closing-v2 .altar-footer { --footer-background: var(--closing-bg); --footer-foreground: var(--closing-fg); background: var(--closing-bg) !important; color: var(--closing-fg) !important; gap: 0; }
-.altar-closing-v2 .altar-footer__descriptor { display: none; }
-.altar-closing-v2 .altar-footer__input::placeholder { color: currentColor; opacity: .3; }
+.site-footer .altar-closing-v2 .altar-footer { --footer-background: var(--closing-bg); --footer-foreground: var(--closing-fg); position: relative; z-index: 2; background: transparent !important; color: var(--closing-fg) !important; gap: 0; }
+/* V2 footer on every page (altar-footer--v2): the home's layout, each page keeping its own background and text color. */
+.site-footer .altar-footer.altar-footer--v2 { gap: 0; }
+.altar-footer--v2 .altar-footer__descriptor { display: none; }
+.altar-footer--v2 .altar-footer__input::placeholder { color: currentColor; opacity: .3; }
 @media (max-width: 749px) { .altar-closing-v2__scene { height: 72vw; min-height: 280px; } }

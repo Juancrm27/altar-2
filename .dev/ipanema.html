@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
     <title>Altar — simulación Ipanema</title>
-    <link rel="icon" href="../static/images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../static/images/altar-favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
@@ -14,18 +14,20 @@
     <link rel="stylesheet" href="../static/css/style-utilities.css">
     <link rel="stylesheet" href="../static/css/style-async.css">
     <link rel="stylesheet" href="../static/css/altar.css">
+    <link rel="stylesheet" href="../static/css/altar-header-v2.css">
     <link rel="stylesheet" href="../static/css/altar-footer.css">
     <link rel="stylesheet" href="./ipanema-sim.css">
   </head>
   <body class="template-category is-altar-commerce" data-sim>
     <!-- layouts/layout.tpl renders this only on category / search / product -->
-    <div class="altar-page-grain" aria-hidden="true"><svg class="altar-solar__grain altar-section-grain " width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-page" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-page)"></rect></svg></div>
+    <!-- layouts/layout.tpl renders this on every page but the home -->
+    <div class="altar-page-grain" aria-hidden="true"><svg class="altar-solar__grain altar-section-grain " width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-page" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-page)"></rect></svg></div>
     <div data-sim-icons></div>
 
     <!-- Header Altar: same markup as sections/altar-header.tpl renders -->
     <header class="js-header header site-header">
-      <div class="altar-nav" data-altar-page="shop">
-        <svg class="altar-solar__grain altar-section-grain altar-nav__grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-header" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-header)"></rect></svg>
+      <div class="altar-nav altar-nav--v2" data-altar-page="shop">
+        <svg class="altar-solar__grain altar-section-grain altar-nav__grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-header" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-header)"></rect></svg>
         <div class="altar-nav__rule altar-nav__rule--top" aria-hidden="true"></div>
         <div class="altar-nav__content">
           <div class="altar-nav__brand">
@@ -42,9 +44,9 @@
             <span class="altar-nav__divider altar-nav__divider--navigation" aria-hidden="true"></span>
           </div>
           <nav class="altar-nav__menu" aria-label="Navegación principal">
-            <a href="./preview.html" data-altar-page-link="home">Home</a>
-            <a href="#/tienda" data-altar-page-link="shop">Shop</a>
-            <a href="#/contacto" data-altar-page-link="contacto">Contacto</a>
+            <a href="#/tienda" data-altar-page-link="shop">Collection</a>
+            <a href="#/the-star" data-altar-page-link="star">The Star</a>
+            <a href="#/contacto" data-altar-page-link="contacto">Contact</a>
           </nav>
           <div class="altar-nav__actions">
             <div class="js-search-container altar-nav__action altar-nav__search-container">
@@ -55,7 +57,7 @@
             </div>
             <span class="altar-nav__divider altar-nav__divider--actions" aria-hidden="true"></span>
             <div class="altar-nav__action-stack">
-              <a class="altar-nav__account" href="#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Login</span></a>
+              <a class="altar-nav__account" href="#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
               <span id="ajax-cart" class="js-cart-container altar-nav__action" data-component="cart-button">
                 <button type="button" class="js-modal-open-private altar-nav__cart" data-target="#modal-cart" aria-label="Carrito de compras">
                   <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span>
@@ -68,15 +70,15 @@
         <div class="altar-nav__menu-rule" aria-hidden="true"></div>
         <div class="altar-nav__panel" id="altar-nav-panel" data-altar-menu-panel hidden>
           <nav class="altar-nav__panel-menu" aria-label="Navegación principal">
-            <a href="./preview.html" data-altar-page-link="home">Home</a>
-            <a href="#/tienda" data-altar-page-link="shop">Shop</a>
-            <a href="#/contacto" data-altar-page-link="contacto">Contacto</a>
+            <a href="#/tienda" data-altar-page-link="shop">Collection</a>
+            <a href="#/the-star" data-altar-page-link="star">The Star</a>
+            <a href="#/contacto" data-altar-page-link="contacto">Contact</a>
           </nav>
           <div class="altar-nav__panel-rule" aria-hidden="true"></div>
           <div class="altar-nav__panel-utilities">
             <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span></button>
             <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span></button>
-            <a class="altar-nav__panel-item" href="#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Login</span></a>
+            <a class="altar-nav__panel-item" href="#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
           </div>
         </div>
         <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
@@ -90,7 +92,7 @@
 
     <footer class="site-footer">
       <!-- Same structure as sections/altar-footer.tpl (Figma Footer / Site). -->
-      <div class="altar-footer altar-footer--light" data-header-theme="light" style="--footer-background:#FBF7E7;--footer-foreground:#000;">
+      <div class="altar-footer altar-footer--v2 altar-footer--light" data-header-theme="light" style="--footer-background:#FBF7E7;--footer-foreground:#000;">
         <div class="altar-footer__top">
           <div class="altar-footer__newsletter">
             <div class="altar-footer__newsletter-copy">

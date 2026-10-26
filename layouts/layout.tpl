@@ -41,9 +41,9 @@
     {% if template == 'home' %}
       <script>(function(d){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("altar-intro");setTimeout(function(){d.classList.remove("altar-intro")},4000)})(document.documentElement)</script>
     {% endif %}
-    <link rel="icon" href="{{ 'images/favicon.svg' | static_url }}" type="image/svg+xml">
-    <link rel="icon" href="{{ 'images/favicon-32.png' | static_url }}" sizes="32x32" type="image/png">
-    <link rel="apple-touch-icon" href="{{ 'images/apple-touch-icon.png' | static_url }}">
+    <link rel="icon" href="{{ 'images/altar-favicon.svg' | static_url }}" type="image/svg+xml">
+    <link rel="icon" href="{{ 'images/altar-favicon-32.png' | static_url }}" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="{{ 'images/altar-apple-touch-icon.png' | static_url }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <style id="altar-theme-tokens">
       :root {
@@ -88,8 +88,9 @@
   >
     {{ component('nubesdk-slot', { type: "before_main_content" }) }}
 
-    {# Altar: film grain behind the shop, product and contact pages (same layer as the home sections 3·4) #}
-    {% if settings.altar_commerce_grain is not same as(false) and template in ['category', 'search', 'product', 'contact'] %}
+    {# Altar: film grain behind the content of every page other than the home (the home grains each section itself):
+       over the ivory, under the images and text. #}
+    {% if settings.altar_commerce_grain is not same as(false) and is_altar_commerce %}
       <div class="altar-page-grain" aria-hidden="true">
         {% include 'snippets/altar-grain.tpl' with { grain_id: 'page', grain_class: '' } %}
       </div>
@@ -164,7 +165,7 @@
     </script>
 
     {# Lightweight shared behaviour; the heavy 3D bundle is exclusive to the home. #}
-    {% if template == 'home' %}<link rel="stylesheet" href="{{ 'css/altar-header-v2.css' | static_url }}">{% endif %}
+    <link rel="stylesheet" href="{{ 'css/altar-header-v2.css' | static_url }}">
     <script src="{{ 'js/altar-header.js' | static_url }}" defer></script>
     <script src="{{ 'js/altar-site.js' | static_url }}" defer></script>
     {% if template == 'home' %}

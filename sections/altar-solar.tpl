@@ -36,6 +36,8 @@
       <i class="altar-solar__glow altar-solar__glow--cyan"></i>
       <i class="altar-solar__glow altar-solar__glow--teal"></i>
     </div>
+    {# Film grain over the sky, under the 3D scene, the hero photo and the gallery. #}
+    {% include 'snippets/altar-grain.tpl' with { grain_id: 'stage-' ~ section.id, grain_class: 'altar-solar__stage-grain' } %}
     <canvas class="altar-solar__canvas" aria-label="{{ solar_settings.accessible_label | default('Sistema solar interactivo') }}"></canvas>
     <section class="altar-solar__manifesto" aria-label="Manifiesto">
       <div class="altar-solar__manifesto-headline">
@@ -187,7 +189,7 @@
   <div class="altar-solar__effect" data-solar-effect aria-hidden="true">
     <svg class="altar-solar__grain" width="100%" height="100%" preserveAspectRatio="none">
       <filter id="altar-grain-{{ section.id }}" x="-20%" y="-20%" width="140%" height="140%">
-        <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed="1" stitchTiles="stitch" />
+        <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch" />
         <feColorMatrix type="saturate" values="0" />
       </filter>
       <rect width="100%" height="100%" filter="url(#altar-grain-{{ section.id }})" />

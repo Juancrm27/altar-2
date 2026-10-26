@@ -210,7 +210,7 @@ function initSearch() {
 /* ---------- Header modals: cart, mobile menu, mobile search ---------- */
 
 function renderModals() {
-  const navLinks = [["./preview.html", "Home"], [`${BASE}#/tienda`, "Shop"], ...store.categories.map((c) => [`${BASE}#/categoria/${c.slug}`, c.name]), [`${BASE}#/contacto`, "Contacto"]];
+  const navLinks = [["./preview.html", "Home"], [`${BASE}#/tienda`, "Shop"], [`${BASE}#/the-star`, "The Star"], ...store.categories.map((c) => [`${BASE}#/categoria/${c.slug}`, c.name]), [`${BASE}#/contacto`, "Contacto"]];
   $("[data-sim-modals]").innerHTML =
     modal({ id: "modal-cart", title: t("cart.title", "Carrito de compras"), from: "right", dockRight: true, widthDesktop: "small", body: `<div data-sim-cart-panel></div>` }) +
     modal({ id: "nav-hamburger", from: "left", classes: "modal-nav-hamburger modal-nav-main",
@@ -406,9 +406,17 @@ function productGrid(list) {
   return `<div class="js-product-table grid grid-2 grid-md-4 sim-grid altar-shop-grid">${list.map((product, index) => productItem(product, index + 1)).join("")}</div>`;
 }
 
-function categoryPage({ slug, query }) {
+// The Star (simulation only): the same products in another order, so the page doesn't read as the collection.
+// A fixed shuffle, so it stays the same on every visit. In Tiendanube it is its own category with its own products.
+function starOrder(list) {
+  // Seed 4: no product keeps its collection position, and both featured slots show other pieces.
+  const score = (product) => [...product.slug].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) % 997, 4);
+  return [...list].sort((a, b) => score(a) - score(b));
+}
+
+function categoryPage({ slug, query, star = false }) {
   const category = store.categories.find((c) => c.slug === slug);
-  let list = query !== undefined ? searchProducts(query) : category ? catalog.filter((p) => p.category === slug) : catalog;
+  let list = query !== undefined ? searchProducts(query) : category ? catalog.filter((p) => p.category === slug) : star ? starOrder(catalog) : catalog;
   const params = new URLSearchParams(location.hash.split("?")[1] || "");
   const sort = params.get("orden") || "relevancia";
   if (sort === "menor") list = [...list].sort((a, b) => a.price - b.price);
@@ -605,6 +613,8 @@ function notFoundPage() {
 
 const routes = [
   ["shop", /^\/(?:tienda)?$/, () => categoryPage({}), "category"],
+  // The Star: a page of its own with the same layout as the collection (in Tiendanube, a category set in the header's "V2 · Enlace The Star").
+  ["star", /^\/the-star$/, () => categoryPage({ star: true }), "category"],
   ["category", /^\/categoria\/([\w-]+)$/, (m) => categoryPage({ slug: m[1] }), "category"],
   ["search", /^\/buscar$/, () => categoryPage({ query: new URLSearchParams(location.hash.split("?")[1] || "").get("q") || "" }), "search"],
   ["product", /^\/producto\/([\w-]+)$/, (m) => productPage({ slug: m[1] }), "product"],
@@ -629,7 +639,7 @@ function renderRoute() {
   const route = currentRoute();
   const commerceTemplates = new Set(["category", "search", "product", "cart", "contact", "page", "account-login", "account-register", "account-reset", "404"]);
   document.body.className = `template-${route.template}${commerceTemplates.has(route.template) ? " is-altar-commerce" : ""}`;
-  const headerPage = ["shop", "category", "search", "product"].includes(route.name) ? "shop" : route.name === "contact" ? "contacto" : "none";
+  const headerPage = ["shop", "category", "search", "product"].includes(route.name) ? "shop" : route.name === "star" ? "star" : route.name === "contact" ? "contacto" : "none";
   const header = $(".altar-nav");
   if (header) header.dataset.altarPage = headerPage;
   $$('[data-altar-page-link]').forEach((link) => {

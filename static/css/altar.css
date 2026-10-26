@@ -87,7 +87,7 @@ html.is-altar-home :is(.js-modal-private, .notification-cart-container) {
 .altar-collection > *, .altar-closing__content { position: relative; z-index: 2; }
 .altar-collection > .altar-section-grain { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .altar-closing > .altar-section-grain { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.altar-section-grain { opacity: var(--section-grain-opacity, .16); mix-blend-mode: screen; }
+.altar-section-grain { opacity: var(--section-grain-opacity, .05); mix-blend-mode: screen; }
 .altar-closing { min-height: max(100svh, calc(540 * var(--u))); padding: calc(131 * var(--u)) calc(12 * var(--u)) calc(45 * var(--u)); color: color-mix(in srgb, var(--altar-primary) 78%, transparent); background: var(--closing-bg, var(--altar-secondary)); font-family: Inter, Arial, Helvetica, sans-serif; font-weight: 400; }
 .altar-closing__symbol { position: absolute; top: calc(-371 * var(--u)); right: calc(12 * var(--u)); z-index: 0; display: block; width: min(calc(698 * var(--u)), 48.5vw); height: auto; max-width: none; pointer-events: none; }
 .altar-collection__gallery { position: relative; z-index: 2; }
@@ -298,10 +298,11 @@ a.altar-collection__photo { display: block; color: inherit; }
 @keyframes altar-intro-rule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes altar-intro-divider { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes altar-intro-clip { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+@keyframes altar-intro-image { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0); } }
 @keyframes altar-intro-frame { from { clip-path: inset(0 0 100% 0 round calc(10 * var(--u))); opacity: .65; } to { clip-path: inset(0 0 0 0 round calc(10 * var(--u))); opacity: .65; } }
 .altar-nav__rule { transform-origin: left center; }
 .altar-nav__divider { transform-origin: center top; }
-.altar-intro:not(.altar-intro--play) :is(.altar-nav__logo, .altar-nav__wordmark, .altar-nav__menu, .altar-nav__cart, .altar-nav__search, .altar-nav__account, .altar-nav__menu-toggle, .altar-solar__manifesto-ids, .altar-nav__eyebrow, .altar-nav__metadata, .altar-solar__scroll-prompt, .altar-solar__campaign, [data-fortune-flip], .altar-solar__fortune-cta-text, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player) { opacity: 0; }
+.altar-intro:not(.altar-intro--play) :is(.altar-hero-v2__campaign, .altar-nav__logo, .altar-nav__layout-switch, .altar-nav__spotify, .altar-nav__experience-divider, .altar-nav__wordmark, .altar-nav__menu, .altar-nav__cart, .altar-nav__search, .altar-nav__account, .altar-nav__menu-toggle, .altar-solar__manifesto-ids, .altar-nav__eyebrow, .altar-nav__metadata, .altar-solar__scroll-prompt, .altar-solar__campaign, [data-fortune-flip], .altar-solar__fortune-cta-text, .altar-solar__pagination, .altar-solar__channel-switcher, .altar-solar__reveal-card, .altar-solar__open-player) { opacity: 0; }
 .altar-intro:not(.altar-intro--play) .altar-nav__rule { transform: scaleX(0); }
 .altar-intro:not(.altar-intro--play) .altar-nav__divider { transform: scaleY(0); }
 .altar-intro:not(.altar-intro--play) .altar-solar__marquee { clip-path: inset(0 100% 0 0); }
@@ -854,19 +855,14 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
   .altar-sort-modal__overlay { display: none !important; }
 }
 
-/* — Film grain beyond the home sections 3·4: footer (every page) and the product / contact background.
-   Same SVG noise and the same --section-grain-opacity; screen lifts dark grounds, multiply marks light ones. — */
+/* — Film grain behind the content of every page other than the home (layouts/layout.tpl): over the ivory of
+   <html>, under images and text. Body, header and footer stay transparent so it shows everywhere. — */
 .altar-page-grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-body:not(.template-product):not(.template-contact) .altar-page-grain { display: none; }
-/* The ivory stays on <html>; the body goes transparent so the grain layer behind the content shows through */
-body:is(.template-product, .template-contact) { background: transparent; }
-body:is(.template-category, .template-search) { background: var(--altar-commerce-background, #fbf7e7); }
 .altar-page-grain .altar-section-grain { mix-blend-mode: multiply; }
-/* Header on product / contact: its opaque ivory (needed while sticky) gets the same grain. Both layers start at
-   the viewport's top-left, so the noise lines up with the page grain below the header. */
-body:is(.template-product, .template-contact) .altar-nav { position: relative; isolation: isolate; }
-.altar-nav > .altar-nav__grain { position: absolute; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: multiply; }
-body:not(.template-product):not(.template-contact) .altar-nav__grain { display: none; }
+body.is-altar-commerce { background: transparent; }
+body.is-altar-commerce .site-footer, body.is-altar-commerce .site-footer .altar-footer { background: transparent !important; }
+/* The page-wide grain covers the header too. */
+.altar-nav > .altar-nav__grain { display: none; }
 
 /* — Contact page: one centred column in Inter (title, form, store contact info underneath) — */
 .template-contact :is(.page-header, .contact-form-section, .sim-section),
