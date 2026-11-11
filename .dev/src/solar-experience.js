@@ -5,7 +5,9 @@ import { gsap } from "gsap";
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 const COMPACT_LAYOUT = window.matchMedia("(max-width: 749px)");
 const clampDpr = () => Math.min(window.devicePixelRatio || 1, 1.75);
-const LIGHTING_STORAGE_KEY = "altar-lighting-v1";
+// Home v3 (Figma "Home / Layout A"): light gradient sky over three screens (film, statement, gallery).
+const IS_V3_HOME = document.documentElement.classList.contains("altar-home-v3");
+const LIGHTING_STORAGE_KEY = IS_V3_HOME ? "altar-lighting-v3" : "altar-lighting-v1";
 // GUI changes are only remembered across reloads when "Recordar cambios" is checked.
 const LIGHTING_PERSIST_KEY = "altar-lighting-persist";
 
@@ -649,6 +651,12 @@ const DEFAULT_LIGHTING = {
   horizonBloomCenterX: 0.5,
   horizonBloomWidth: 900,
   horizonLine: 0,
+  // Home v3, section 2 copy: worn print (SVG filter #altar-worn-text in the page).
+  wornEnabled: true,
+  wornBlur: 0.1,
+  wornErosion: 0.14,
+  wornNoiseScale: 2.3,
+  wornRoughness: 1.2,
   lightingPresetVersion: LIGHTING_PRESET_VERSION,
 };
 
@@ -656,7 +664,70 @@ const DEFAULT_LIGHTING = {
 const COMPACT_LIGHTING = {
   manifestoY: 120,
 };
-const lightingDefaults = () => ({ ...DEFAULT_LIGHTING, ...(COMPACT_LAYOUT.matches ? COMPACT_LIGHTING : {}) });
+// V3, both layouts: orbits tuned in the lighting panel (02 · 3D → Órbitas). Kept apart from the day/night
+// presets below so switching A ⇄ B never resets them.
+const V3_SHARED_LIGHTING = {
+  // Grainy blur (tuned in the lighting panel). Intensidad grano drives every grain layer of the page on v3
+  // (see altar-home-v3.css).
+  // Intensidad grano is per layout (A 0.21, B 0.09: the grain reads stronger over the dark sky).
+  effectBlur: 0,
+  grainFrequency: 0.5,
+  grainSpeed: 10,
+  orbitSpeed: 0.1,
+  orbitKepler: 1.6,
+  orbitTilt: 65,
+  orbitScale: 1.4,
+  orbitDirection: "Horario",
+  moonSpeed: 2.25,
+  spinSpeed: 1.5,
+  orbitLineOpacity: 0,
+};
+// V3 draws the sky over a light gradient: white stars with more halo, and more frequent, longer shooting stars
+// so they read on the blue and peach grounds.
+const V3_LIGHTING = {
+  // Daylight fill: without it the planets' lit side faces away and they read as black dots on the light sky.
+  // Ambiente → Cielo tuned in the lighting panel on layout A.
+  hemisphereSky: "#8daccd",
+  hemisphereGround: "#e3ac94",
+  hemisphereIntensity: 2,
+  keyIntensity: 0.8,
+  grainOpacity: 0.21,
+  // Stars tuned in the lighting panel (02 · 3D → Estrellas) on layout A.
+  starCount: 3850,
+  starSize: 2.4,
+  starBrightness: 2.4,
+  starColor: "#ffffff",
+  starColorVariation: 0.35,
+  twinkleSpeed: 7.95,
+  twinkleAmount: 0.5,
+  bloomSize: 0,
+  bloomIntensity: 1.2,
+  starDrift: 0.75,
+  // No shooting stars on the v3 home (both layouts); the panel's "Activas" box can still turn them on.
+  shootingEnabled: false,
+  shootingPauseMin: 2,
+  shootingPauseMax: 6,
+  shootingSpeed: 30,
+  shootingLength: 9,
+  shootingWidth: 0.32,
+  shootingBrightness: 4,
+  shootingColor: "#ffffff",
+};
+// V3 layout B (Figma "Home / Layout B") is the night version: the original dark-sky values for the same keys,
+// keeping the taller field's star count and the more frequent shooting stars.
+const V3_NIGHT_LIGHTING = {
+  ...Object.fromEntries(Object.keys(V3_LIGHTING).map((key) => [key, DEFAULT_LIGHTING[key]])),
+  starCount: 1100,
+  grainOpacity: 0.09,
+  shootingEnabled: false,
+  shootingPauseMin: V3_LIGHTING.shootingPauseMin,
+  shootingPauseMax: V3_LIGHTING.shootingPauseMax,
+};
+const lightingDefaults = () => ({
+  ...DEFAULT_LIGHTING,
+  ...(IS_V3_HOME ? { ...V3_SHARED_LIGHTING, ...V3_LIGHTING } : {}),
+  ...(COMPACT_LAYOUT.matches ? COMPACT_LIGHTING : {}),
+});
 
 // UI palette (static/css/altar.css :root). The CSS follows the two variables; the SVG icons carry the primary
 // yellow inside the file, so they are re-tinted from their original source when it changes.
@@ -751,7 +822,8 @@ const ORBIT_SEGMENTS = 128;
 const X_AXIS = new THREE.Vector3(1, 0, 0);
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
-const STAR_FIELD = { width: 90, top: 24, bottom: -64, near: -8, far: -40 };
+// V3's stage is three screens tall (film, statement, gallery), so its field reaches further down.
+const STAR_FIELD = { width: 90, top: 24, bottom: IS_V3_HOME ? -108 : -64, near: -8, far: -40 };
 const STAR_TINTS = ["#fff3a9", "#ffd9b0", "#c9d6ff", "#ffffff", "#ffb28e"].map((hex) => new THREE.Color(hex));
 
 const STAR_VERTEX_SHADER = `
@@ -1348,7 +1420,7 @@ class SolarExperience {
     this.rimLight = new THREE.DirectionalLight(DEFAULT_LIGHTING.rimColor, DEFAULT_LIGHTING.rimIntensity);
     this.rimLight.position.set(DEFAULT_LIGHTING.rimX, DEFAULT_LIGHTING.rimY, DEFAULT_LIGHTING.rimZ);
     this.scene.add(this.hemisphereLight, this.keyLight, this.rimLight);
-    this.createStars(DEFAULT_LIGHTING);
+    this.createStars(lightingDefaults());
   }
 
   setupHorizonLayer() {
@@ -1529,7 +1601,8 @@ class SolarExperience {
         });
         this.stonesGroup.add(scene, ...contacts);
         this.stonesReady = true;
-        this.applyLightingSettings(this.effectSettings ?? lightingDefaults());
+        // Re-apply from the base settings (the panel's object), not from effectSettings, which is a copy.
+        this.applyLightingSettings(this.lightingBase ?? this.effectSettings ?? lightingDefaults());
         this.root.classList.add("is-stones-ready");
       },
       undefined,
@@ -1648,6 +1721,8 @@ class SolarExperience {
     this.renderer.toneMapping = TONE_MAPPINGS[settings.toneMapping] ?? THREE.ACESFilmicToneMapping;
     this.root.style.setProperty("--effect-blur", `calc(${Number(settings.effectBlur)} * var(--u, 1px))`);
     this.root.style.setProperty("--grain-opacity", Number(settings.grainOpacity));
+    // V3: one grain intensity for the whole page, footer included (it sits outside the solar root).
+    document.documentElement.style.setProperty("--grain-opacity", Number(settings.grainOpacity));
     this.root.style.setProperty("--section-grain-opacity", Number(settings.sectionGrainOpacity));
     // The footer grain sits outside the solar root, so the section grain opacity also goes on :root.
     document.documentElement.style.setProperty("--section-grain-opacity", Number(settings.sectionGrainOpacity));
@@ -1808,7 +1883,21 @@ class SolarExperience {
       this.sectionGuide.hidden = !settings.showSections;
       this.updateTramoHud();
     }
+    this.applyWornText(settings);
     this.effectSettings = settings;
+  }
+
+  // Home v3 sections 2 and 4: worn print. The filter roughens the letter edges (displacement), opens holes where the
+  // noise is dark (erosion: alpha = 8·(noise − threshold)) and softens the result (blur).
+  applyWornText(settings) {
+    const filter = document.getElementById("altar-worn-text");
+    if (!filter) return;
+    const erosion = THREE.MathUtils.clamp(Number(settings.wornErosion), 0, 1);
+    filter.querySelector("[data-worn-noise]")?.setAttribute("baseFrequency", Number(settings.wornNoiseScale).toFixed(3));
+    filter.querySelector("[data-worn-displace]")?.setAttribute("scale", Number(settings.wornRoughness).toFixed(2));
+    filter.querySelector("[data-worn-erode]")?.setAttribute("values", `0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  8 0 0 0 ${(-8 * erosion * 0.7).toFixed(3)}`);
+    filter.querySelector("[data-worn-blur]")?.setAttribute("stdDeviation", Number(settings.wornBlur).toFixed(2));
+    document.documentElement.classList.toggle("has-worn-text", Boolean(settings.wornEnabled));
   }
 
   setupLightingControls() {
@@ -1942,7 +2031,7 @@ ${stonePositionsMarkup(1)}
           <label>Intensidad grano <span><input type="range" min="0" max="0.25" step="0.01" data-lighting="grainOpacity"><output></output></span></label>
           <label>Detalle grano <span><input type="range" min="0.1" max="1.5" step="0.05" data-lighting="grainFrequency"><output></output></span></label>
           <label>Refresco FPS <span><input type="range" min="1" max="24" step="1" data-lighting="grainSpeed"><output></output></span></label>
-          <label>Grano secc. 3·4 <span><input type="range" min="0" max="0.5" step="0.01" data-lighting="sectionGrainOpacity"><output></output></span></label>
+          ${IS_V3_HOME ? "" : `<label>Grano secc. 3·4 <span><input type="range" min="0" max="0.5" step="0.01" data-lighting="sectionGrainOpacity"><output></output></span></label>`}
         </details>
         <details><summary>Órbitas</summary>
           <label>Velocidad <span><input type="range" min="0" max="5" step="0.05" data-lighting="orbitSpeed"><output></output></span></label>
@@ -2018,6 +2107,13 @@ ${stonePositionsMarkup(1)}
           <label>Bloom intensidad <span><input type="range" min="0" max="3" step="0.05" data-lighting="bloomIntensity"><output></output></span></label>
           <label>Deriva <span><input type="range" min="0" max="3" step="0.05" data-lighting="starDrift"><output></output></span></label>
         </details>
+        ${IS_V3_HOME ? `<details><summary>Texto desgastado</summary>
+          <label class="is-boolean">Activo <input type="checkbox" data-lighting="wornEnabled"></label>
+          <label>Desenfoque px <span><input type="range" min="0" max="3" step="0.05" data-lighting="wornBlur"><output></output></span></label>
+          <label>Desgaste <span><input type="range" min="0" max="1" step="0.01" data-lighting="wornErosion"><output></output></span></label>
+          <label>Escala ruido <span><input type="range" min="0.05" max="3" step="0.05" data-lighting="wornNoiseScale"><output></output></span></label>
+          <label>Bordes irregulares <span><input type="range" min="0" max="8" step="0.1" data-lighting="wornRoughness"><output></output></span></label>
+        </details>` : ""}
         <details><summary>Render</summary>
           <label>Exposición <span><input type="range" min="0.1" max="3" step="0.05" data-lighting="exposure"><output></output></span></label>
           <label class="is-select">Color mapping <select data-lighting="toneMapping">${Object.keys(TONE_MAPPINGS).map((name) => `<option>${name}</option>`).join("")}</select></label>
@@ -2053,6 +2149,7 @@ ${stonePositionsMarkup(1)}
       },
       { label: "04 · Grainy blur", groups: ["Grainy blur"] },
       { label: "05 · Carta", groups: ["Carta", "Carta foil", "Carta extras"] },
+      ...(IS_V3_HOME ? [{ label: "06 · Texto secciones 2 y 4", groups: ["Texto desgastado"] }] : []),
     ];
     const panelBody = panel.querySelector(".lighting-panel__body");
     const resetButton = panel.querySelector("[data-lighting-reset]");
@@ -2116,6 +2213,14 @@ ${stonePositionsMarkup(1)}
         const decimals = Math.max(1, (input.step.split(".")[1] || "").length);
         field.value = Number(input.value).toFixed(decimals);
       });
+    };
+
+    // The object every panel input edits; v3's A ⇄ B swap writes into it too (applyV3Layout).
+    this.panelSettings = settings;
+    // V3: switching A ⇄ B changes values under the panel; this puts them back in its fields.
+    this.refreshLightingPanel = () => {
+      panel.querySelectorAll("[data-lighting]").forEach((input) => setInputValue(input, settings[input.dataset.lighting]));
+      updateOutputs();
     };
 
     panel.querySelectorAll("[data-lighting]").forEach((input) => {
@@ -2340,7 +2445,10 @@ ${stonePositionsMarkup(1)}
       this.shootingGeometry = new THREE.PlaneGeometry(1, 1).translate(-0.5, 0, 0);
     }
     const ndcX = THREE.MathUtils.lerp(SHOOTING_STAR_ZONE.left, SHOOTING_STAR_ZONE.right, Math.random());
-    const ndcY = THREE.MathUtils.lerp(SHOOTING_STAR_ZONE.bottom, SHOOTING_STAR_ZONE.top, Math.random());
+    const ndcY = IS_V3_HOME
+      ? this.visibleShootingY()
+      : THREE.MathUtils.lerp(SHOOTING_STAR_ZONE.bottom, SHOOTING_STAR_ZONE.top, Math.random());
+    if (ndcY === null) return;
     const direction = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(this.camera).sub(this.camera.position).normalize();
     const distance = (SHOOTING_STAR_DEPTH - this.camera.position.z) / direction.z;
     const start = this.camera.position.clone().addScaledVector(direction, distance);
@@ -2358,7 +2466,8 @@ ${stonePositionsMarkup(1)}
     }));
     mesh.position.copy(start);
     mesh.rotation.z = angle;
-    mesh.renderOrder = 2;
+    // V3: drawn with the star field (renderOrder -1), so they pass behind the sun's glow as well as the planets.
+    mesh.renderOrder = IS_V3_HOME ? -1 : 2;
     this.scene.add(mesh);
     this.shootingStars.push({
       mesh,
@@ -2368,17 +2477,47 @@ ${stonePositionsMarkup(1)}
     });
   }
 
+  // V3: shooting stars belong to screens 2 (statement) and 3 (gallery) only. The canvas spans three screens,
+  // so a star is placed in the part of screens 2–3 that is on screen (away from its top and bottom edges).
+  // Returns null when that part is not in view.
+  visibleShootingY() {
+    const bounds = this.canvas.getBoundingClientRect();
+    const screen = bounds.height / 3;
+    const top = Math.max(screen, -bounds.top);
+    const bottom = Math.min(3 * screen, window.innerHeight - bounds.top);
+    if (!bounds.height || bottom - top < 120) return null;
+    const y = THREE.MathUtils.lerp(top + (bottom - top) * 0.12, top + (bottom - top) * 0.75, Math.random());
+    return 1 - (2 * y) / bounds.height;
+  }
+
+  // V3: true while the middle of the viewport is over screen 2 or 3.
+  inShootingZone() {
+    const bounds = this.canvas.getBoundingClientRect();
+    const position = (window.innerHeight / 2 - bounds.top) / (bounds.height / 3);
+    return position >= 1 && position < 3;
+  }
+
+  // V3: frequent inside screens 2–3; elsewhere the timer keeps ticking without spawning (see updateShootingStars).
+  shootingPauseScale() {
+    return IS_V3_HOME ? 0.3 : 1;
+  }
+
   updateShootingStars(time, delta) {
     const settings = this.effectSettings ?? DEFAULT_LIGHTING;
     const scheduleNext = () => {
-      const pauseMin = Number(settings.shootingPauseMin);
-      const pauseMax = Math.max(pauseMin, Number(settings.shootingPauseMax));
+      const scale = this.shootingPauseScale();
+      const pauseMin = Number(settings.shootingPauseMin) * scale;
+      const pauseMax = Math.max(pauseMin, Number(settings.shootingPauseMax) * scale);
       this.nextShootingStar = time + THREE.MathUtils.lerp(pauseMin, pauseMax, Math.random());
     };
     if (!settings.shootingEnabled) {
       scheduleNext();
+    } else if (IS_V3_HOME && !this.inShootingZone()) {
+      // Outside screens 2–3: none, and the first one comes soon after entering them.
+      this.nextShootingStar = Math.min(this.nextShootingStar, time + 0.6);
     } else if (!this.shootingStars.length && time >= this.nextShootingStar) {
       this.spawnShootingStar(settings);
+      if (!this.shootingStars.length) scheduleNext();
     }
 
     this.shootingStars = this.shootingStars.filter((star) => {
@@ -2903,7 +3042,8 @@ ${stonePositionsMarkup(1)}
       frame = 0;
       if (stale || !desktop.matches || pointer.x === null) return hide();
       const target = document.elementFromPoint(pointer.x, pointer.y)?.closest("[data-cursor-label]");
-      if (!target || !target.closest(".altar-solar, .altar-page-section") || target.closest(".is-dragging")) return hide();
+      // The v3 closing (section 5) lives in the footer, outside the solar root: its photo badge counts too.
+      if (!target || !target.closest(".altar-solar, .altar-page-section, .altar-v3-closing") || target.closest(".is-dragging")) return hide();
       const text = labelFor(target);
       if (label.textContent !== text) label.textContent = text;
       badge.classList.toggle("is-back", isBack(target));
@@ -2948,6 +3088,10 @@ ${stonePositionsMarkup(1)}
   }
 
   setupDraggables() {
+    // V3: the hero film can be moved around. Touch keeps scrolling the page over it; mouse and pen drag it.
+    if (IS_V3_HOME) makeDraggable(document.getElementById("altar-hero-campaign"), { allowTouch: false });
+    // V3: so can the campaign photo over the closing stones.
+    if (IS_V3_HOME) makeDraggable(document.querySelector(".altar-v3-closing__photo"), { allowTouch: false });
     makeDraggable(this.root.querySelector(".altar-solar__campaign"));
     makeDraggable(this.root.querySelector("[data-ground-campaign]"));
     // Touch keeps scrolling the page over the card; mouse and pen can drag it.
@@ -3443,8 +3587,11 @@ ${stonePositionsMarkup(1)}
     this.foilMouse.y += (-this.pointer.y - this.foilMouse.y) * ease;
 
     const cardScale = Math.max(Number(settings.cardScale), this.fortuneFocusScale || 0, 1);
-    const pixelRatio = Math.min((window.devicePixelRatio || 1) * cardScale, 4);
     this.foilCards.forEach((effect) => {
+      // A card laid out wider than 236 px (section 4's oracle is 310 px) renders at its real size, so the
+      // canvas is never stretched: a stretched buffer leaves the rounded corners stepped and soft.
+      const layoutScale = (effect.card.offsetWidth || 236) / 236;
+      const pixelRatio = Math.min((window.devicePixelRatio || 1) * Math.max(cardScale, layoutScale), 4);
       if (effect.renderer.getPixelRatio() !== pixelRatio) {
         effect.renderer.setPixelRatio(pixelRatio);
         effect.renderer.setSize(236, 358, false);
@@ -3474,12 +3621,15 @@ ${stonePositionsMarkup(1)}
     }, { passive: true });
     if (this.isV2Home) {
       document.addEventListener("altar:home-layout", (event) => {
-        this.moveSystemToPose(event.detail.layout === "b" ? 1 : 0);
+        if (IS_V3_HOME) this.applyV3Layout(event.detail.layout);
+        // V3: B keeps A's planets exactly (position, rotation, scale and orbits); only the light changes.
+        if (!IS_V3_HOME) this.moveSystemToPose(event.detail.layout === "b" ? 1 : 0);
         // The layout swap resizes the gallery and so the stage: size it now, before the wave measures it,
         // or the reveal canvas gets stretched and the circle turns into an oval.
         this.resize();
-        // The wave grows as a circle from the centre of the hero photo.
-        this.playLayoutWave?.(document.getElementById("altar-hero-campaign") ?? document.querySelector("[data-altar-layout-toggle]"));
+        // The wave grows as a circle from the centre of the hero photo. V3 reveals the whole page instead
+        // (altar-header.js + altar-home-v3.css); this wave paints the v2 space colour and would fight it.
+        if (!IS_V3_HOME) this.playLayoutWave?.(document.getElementById("altar-hero-campaign") ?? document.querySelector("[data-altar-layout-toggle]"));
       });
     }
     this.resizeObserver = new ResizeObserver(() => this.resize());
@@ -3490,6 +3640,15 @@ ${stonePositionsMarkup(1)}
     }, { rootMargin: "20%" });
     this.intersectionObserver.observe(this.root);
     this.resize();
+  }
+
+  // V3: switching A ⇄ B swaps day and night lighting on the base settings object, the one the panel edits
+  // (applyLightingSettings keeps it in lightingBase; effectSettings is a per-channel copy of it).
+  applyV3Layout(layout) {
+    const settings = this.panelSettings ?? this.lightingBase ?? this.effectSettings ?? lightingDefaults();
+    Object.assign(settings, layout === "b" ? V3_NIGHT_LIGHTING : V3_LIGHTING);
+    this.applyLightingSettings(settings);
+    this.refreshLightingPanel?.();
   }
 
   setupSectionGuide() {
@@ -3569,10 +3728,19 @@ ${stonePositionsMarkup(1)}
     this.renderer.setPixelRatio(clampDpr());
     this.renderer.setSize(width, height, false);
     this.closingCamera.copy(this.camera);
-    this.closingCamera.aspect = width / height;
-    const zoom = 1.8 * Math.min(1, (width / height) / 3);
+    // --closing-stones-scale (CSS) enlarges the whole composition by that factor: the stage is that much taller,
+    // the view is laid out that much wider and cropped to the stage's centre, so the stones keep their layout.
+    // --closing-stones-crop (0–1) trims that share of the view's empty bottom: the stage is that much shorter and only
+    // the top of the view is drawn, so the stones keep their size and place.
+    const stageStyle = getComputedStyle(this.closingStage);
+    const scale = Math.max(1, parseFloat(stageStyle.getPropertyValue("--closing-stones-scale")) || 1);
+    const crop = THREE.MathUtils.clamp(parseFloat(stageStyle.getPropertyValue("--closing-stones-crop")) || 0, 0, 0.9);
+    const fullWidth = width * scale;
+    const fullHeight = height / (1 - crop);
+    this.closingCamera.aspect = fullWidth / fullHeight;
+    const zoom = 1.8 * Math.min(1, (fullWidth / fullHeight) / 3);
     this.closingCamera.zoom = zoom;
-    this.closingCamera.setViewOffset(width, height, 0, height * (0.05 + 1.17 * zoom), width, height);
+    this.closingCamera.setViewOffset(fullWidth, fullHeight, (fullWidth - width) / 2, fullHeight * (0.05 + 1.17 * zoom), width, height);
     this.closingCamera.updateProjectionMatrix();
   }
 

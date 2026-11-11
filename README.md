@@ -36,7 +36,8 @@ cd .dev
 npm run preview
 ```
 
-- Experiencia 3D: `http://127.0.0.1:4173/.dev/preview.html`
+- Home (v3, Figma "Home / Layout A" y "Layout B": film de campaña, cielo con estrellas 3D, el interruptor del nav alterna A día/español y B noche/inglés): `http://127.0.0.1:4173/.dev/preview.html`
+- Home anterior (v2, espacio oscuro), para comparar: `http://127.0.0.1:4173/.dev/preview-v2.html`
 - Flujo comercial simulado: `http://127.0.0.1:4173/.dev/storefront.html`
 - **Simulación Ipanema:** `http://127.0.0.1:4173/.dev/ipanema.html`. Tiene el header de Altar y las piezas mínimas de Ipanema: carrito lateral, buscador con sugerencias, menú móvil, categoría con filtros y orden, producto con variantes y stock, carrito, contacto, login/registro, páginas de contenido y 404. El botón "Mapa de la simulación" lista todas las páginas y los estados. Usa el CSS real de Ipanema y lee `config/settings_data.json` (colores, tipografías, botones) y `translations/es_AR.json`, así que refleja los cambios en esos archivos. `?open=cart|search|menu|filters` abre ese panel al cargar. Es una maqueta: el HTML real lo renderiza Tiendanube.
 

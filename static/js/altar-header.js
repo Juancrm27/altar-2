@@ -19,6 +19,33 @@
     if (label) label.textContent = open ? toggle.dataset.labelClose : toggle.dataset.labelOpen;
   }
 
+  // Home v3: A ⇄ B (colours, copy, sky, 3D lighting) is revealed as one circle growing from the hero film,
+  // with a soft edge (View Transitions; the circle itself lives in altar-home-v3.css). Without support, or
+  // with reduced motion, the layouts swap at once.
+  function revealLayout(swap) {
+    var root = document.documentElement;
+    if (!root.classList.contains("altar-home-v3") || !document.startViewTransition ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      swap();
+      return;
+    }
+    var source = document.getElementById("altar-hero-campaign");
+    var bounds = source && source.getBoundingClientRect();
+    // From the film's centre while it is on screen; otherwise from the middle of the viewport.
+    var onScreen = bounds && bounds.bottom > 0 && bounds.top < window.innerHeight;
+    var x = onScreen ? bounds.left + bounds.width / 2 : window.innerWidth / 2;
+    var y = onScreen ? bounds.top + bounds.height / 2 : window.innerHeight / 2;
+    var reach = Math.max(Math.hypot(x, y), Math.hypot(window.innerWidth - x, y),
+      Math.hypot(x, window.innerHeight - y), Math.hypot(window.innerWidth - x, window.innerHeight - y));
+    root.style.setProperty("--altar-wave-x", x + "px");
+    root.style.setProperty("--altar-wave-y", y + "px");
+    // Past the farthest corner by the width of the soft edge, so the old layout is fully gone at the end.
+    root.style.setProperty("--altar-wave-end", Math.ceil(reach + 160) + "px");
+    root.classList.add("is-layout-revealing");
+    var transition = document.startViewTransition(swap);
+    transition.finished.finally(function () { root.classList.remove("is-layout-revealing"); });
+  }
+
   function closeAll() {
     document.querySelectorAll(".altar-nav.is-menu-open").forEach(function (nav) { setOpen(nav, false); });
   }
@@ -27,10 +54,13 @@
     var layout = event.target.closest("[data-altar-layout-toggle]");
     if (layout) {
       var alternate = layout.getAttribute("aria-checked") !== "true";
-      layout.setAttribute("aria-checked", String(alternate));
-      layout.setAttribute("aria-label", alternate ? "Usar layout inicial" : "Usar layout alternativo");
-      document.documentElement.dataset.altarHomeLayout = alternate ? "b" : "a";
-      document.dispatchEvent(new CustomEvent("altar:home-layout", { detail: { layout: alternate ? "b" : "a" } }));
+      var swap = function () {
+        layout.setAttribute("aria-checked", String(alternate));
+        layout.setAttribute("aria-label", alternate ? "Usar layout inicial" : "Usar layout alternativo");
+        document.documentElement.dataset.altarHomeLayout = alternate ? "b" : "a";
+        document.dispatchEvent(new CustomEvent("altar:home-layout", { detail: { layout: alternate ? "b" : "a" } }));
+      };
+      revealLayout(swap);
       return;
     }
     var spotify = event.target.closest("[data-altar-spotify-toggle]");

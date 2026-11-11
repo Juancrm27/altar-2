@@ -1,6 +1,6 @@
 // Builds a static copy of the local preview for Netlify (review only — production lives on Tiendanube).
 // Layout mirrors the repo so every "../static/..." path in the preview keeps working:
-//   dist/preview/  ← preview.html (+ index.html), storefront mock, its scripts and data
+//   dist/preview/  ← preview.html (home v3, + index.html), preview-v2.html (previous home), storefront mock, its scripts and data
 //   dist/static/   ← theme assets (compiled JS, CSS, images, models)
 // No dependencies: static/js/solar-experience.js and altar-site.js are already compiled and committed.
 import { cpSync, existsSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -16,7 +16,7 @@ rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, "preview"), { recursive: true });
 
 cpSync(join(root, "static"), join(dist, "static"), { recursive: true, filter: (path) => !skip(path) });
-for (const entry of ["preview.html", "storefront.html", "storefront-mock.html", "storefront.css", "ipanema.html", "ipanema-sim.css", "src", "data"]) {
+for (const entry of ["preview.html", "preview-v2.html", "storefront.html", "storefront-mock.html", "storefront.css", "ipanema.html", "ipanema-sim.css", "src", "data"]) {
   const from = join(dev, entry);
   if (existsSync(from)) cpSync(from, join(dist, "preview", entry), { recursive: true, filter: (path) => !skip(path) });
 }

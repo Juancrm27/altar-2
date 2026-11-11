@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" class="is-altar-home">
+<html lang="es" class="is-altar-home altar-home-v3 has-worn-text">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -19,9 +19,21 @@
 <link rel="stylesheet" href="../static/css/altar-header-v2.css">
     <link rel="stylesheet" href="../static/css/altar-footer.css">
     <link rel="stylesheet" href="./ipanema-sim.css">
+    <link rel="stylesheet" href="../static/css/altar-home-v3.css">
   </head>
   <body class="template-home" data-sim-base="./ipanema.html">
     <div data-sim-icons></div>
+    <!-- Sections 2 and 4 worn print (Texto desgastado in the lighting panel; solar-experience.js applyWornText keeps
+         these attributes in sync). Noise → rough edges (displacement) → erosion mask → blur. -->
+    <svg class="altar-v3-filters" width="0" height="0" aria-hidden="true" focusable="false">
+      <filter id="altar-worn-text" x="-2%" y="-10%" width="104%" height="120%" color-interpolation-filters="sRGB">
+        <feTurbulence data-worn-noise type="fractalNoise" baseFrequency="2.300" numOctaves="2" seed="7" result="noise"></feTurbulence>
+        <feDisplacementMap data-worn-displace in="SourceGraphic" in2="noise" scale="1.20" xChannelSelector="R" yChannelSelector="G" result="rough"></feDisplacementMap>
+        <feColorMatrix data-worn-erode in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  8 0 0 0 -0.784" result="mask"></feColorMatrix>
+        <feComposite in="rough" in2="mask" operator="in" result="worn"></feComposite>
+        <feGaussianBlur data-worn-blur in="worn" stdDeviation="0.10"></feGaussianBlur>
+      </filter>
+    </svg>
     <!-- Header Altar: same markup as sections/altar-header.tpl and .dev/ipanema.html; behaviour from src/ipanema-sim.js -->
     <header class="js-header header site-header">
       <div class="altar-nav altar-nav--v2" data-altar-page="home">
@@ -43,20 +55,20 @@
           <div class="altar-nav__experience" aria-label="Controles de experiencia">
 <button type="button" class="altar-nav__layout-switch" data-altar-layout-toggle aria-controls="altar-hero-campaign" role="switch" aria-checked="false" aria-label="Usar layout alternativo"><span aria-hidden="true"></span></button>
 <button type="button" class="altar-nav__spotify" data-altar-spotify-toggle aria-label="Escuchar en Spotify (abre una pestaña nueva)">PLAY</button>
-</div><span class="altar-nav__experience-divider" aria-hidden="true"></span><nav class="altar-nav__menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><a href="./ipanema.html#/the-star">The Star</a><a href="./ipanema.html#/contacto">Contact</a></nav>
+</div><span class="altar-nav__experience-divider" aria-hidden="true"></span><nav class="altar-nav__menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda"><span class="v3-a">Colección</span><span class="v3-b">Collection</span></a><a href="./ipanema.html#/the-star"><span class="v3-a">Collab</span><span class="v3-b">The Star</span></a><a href="./ipanema.html#/contacto"><span class="v3-a">Contacto</span><span class="v3-b">Contact</span></a></nav>
           <div class="altar-nav__actions">
             <div class="js-search-container altar-nav__action altar-nav__search-container">
               <button type="button" class="js-search-trigger altar-nav__search" aria-label="Buscar" aria-expanded="false">
-                <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span>
+                <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span class="v3-a">Buscar</span><span class="v3-b">Search</span>
               </button>
               <div class="js-search-expand-form search-floating-container altar-nav__search-panel" aria-hidden="true" data-sim-search-slot></div>
             </div>
             <span class="altar-nav__divider altar-nav__divider--actions" aria-hidden="true"></span>
             <div class="altar-nav__action-stack">
-              <a class="altar-nav__account" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
+              <a class="altar-nav__account" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span class="v3-a">Ingresar</span><span class="v3-b">Log in</span></a>
               <span id="ajax-cart" class="js-cart-container altar-nav__action" data-component="cart-button">
                 <button type="button" class="js-modal-open-private altar-nav__cart" data-target="#modal-cart" aria-label="Carrito de compras">
-                  <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span>
+                  <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span class="v3-a">Carrito</span><span class="v3-b">Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span>
                 </button>
               </span>
             </div>
@@ -65,12 +77,12 @@
         </div>
         <div class="altar-nav__menu-rule" aria-hidden="true"></div>
         <div class="altar-nav__panel" id="altar-nav-panel" data-altar-menu-panel hidden>
-          <nav class="altar-nav__panel-menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda">Collection</a><a href="./ipanema.html#/the-star">The Star</a><a href="./ipanema.html#/contacto">Contact</a></nav>
+          <nav class="altar-nav__panel-menu" aria-label="Navegación principal"><a href="./ipanema.html#/tienda"><span class="v3-a">Colección</span><span class="v3-b">Collection</span></a><a href="./ipanema.html#/the-star"><span class="v3-a">Collab</span><span class="v3-b">The Star</span></a><a href="./ipanema.html#/contacto"><span class="v3-a">Contacto</span><span class="v3-b">Contact</span></a></nav>
           <div class="altar-nav__panel-rule" aria-hidden="true"></div>
           <div class="altar-nav__panel-utilities">
-            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span></button>
-            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span></button>
-            <a class="altar-nav__panel-item" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
+            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span class="v3-a">Buscar</span><span class="v3-b">Search</span></button>
+            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span class="v3-a">Carrito</span><span class="v3-b">Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span></button>
+            <a class="altar-nav__panel-item" href="./ipanema.html#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span class="v3-a">Ingresar</span><span class="v3-b">Log in</span></a>
           </div>
         </div>
         <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
@@ -87,9 +99,8 @@
             </div>
           </div>
           <div class="altar-solar__stage" data-solar-stage>
-            <a class="altar-hero-v2__campaign" id="altar-hero-campaign" href="./ipanema.html#/tienda" aria-label="Campaña Altar · Ver colección" data-cursor-label="Ver colección">
-              <img class="altar-hero-v2__media altar-hero-v2__media--compact" src="../static/images/altar-v2-hero-compact.png" alt="Detalle de la colección Altar en tejido azul y verde" width="1526" height="1008" fetchpriority="high">
-              <img class="altar-hero-v2__media altar-hero-v2__media--expanded" src="../static/images/altar-v2-hero-expanded.png" alt="" aria-hidden="true" width="1536" height="1006">
+            <a class="altar-hero-v2__campaign altar-hero-v3__film" id="altar-hero-campaign" href="./ipanema.html#/tienda" aria-label="Film de campaña Altar · Ver colección" data-cursor-label="Arrastrar" data-cursor-icon="move">
+              <video class="altar-hero-v2__media" src="../static/videos/altar-film.mp4" poster="../static/images/altar-film-poster.jpg" width="1344" height="1008" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
             </a>
             <div class="altar-solar__sky" aria-hidden="true">
               <i class="altar-solar__glow altar-solar__glow--rose"></i>
@@ -196,7 +207,7 @@
               </div>
             </div>
           </div>
-          <section class="altar-solar__ground altar-collection" id="coleccion" aria-label="Colección ELEMENTAL">
+          <section class="altar-solar__ground altar-collection" id="coleccion" aria-label="Drop ELEMENTAL">
             <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
               <filter id="altar-grain-collection-preview" x="0" y="0" width="100%" height="100%">
                 <feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence>
@@ -204,14 +215,17 @@
               </filter>
               <rect width="100%" height="100%" filter="url(#altar-grain-collection-preview)"></rect>
             </svg>
-            <div class="altar-collection__heading">
-              <div class="altar-collection__identity">
-                <div class="altar-collection__meta"><span>SS 27</span><span>101 couture</span></div>
-                <h2>ELEMENTAL</h2>
-              </div>
-              <div class="altar-collection__note">
-                <span>As bordado</span>
-                <p>Hecho despacio, a mano y con intención. Para quien sabe mirar más allá.</p>
+            <div class="altar-v3-statement" aria-label="Drop N.º I — Elemental">
+              <div class="altar-v3-statement__body">
+                <p class="altar-v3-statement__label" aria-label="Drop N.º I — Elemental"><span>Drop</span><span>N.º</span><span>I</span><span>—</span><span>ELEMENTAL</span></p>
+                <div class="altar-v3-justified v3-a" lang="es">
+                  <p>Actualización del sistema operativo a modo avión. Fuego, tierra, aire &amp; agua.<br> Un amuleto por elemento en fibras naturales. Ropa creada para acompañar la evolución personal<br> y honrar los ciclos.</p>
+                  <p>Una invitación a entrar en órbita y leer entre líneas. Diseñada y hecha a mano en Buenos Aires.</p>
+                </div>
+                <div class="altar-v3-justified v3-b" lang="en">
+                  <p>Operating system updated to flight mode. Fire, earth, air &amp; water.<br> One amulet per element, in natural fibres. Clothes that witness your personal evolution<br> and honour the cycles.</p>
+                  <p>An invitation to sync into orbit and read between the lines. Designed and handcrafted in Buenos Aires.</p>
+                </div>
               </div>
             </div>
             <a class="altar-collection__continuation" href="./ipanema.html#/tienda" tabindex="-1" aria-hidden="true" data-cursor-label="Ver colección"></a>
@@ -220,10 +234,6 @@
               <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver colección"><img src="../static/images/altar-v2-editorial-2.png" alt="Composición de flores de la campaña Altar" width="339" height="472" loading="lazy"></a>
               <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver colección"><img src="../static/images/altar-v2-editorial-3.png" alt="Vestido azul y verde de la colección Altar" width="339" height="472" loading="lazy"></a>
               <a class="altar-collection__photo" href="./ipanema.html#/tienda" data-cursor-label="Ver colección"><img src="../static/images/altar-v2-editorial-4.png" alt="Retrato con flores y tejido verde" width="339" height="472" loading="lazy"></a>
-            </div>
-            <div class="altar-collection__materia">
-              <span>La materia</span>
-              <p>Cada material guarda una forma posible. El cuerpo termina de revelarla.</p>
             </div>
           </section>
           <section class="altar-closing altar-manifesto-v2" id="about" aria-label="Manifiesto de Altar">
@@ -234,8 +244,7 @@
               </filter>
               <rect width="100%" height="100%" filter="url(#altar-grain-closing-preview)"></rect>
             </svg>
-            <img class="altar-closing__symbol" src="../static/images/altar-symbol-large.svg" alt="" width="698" height="673" loading="lazy">
-            <div class="altar-closing__content">
+                        <div class="altar-closing__content">
 <div class="altar-manifesto__oracle"><div class="altar-solar__fortune-cards is-open" id="altar-fortune-card" role="group" aria-label="Mensaje de Altar" aria-hidden="false">
                 <span class="altar-solar__fortune-cta-frame" aria-hidden="true"></span>
                 <p class="altar-solar__fortune-cta-text"><img class="altar-solar__fortune-cta-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Toca la carta.<br>Hay algo esperándote</span></p>
@@ -270,20 +279,21 @@
                 </aside>
                 <button type="button" class="altar-solar__fortune-close" data-fortune-close tabindex="-1" aria-label="Cerrar carta"><img src="../static/images/altar-close.svg" alt="" width="14" height="14"></button>
               </div></div>
-              <div class="altar-closing__note">
-                <span>El tejido</span>
-                <p>Formas únicas que cuentan historias, entrelazadas con paciencia y cariño.</p>
-              </div>
               <div class="altar-closing__identity">
-                <div class="altar-closing__head">
-                  <div class="altar-collection__meta"><span>SS 27</span><span>101 couture</span></div>
-                  <p class="altar-closing__wordmark"><span>altar</span><sup>©</sup></p>
-                </div>
-                <div class="altar-closing__manifesto">
-                  <p class="altar-closing__lead">En 2026,  Manifiesto<span class="altar-closing__tag">Argentina<sup>01</sup></span></p>
-                  <p class="altar-closing__body">Me inspiran los altares paganos y populares: un santo local, una piedra del río y una diosa india. Los cuatro elementos representados. Un registro físico del universo interior y los arquetipos que resuenan. La libertad de armar un rincón y verlo crecer. Vincularse con lo divino sin culpa, miedo o manual heredado. Decido cómo juego las cartas que me tocan. El cielo y el infierno se sintonizan en lo cotidiano. Diseño sistemas para ofrendar más de lo que extraigo. Bailo entre el marco moral y lo salvaje. Practico rituales que ordenan el misterio de lo oculto. Una búsqueda humana, sensible, comercial e imperfecta. No pretende ser sagrada. Busca los puntos donde lo divino y lo mundano se encuentran. Escenas donde todos los que participan ganan. De esta curiosidad nace altar. Objetos que funcionan como amuletos para anclar quién soy, dónde habito y quién quiero ser. Piezas que se llevan en el cuerpo y evolucionan en cada colección.</p>
-                  <p class="altar-closing__signature"><span class="altar-closing__tag">Sofía Guevara<sup>02</sup></span></p>
-                  <p class="altar-closing__body">Un archivo de objetos para mundos interiores.</p>
+                <p class="altar-closing__wordmark"><span>altar</span></p>
+                <div class="altar-v3-manifesto">
+                  <h2 class="altar-v3-manifesto__title v3-a" lang="es" aria-label="Archivo de amuletos para el universo interno — Manifiesto 2026"><span>Archivo</span><span>de</span><span>amuletos</span><span>para</span><span>el</span><span>universo</span><span>interno</span><span>—</span><span>Manifiesto</span><span>2026</span></h2>
+                  <h2 class="altar-v3-manifesto__title v3-b" lang="en" aria-label="Archive of amulets for the inner universe — Manifesto 2026"><span>Archive</span><span>of</span><span>amulets</span><span>for</span><span>the</span><span>inner</span><span>universe</span><span>—</span><span>Manifesto</span><span>2026</span></h2>
+                  <div class="altar-v3-justified v3-a" lang="es">
+                    <p>El cielo y el infierno son estados de frecuencia que se sintonizan en lo cotidiano.<br> Me interesa el borde donde lo humano se encuentra con lo animal.<br> Me inspiran los altares populares: un santo local, una piedra del río<br> y el arquetipo del momento. Mapas de lo que alguien lleva dentro.<br> Amuletos hechos a mano.</p>
+                    <p>Altar nació en 2020 como un juego para salir del modo supervivencia.<br> Cada día, un gesto mínimo por elemento: un saludo al sol, una sopa caliente,<br> una hoja escrita y una meditación breve. Los tildaba en una nota del teléfono.<br> El juego tomó vida propia. El caos se ordenó en cuatro<br> actos de una obra.</p>
+                    <p>Juego para invocar la inspiración efímera. Me fascina la señal entre el ruido.<br> Busco sistemas en los que pueda ofrendar más de lo que tomo.</p>
+                  </div>
+                  <div class="altar-v3-justified v3-b" lang="en">
+                    <p>Heaven and hell are frequency states tuned in the mundane. I’m rather fond of<br> that edge where the human meets the feral. I’m fascinated by folk altars:<br> a local saint, a river stone and the hour’s archetype. Little maps of what a person<br> carries inside. Amulets shaped by hand.</p>
+                    <p>Altar was born in 2020 as a game to get out of survival mode.<br> One small gesture per element, every day: a sun salutation, a hot soup,<br> a written page and a brief meditation. I ticked them off in a phone note.<br> The game took on a life of its own. The day settled into four<br> acts of fun chaos.</p>
+                    <p>Play to evoke the creative state. I’m thrilled by the ephemeral signal in between<br> process and iteration. I search for systems in which I can offer more than I take.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -300,63 +310,37 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer"><div class="altar-closing-v2" id="closing"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div><svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-closing-footer" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-closing-footer)"></rect></svg>
-      <!-- Same structure as sections/altar-footer.tpl (Figma Footer / Site). -->
-      <div class="altar-footer altar-footer--v2 altar-footer--color" data-header-theme="light" style="--footer-background:#FFF3A9;--footer-foreground:#601E2A;">
-        <div class="altar-footer__top">
-          <div class="altar-footer__newsletter">
-            <div class="altar-footer__newsletter-copy">
-              <p class="altar-footer__label">[ NEWSLETTER ]</p>
-              <p class="altar-footer__body">Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.</p>
-            </div>
-            <form class="altar-footer__form" data-newsletter-form>
-              <div class="altar-footer__field">
-                <label class="visually-hidden" for="altar-newsletter-email">Tu correo</label>
-                <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input" placeholder="Tu correo" autocomplete="email" required>
-                <button type="submit" class="altar-footer__submit"><span>Suscribirme</span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h5v5M3.5 8.5l5-5"/></svg></button>
-              </div>
-              <p class="altar-footer__status" role="status"></p>
-            </form>
-            <nav class="altar-footer__social" aria-label="Redes sociales">
-              <a href="https://www.instagram.com/altarmundi/" target="_blank" rel="noopener" aria-label="Instagram"><img class="altar-footer__social-mask" src="../static/images/altar-instagram.svg" alt="" width="24" height="24" style="--altar-social-mask: url('/static/images/altar-instagram.svg');"></a>
-            </nav>
-          </div>
-          <div class="altar-footer__groups">
-            <nav class="altar-footer__group altar-footer__group--help" aria-label="Ayuda">
-              <p class="altar-footer__label">Ayuda</p>
-              <a href="#">Envíos y devoluciones</a>
-              <a href="#">Solicitud de devolución</a>
-              <a class="altar-footer__keep-case" href="#">FAQs</a>
-            </nav>
-            <div class="altar-footer__group altar-footer__group--address">
-              <p class="altar-footer__label">Contacto</p>
-              <span>Buenos Aires, Arg.</span>
-              <a href="https://wa.me/541157991078">WhatsApp</a>
-              <a href="mailto:hola@altarmundi.com">Correo</a>
-            </div>
-            <nav class="altar-footer__group altar-footer__group--explore" aria-label="Explorar">
-              <p class="altar-footer__label">Explorar</p>
-              <a href="./ipanema.html#/tienda">Store</a>
-              <a href="#about">About</a>
-              <a href="#">Makers</a>
-            </nav>
-          </div>
+    <footer class="site-footer"><div class="altar-closing-v2 altar-v3-closing" id="closing"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div><svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-closing-footer" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-closing-footer)"></rect></svg>
+      <figure class="altar-v3-closing__photo">
+        <a href="./ipanema.html#/tienda" data-cursor-label="Arrastrar" data-cursor-icon="move">
+          <img class="v3-a" src="../static/images/altar-v3-closing.jpg" alt="Retrato de campaña con camisa de lino crudo" width="1400" height="934" loading="lazy">
+          <img class="v3-b altar-v3-closing__compact" src="../static/images/altar-v2-hero-compact.png" alt="Campaign detail in blue and green fabric" width="1526" height="1008" loading="lazy">
+        </a>
+      </figure>
+    </div>
+    <!-- Figma Footer / Minimal (667:1603). -->
+    <div class="altar-footer-min">
+      <svg class="altar-solar__grain altar-section-grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-footer-min" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-footer-min)"></rect></svg>
+      <form class="altar-footer-min__newsletter" id="altar-footer-newsletter" data-newsletter-form hidden>
+        <label class="visually-hidden" for="altar-footer-email"><span class="v3-a">Tu correo</span><span class="v3-b">Your email</span></label>
+        <input id="altar-footer-email" type="email" name="email" autocomplete="email" required placeholder="Correo" data-placeholder-a="Correo" data-placeholder-b="Email">
+        <button type="submit"><span class="v3-a">Enviar</span><span class="v3-b">Send</span></button>
+        <p class="altar-footer__status" role="status"></p>
+      </form>
+      <nav class="altar-footer-min__links" aria-label="Enlaces">
+        <button type="button" aria-expanded="false" aria-controls="altar-footer-newsletter" data-newsletter-toggle><span class="v3-a">Cartas</span><span class="v3-b">Newsletter</span></button>
+        <a href="https://www.instagram.com/altarmundi/" target="_blank" rel="noopener">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">YouTube</a>
+        <a href="./ipanema.html#/contacto"><span class="v3-a">Contacto</span><span class="v3-b">Contact</span></a>
+        <a href="https://wa.me/541157991078" target="_blank" rel="noopener">WhatsApp</a>
+      </nav>
+      <div class="altar-footer-min__legal">
+        <div class="altar-footer-min__brand">
+          <p>©2026 altar</p>
+          <a href="https://www.tiendanube.com" target="_blank" rel="noopener" aria-label="Creado con Tiendanube"><img src="../static/images/altar-creado-con-tiendanube.svg" alt="" width="155" height="17"></a>
         </div>
-        <p class="altar-footer__descriptor">CONCEPT STORE  /  C.A.B.A. (ARG)</p>
-        <div class="altar-footer__bottom">
-          <div class="altar-footer__meta">
-            <div class="altar-footer__meta-left">
-              <p class="altar-footer__copyright">©2026 altar</p>
-              <span class="altar-footer__powered"><span class="sim-powered-by">Creado con Tiendanube</span></span>
-            </div>
-          </div>
-          <div class="altar-footer__legal">
-            <div class="claim-link"><span class="claim-text">Defensa de las y los consumidores.</span><a href="#">Para reclamos ingresá acá.</a><span>/</span><a href="#">Botón de arrepentimiento</a></div>
-          </div>
-          <div class="altar-footer__platform footer-secondary-info">
-            <div class="footer-legal-container"><div class="claim-link"><span class="claim-text">Defensa de las y los consumidores.</span><a href="#">Para reclamos ingresá acá.</a><span>/</span><a href="#">Botón de arrepentimiento</a></div></div>
-          </div>
-        </div>
+        <div class="altar-footer-min__claim"><a href="#">Defensa de las y los consumidores. Para reclamos ingresá acá.</a><span aria-hidden="true">/</span><a href="#">Botón de arrepentimiento</a></div>
       </div>
     </div></footer>
     <script>
@@ -373,6 +357,25 @@
           if (page) a.href = "./ipanema.html" + page;
         });
       }
+    </script>
+    <script>
+      // Layout A speaks Spanish, layout B English (the header switch sets data-altar-home-layout).
+      document.addEventListener("altar:home-layout", function (event) {
+        var b = event.detail.layout === "b";
+        document.documentElement.lang = b ? "en" : "es";
+        var email = document.getElementById("altar-footer-email");
+        if (email) email.placeholder = b ? email.dataset.placeholderB : email.dataset.placeholderA;
+      });
+      // Footer: Cartas / Newsletter opens the CORREO — ENVIAR row above the links.
+      document.querySelectorAll("[data-newsletter-toggle]").forEach(function (toggle) {
+        toggle.addEventListener("click", function () {
+          var form = document.getElementById(toggle.getAttribute("aria-controls"));
+          var open = toggle.getAttribute("aria-expanded") !== "true";
+          toggle.setAttribute("aria-expanded", String(open));
+          form.hidden = !open;
+          if (open) form.querySelector("input").focus();
+        });
+      });
     </script>
     <div data-sim-modals></div>
     <script src="../static/js/altar-header.js" defer></script>

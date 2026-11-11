@@ -1,0 +1,362 @@
+/* Home v3 · Figma "Home / Layout A" (631:1003) and "Home / Layout B" (631:1314).
+   Loaded after altar-header-v2.css and scoped to <html class="altar-home-v3">, so the v2 home is untouched.
+   The header switch sets <html data-altar-home-layout="b">: A is the day version in Spanish, B the night
+   version in English. One continuous sky runs behind the first three screens (film, statement, gallery):
+   the 3D stage is that tall and carries the gradient, the stars and the shooting stars; 04–06 continue on
+   the last colour of that gradient. */
+html.is-altar-home.altar-home-v3 {
+  --v3-ink: #091e2b;
+  --v3-sage: #c6ca9f;
+  /* Layout A */
+  --v3-fg: var(--v3-ink);
+  --v3-bg: var(--v3-sage);
+  /* Sky colours at the top of 01, end of 01, end of 02 and end of the gallery (the gradient is built on the stage). */
+  --v3-sky-c0: #83a6cc; --v3-sky-c1: #becadd; --v3-sky-c2: #e3ac94; --v3-sky-c3: #c6ca9f;
+  --v3-switch-track: var(--v3-ink);
+  --v3-switch-knob: var(--v3-sage);
+  --v3-grain-blend: multiply;
+  color-scheme: light;
+  background: var(--v3-bg);
+}
+html.is-altar-home.altar-home-v3[data-altar-home-layout="b"] {
+  /* Layout B: #0F0F0F hero, black statement, black → #091E2B gallery, held to the edge so it meets 04's navy. */
+  --v3-fg: var(--v3-sage);
+  --v3-bg: var(--v3-ink);
+  --v3-sky-c0: #0f0f0f; --v3-sky-c1: #000; --v3-sky-c2: #000; --v3-sky-c3: #091e2b;
+  --v3-switch-track: var(--v3-sage);
+  --v3-switch-knob: #0f0f0f;
+  --v3-grain-blend: screen;
+  color-scheme: dark;
+}
+/* Copy per layout: .v3-a (Spanish) and .v3-b (English). Blocks swap with display. */
+html.altar-home-v3:not([data-altar-home-layout="b"]) .v3-b:not(:is(.altar-nav__menu a, .altar-nav__search, .altar-nav__account, .altar-footer-min__links > *) > *),
+html.altar-home-v3[data-altar-home-layout="b"] .v3-a:not(:is(.altar-nav__menu a, .altar-nav__search, .altar-nav__account, .altar-footer-min__links > *) > *) { display: none !important; }
+/* Nav and footer words don't move when the language changes: both versions sit in the same grid cell, the
+   link takes the width of the longer one and the unused one is only made invisible. (With display: none the
+   Spanish letters would also replay their intro fade, one by one, every time B goes back to A.) */
+html.altar-home-v3 :is(.altar-nav__menu a, .altar-nav__search, .altar-nav__account, .altar-footer-min__links > *):has(> .v3-a + .v3-b) {
+  display: inline-grid;
+  justify-items: center;
+  align-items: center;
+}
+html.altar-home-v3 :is(.altar-nav__menu a, .altar-nav__search, .altar-nav__account, .altar-footer-min__links > *) > :is(.v3-a, .v3-b) { grid-area: 1 / 1; }
+html.altar-home-v3:not([data-altar-home-layout="b"]) :is(.altar-nav__menu a, .altar-nav__search, .altar-nav__account, .altar-footer-min__links > *) > .v3-b,
+html.altar-home-v3[data-altar-home-layout="b"] :is(.altar-nav__menu a, .altar-nav__search, .altar-nav__account, .altar-footer-min__links > *) > .v3-a { visibility: hidden; }
+/* Footer links (Figma Footer / Minimal): each link is only as wide as its visible word, so CARTAS sits on the left
+   edge and the mobile rows break as in Figma; the hidden language leaves the flow instead of reserving space. */
+html.altar-home-v3 .altar-footer-min__links > * { position: relative; justify-items: start; }
+html.altar-home-v3:not([data-altar-home-layout="b"]) .altar-footer-min__links > * > .v3-b,
+html.altar-home-v3[data-altar-home-layout="b"] .altar-footer-min__links > * > .v3-a { position: absolute; top: 0; left: 0; }
+/* Once the opening sequence is over, its per-letter fades are spent: never let them run again. */
+html.altar-home-v3:not(.altar-intro) .altar-intro__char { animation: none !important; }
+
+.altar-home-v3 .altar-solar { background: var(--v3-bg); }
+html.altar-home-v3 body.template-home .altar-solar__stage {
+  /* --hero-height is the stage's own first screen; 02 is --v3-statement-height tall; the gallery's bottom
+     margin is the same expression as in 03 below. */
+  --v3-sky-1: var(--hero-height, 100svh);
+  --v3-sky-2: calc(var(--hero-height, 100svh) + var(--v3-statement-height, 100svh));
+  --v3-sky-3: calc(100% - var(--v3-gallery-bottom, 0px));
+  /* Stops on the real section edges; the last colour holds to the end, so 03 meets 04 on the very same colour. */
+  background: linear-gradient(180deg, var(--v3-sky-c0) 0, var(--v3-sky-c1) var(--v3-sky-1), var(--v3-sky-c2) var(--v3-sky-2), var(--v3-sky-c3) var(--v3-sky-3), var(--v3-sky-c3) 100%);
+}
+@media (max-width: 749px) {
+  html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: calc(100% - 72px); }
+}
+/* Section heights from Figma (1440 frame): 01 832 · 02 512 · 03 707 · 04 624 · 05 832 · 06 106.
+   03: the 543 px gallery sits 82 px from the top and 82 px from the bottom, in A and B. */
+html.altar-home-v3 {
+  --v3-gallery-top: 5.694444vw;
+  --v3-gallery-bottom: 5.694444vw;
+}
+.altar-home-v3 .altar-solar__sky { display: none; }
+.altar-home-v3 .altar-solar__stage > .altar-solar__stage-grain { mix-blend-mode: var(--v3-grain-blend); }
+/* 03 → 04 without a seam: the stars and planets thin out over the last half screen of the sky instead of
+   stopping on a line. Only while the canvas sits in the stage; the closing scene borrows it unmasked. */
+.altar-home-v3 .altar-solar__stage > .altar-solar__canvas {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 55svh), transparent 100%);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 55svh), transparent 100%);
+}
+
+/* Navigation / Site — #091E2B (A) · #C6CA9F (B) */
+.altar-home-v3 .altar-nav.altar-nav--v2 { --altar-nav-color: var(--v3-fg); color: var(--v3-fg); }
+.altar-home-v3 .altar-nav--v2 .altar-nav__logo { background: var(--v3-fg); -webkit-mask: url("../images/altar-logo.svg") center / contain no-repeat; mask: url("../images/altar-logo.svg") center / contain no-repeat; }
+.altar-home-v3 .altar-nav--v2 .altar-nav__logo img { opacity: 0; }
+.altar-home-v3 .altar-nav--v2 .altar-nav__layout-switch { background: var(--v3-switch-track); }
+.altar-home-v3 .altar-nav--v2 .altar-nav__layout-switch span { background: var(--v3-switch-knob); }
+.altar-home-v3 .altar-nav--v2 .altar-nav__experience-divider { opacity: 1; }
+.altar-home-v3 .altar-nav--v2 :is(a, button):hover { color: var(--v3-fg); opacity: .6; }
+.altar-home-v3 .altar-nav--v2 .altar-nav__layout-switch:hover { opacity: 1; }
+.altar-home-v3 :is(.altar-cursor-badge__label, .altar-cursor-badge__arrow) { color: var(--v3-bg); background: var(--v3-fg); }
+@media (max-width: 1199px) {
+  .altar-home-v3 .altar-nav--v2.is-menu-open .altar-nav__panel { background: var(--v3-bg); color: var(--v3-fg); }
+}
+
+/* 01 / Hero — Campaign film: 670 × 502.5 at x 130, centred vertically on the first screen (1440 × 832),
+   in both layouts (html.altar-home-v3 outranks the v2 layout-B rule that stretches the hero photo).
+   It can be dragged anywhere on screen (makeDraggable → --drag-x/--drag-y); a plain click still opens the shop. */
+html.altar-home-v3 body.template-home .altar-hero-v3__film {
+  --film-width: min(46.527778vw, calc((100svh - 200px) * 4 / 3));
+  left: 9.027778vw;
+  top: calc(var(--hero-height, 100svh) / 2 - var(--film-width) * .375);
+  width: var(--film-width);
+  aspect-ratio: 4 / 3;
+  background: transparent;
+  translate: var(--drag-x, 0px) var(--drag-y, 0px);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+html.altar-home-v3 body.template-home .altar-hero-v3__film.is-dragging { cursor: grabbing; }
+.altar-home-v3 .altar-hero-v3__film video { object-fit: cover; pointer-events: none; }
+html.altar-home-v3 .altar-collection__continuation { display: none; }
+@media (max-width: 749px) {
+  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: calc(100vw - 24px); left: 0; }
+}
+
+/* 02 + 03 share .altar-collection, which sits over the lower two screens of the stage.
+   flow-root keeps the gallery's bottom margin inside, so the measured height (and the sky) reaches past it. */
+.altar-home-v3 body.template-home .altar-collection { display: flow-root; padding: 0; color: var(--v3-fg); }
+
+/* 02 / Manifesto — Statement: 1440 × 512 band, its 878 × ~153 copy centred in it (x 281). A: 18.895 px text, 22.7 px under
+   the DROP line · B: 17.65 px, 5.0 px. Sizes are vw of the 1440 frame, so text and column scale together and
+   Figma's line breaks hold on every desktop width; phones get readable fixed sizes instead. */
+html.altar-home-v3 { --v3-statement-height: 35.555556vw; }
+.altar-v3-statement { display: flex; height: var(--v3-statement-height); padding: 0 24px; align-items: center; justify-content: center; }
+.altar-v3-statement__body {
+  display: flex; width: 60.972222vw; flex-direction: column; gap: 1.574583vw;
+  color: var(--v3-fg); font: 300 1.312153vw/1.35 Inter, Arial, sans-serif; /* Inter Light, as in Figma */
+}
+html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: .350208vw; font-size: 1.225694vw; }
+.altar-v3-statement__label { display: flex; justify-content: space-between; margin: 0; line-height: 1.800764vw; letter-spacing: -.045021vw; text-transform: uppercase; }
+@media (min-width: 750px) {
+  /* The statement keeps Figma's lines on every desktop width (its column scales with the text). */
+  .altar-v3-statement .altar-v3-justified br { display: inline; }
+  .altar-v3-statement .altar-v3-justified p { white-space: nowrap; }
+}
+@media (max-width: 749px) {
+  .altar-v3-statement__body { width: 100%; gap: 18px; font-size: 15px; }
+  html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: 6px; font-size: 14px; }
+  .altar-v3-statement__label { line-height: 20.585px; letter-spacing: -.5146px; }
+}
+/* Worn print on the copy of sections 2 and 4, A and B (filter #altar-worn-text in the page; tuned in the
+   lighting panel, 06 · Texto secciones 2 y 4). In 04 it covers the wordmark, title and paragraphs, not the card. */
+.altar-v3-filters { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
+html.altar-home-v3.has-worn-text :is(.altar-v3-statement__body, .altar-manifesto-v2 .altar-closing__identity) { filter: url("#altar-worn-text"); }
+/* Justified, last line included (Figma "justificado"): every line runs edge to edge. On desktop the <br>
+   reproduce Figma's lines; below 1240px the column narrows and the text reflows on its own. */
+.altar-v3-justified p { margin: 0; text-align: justify; text-align-last: justify; hyphens: none; }
+@media (max-width: 1239px) { .altar-v3-justified br { display: none; } }
+/* Figma's lines are tight (3 px word gaps in places) and browser Inter runs a hair wider: keep each Figma
+   line whole instead of spilling one word onto a line of its own. */
+@media (min-width: 1240px) { .altar-v3-justified p { white-space: nowrap; } }
+
+/* 03 / Campaign — Editorial gallery: 4 × (360 × 543), centred on its screen. */
+.altar-home-v3 body.template-home .altar-collection__gallery { margin: var(--v3-gallery-top) 0 var(--v3-gallery-bottom); }
+.altar-home-v3 body.template-home .altar-collection__photo { background: transparent; }
+@media (max-width: 749px) {
+  html.altar-home-v3 { --v3-statement-height: 80svh; }
+  .altar-v3-statement { height: auto; min-height: var(--v3-statement-height); padding: 120px 24px; }
+  .altar-home-v3 body.template-home .altar-collection__gallery { margin: 72px 0; }
+}
+
+/* 04 / Brand story — Oracle card and wordmark (text column: 596 px in A, 562 px in B) */
+html.altar-home-v3 body.template-home .altar-manifesto-v2 { --manifesto-bg: var(--v3-bg); --manifesto-text: var(--v3-fg); }
+/* 04 is a 624 px band (1440 frame) with the 470 px card and the copy centred in it. */
+@media (min-width: 750px) {
+  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: 43.333333vw; }
+}
+@media (min-width: 1101px) {
+  html.altar-home-v3 body.template-home .altar-manifesto-v2 { padding-top: 0; padding-bottom: 0; }
+}
+.altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { gap: 0; }
+.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-weight: 300; }
+.altar-v3-manifesto { width: min(596px, 100%); margin-top: 63px; color: var(--v3-fg); font: 400 15px/1.35 Inter, Arial, sans-serif; }
+/* Figma: 562 px. Browser Inter sets "…tuned in the mundane. I’m rather fond of" 9 px wider, so 572. */
+html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-manifesto { width: min(572px, 100%); }
+.altar-v3-manifesto__title { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 3px; margin: 0 0 20px; font: 400 17.154px/20.585px Inter, Arial, sans-serif; letter-spacing: -.5146px; text-transform: uppercase; white-space: nowrap; }
+.altar-v3-manifesto .altar-v3-justified p + p { margin-top: 20px; }
+@media (max-width: 749px) {
+  .altar-v3-manifesto { margin-top: 32px; }
+  .altar-v3-manifesto__title { justify-content: flex-start; column-gap: .3em; font-size: 15px; line-height: 20px; }
+}
+
+/* 05 / Closing — campaign photo (426.96 × 285.11 at x 732, y 50 of the 1440 × 832 frame) over the persistent 3D
+   stones (1440 × 480 at the bottom). B uses the compact hero photo, drawn at 459.4 × 304 inside the frame. */
+.altar-v3-closing { display: grid; min-height: max(100svh, 57.777778vw); place-items: center; }
+.altar-v3-closing > .altar-closing-v2__scene { position: absolute; right: 0; bottom: 0; left: 0; z-index: 2; background: transparent; }
+.altar-v3-closing__photo { position: absolute; top: 3.472222vw; left: 50.833333vw; z-index: 3; width: 29.650054vw; aspect-ratio: 426.9608 / 285.1064; margin: 0; overflow: hidden; background: #fff; }
+.altar-v3-closing__photo a, .altar-v3-closing__photo img { display: block; width: 100%; height: 100%; }
+/* Draggable like the hero film (makeDraggable → --drag-x/--drag-y); a plain click still opens the shop. */
+.altar-v3-closing__photo { translate: var(--drag-x, 0px) var(--drag-y, 0px); cursor: grab; user-select: none; -webkit-user-select: none; }
+.altar-v3-closing__photo.is-dragging { cursor: grabbing; }
+.altar-v3-closing__photo img { pointer-events: none; }
+.altar-v3-closing__photo img { object-fit: cover; }
+.altar-v3-closing__photo .altar-v3-closing__compact { scale: 1.066266; }
+/* The photo is centred under the copy column of 04 (Figma grid): that column starts at 44.44vw (x 640) and is
+   596 px wide in A, 572 px in B. Tying the photo to it keeps them aligned on every desktop width. */
+html.altar-home-v3 { --v3-text-col: min(596px, 48.402778vw); }
+html.altar-home-v3[data-altar-home-layout="b"] { --v3-text-col: min(572px, 48.402778vw); }
+@media (min-width: 1101px) {
+  .altar-v3-closing__photo { left: calc(44.444444vw + (var(--v3-text-col) - 29.650054vw) / 2); }
+}
+@media (max-width: 749px) {
+  .altar-v3-closing { min-height: 0; padding: 120px 24px 0; place-items: start center; }
+  .altar-v3-closing > .altar-closing-v2__scene { position: relative; grid-row: 2; width: calc(100% + 48px); margin: -24px -24px 0; }
+  .altar-v3-closing__photo { position: relative; top: auto; left: auto; width: 100%; }
+}
+
+/* 06 / Footer — Minimal (667:1603): Claro in A, Oscuro in B. The first link (Cartas / Newsletter)
+   opens the CORREO — ENVIAR row above the links and stays underlined while it is open. */
+.altar-home-v3 .site-footer { background: var(--v3-bg); }
+.altar-footer-min { position: relative; isolation: isolate; display: flex; padding: 32px 24px 16px; flex-direction: column; gap: 24px; color: var(--v3-fg); background: var(--v3-bg); font-family: Inter, Arial, sans-serif; }
+/* Same film grain as the closing above it (multiply in A, screen in B), so 05 and 06 read as one surface. */
+.altar-footer-min > .altar-section-grain { position: absolute; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: var(--v3-grain-blend); }
+.altar-footer-min :is(a, button) { padding: 0; border: 0; color: inherit; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; text-decoration: none; cursor: pointer; }
+.altar-footer-min :is(a, button):hover { opacity: .6; }
+.altar-footer-min :is(a, button, input):focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
+.altar-footer-min [data-newsletter-toggle][aria-expanded="true"] { text-decoration: underline; text-underline-position: from-font; }
+.altar-footer-min__newsletter { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 8px; border-bottom: 1px solid color-mix(in srgb, currentColor 40%, transparent); font-size: 12px; line-height: normal; text-transform: uppercase; }
+.altar-footer-min__newsletter[hidden] { display: none; }
+.altar-footer-min__newsletter input { min-width: 0; flex: 1; padding: 0; border: 0; border-radius: 0; color: inherit; background: none; font: inherit; text-transform: inherit; }
+.altar-footer-min__newsletter input::placeholder { color: inherit; opacity: 1; }
+/* The row's own rule is the field: focus shows by making it solid instead of drawing a box. */
+.altar-footer-min__newsletter input:focus-visible { outline: none; }
+.altar-footer-min__newsletter:focus-within { border-bottom-color: currentColor; }
+.altar-footer-min__newsletter .altar-footer__status { margin: 0; font-size: 10px; text-transform: none; }
+.altar-footer-min__newsletter .altar-footer__status:empty { display: none; }
+.altar-footer-min__links { display: flex; justify-content: space-between; gap: 16px; font-size: 12px; line-height: normal; text-transform: uppercase; }
+.altar-footer-min__legal { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 10px; line-height: normal; }
+.altar-footer-min__brand { display: flex; align-items: center; gap: 16px; }
+.altar-footer-min__brand p { margin: 0; font-size: inherit; line-height: inherit; }
+/* The Tiendanube mark follows the text colour: the SVG is used as a mask. */
+.altar-footer-min__brand a { display: block; width: 155px; height: 17px; background: currentColor; -webkit-mask: url("../images/altar-creado-con-tiendanube.svg") center / contain no-repeat; mask: url("../images/altar-creado-con-tiendanube.svg") center / contain no-repeat; }
+.altar-footer-min__brand img { display: block; width: 155px; height: 17px; opacity: 0; }
+.altar-footer-min__claim { display: flex; flex-wrap: wrap; gap: 8px; }
+.altar-footer-min__claim a:last-child { text-decoration: underline; text-underline-position: from-font; }
+/* Mobile (Device=Mobile): wrapped links, consumer lines stacked above the brand. */
+@media (max-width: 749px) {
+  .altar-footer-min { padding-inline: 16px; }
+  .altar-footer-min__links { flex-wrap: wrap; justify-content: flex-start; gap: 12px 42px; }
+  .altar-footer-min__legal { flex-direction: column-reverse; align-items: flex-start; gap: 10px; }
+  .altar-footer-min__claim { flex-direction: column; gap: 6px; }
+  .altar-footer-min__claim > span { display: none; }
+}
+
+/* A ⇄ B: the new layout grows as a circle from the hero film over the old one (altar-header.js starts the
+   View Transition and sets the centre and reach). The edge is feathered over 160 px so the change reads as a
+   wash of light, not a cut. Only the root is captured: the page is one picture for the length of the wave. */
+@property --altar-wave {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+html.is-layout-revealing::view-transition-group(root) { animation-duration: 1500ms; }
+html.is-layout-revealing::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+html.is-layout-revealing::view-transition-new(root) {
+  mix-blend-mode: normal;
+  -webkit-mask-image: radial-gradient(circle at var(--altar-wave-x, 50%) var(--altar-wave-y, 50%), #000 calc(var(--altar-wave) - 160px), transparent var(--altar-wave));
+  mask-image: radial-gradient(circle at var(--altar-wave-x, 50%) var(--altar-wave-y, 50%), #000 calc(var(--altar-wave) - 160px), transparent var(--altar-wave));
+  animation: altar-layout-wave 1500ms cubic-bezier(.33, 0, .2, 1) both;
+}
+@keyframes altar-layout-wave {
+  from { --altar-wave: 0px; }
+  to { --altar-wave: var(--altar-wave-end, 2000px); }
+}
+
+/* Film grain on the whole page (Grainy blur → Intensidad grano, Detalle grano, Refresco FPS): over the sky, the
+   3D, every background and every text; under the hero film, the photos and the oracle card, which stay clean.
+   Each section's own grain layer is lifted over its copy and the media are lifted over the grain. One opacity
+   (--grain-opacity, also set on <html>) and one blend for all, so the layers meet without seams. */
+html.altar-home-v3 :is(.altar-solar__stage-grain, .altar-section-grain) {
+  opacity: var(--grain-opacity, .05);
+  mix-blend-mode: var(--v3-grain-blend);
+}
+/* 01–03: the stage grain covers the full sky (01, 02 and 03) above the 3D and the statement copy. The stage
+   and the collection make no stacking context here, so the film and the gallery can sit over it. */
+html.altar-home-v3 .altar-solar__stage > .altar-solar__stage-grain { z-index: 7; }
+html.altar-home-v3 body.template-home .altar-hero-v3__film { z-index: 8; }
+html.altar-home-v3 body.template-home .altar-collection { z-index: auto; }
+html.altar-home-v3 body.template-home .altar-collection__gallery { z-index: 8; }
+/* The old top-screen grain of the blur layer would double the stage grain; the blur itself still works. */
+html.altar-home-v3 .altar-solar__effect > .altar-solar__grain { display: none; }
+/* 04: grain over the wordmark and copy, card over the grain. */
+html.altar-home-v3 .altar-manifesto-v2 > .altar-section-grain { z-index: 3; }
+html.altar-home-v3 .altar-manifesto-v2 .altar-closing__content { z-index: auto; }
+html.altar-home-v3 .altar-manifesto__oracle { z-index: 4; }
+/* 05: grain over the stones, photo over the grain. */
+html.altar-home-v3 .altar-v3-closing > .altar-closing-v2__scene { z-index: 1; }
+html.altar-home-v3 .altar-v3-closing > .altar-section-grain { z-index: 2; }
+/* 06: grain over the footer copy. */
+html.altar-home-v3 .altar-footer-min > .altar-section-grain { z-index: 1; }
+
+/* Tablet (Figma "Home / Layout A — Tablet", 834 frame): desktop scaled down, every size in --t (1 px of the
+   834 frame). 01 is 666 tall with the 667 × 500 film centred; 02 201; 03 the 4-up gallery 17 / 16.5 from the
+   edges; 04 435 with the 221.7 card and a 319.7 column; 05 472 (photo and stones keep the desktop vw). */
+@media (min-width: 750px) and (max-width: 1199px) {
+  html.altar-home-v3 {
+    --t: calc(100vw / 834);
+    --v3-statement-height: calc(201 * var(--t));
+    --v3-gallery-top: calc(17 * var(--t));
+    --v3-gallery-bottom: calc(16.5 * var(--t));
+  }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(666 * var(--t)); }
+  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: calc(667 * var(--t)); left: calc(83.5 * var(--t)); top: calc(103 * var(--t)); }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection { min-height: 0; }
+
+  html.altar-home-v3 .altar-v3-statement__body { width: calc(604.74 * var(--t)); gap: calc(15.59 * var(--t)); font-size: calc(13.02 * var(--t)); }
+  html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: calc(3.47 * var(--t)); font-size: calc(12.16 * var(--t)); }
+  html.altar-home-v3 .altar-v3-statement__label { line-height: calc(17.88 * var(--t)); letter-spacing: calc(-.45 * var(--t)); }
+  html.altar-home-v3 .altar-v3-statement .altar-v3-justified br { display: none; }
+  html.altar-home-v3 .altar-v3-statement .altar-v3-justified p { white-space: normal; }
+
+  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: calc(435 * var(--t)); padding: calc(24 * var(--t)) calc(50 * var(--t)); }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__content { width: auto; margin-inline: auto; grid-template-columns: calc(221.7 * var(--t)) calc(319.66 * var(--t)); gap: calc(50 * var(--t)); }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-size: calc(59.01 * var(--t)); line-height: calc(57.05 * var(--t)); letter-spacing: calc(3.11 * var(--t)); }
+  html.altar-home-v3 .altar-v3-manifesto { width: 100%; margin-top: calc(42.09 * var(--t)); font-size: calc(10.02 * var(--t)); line-height: calc(13.53 * var(--t)); }
+  /* Two lines here: the first justified, the last one set left (the ::after soaks up its free space). */
+  html.altar-home-v3 .altar-v3-manifesto__title { column-gap: .3em; margin-bottom: calc(13.36 * var(--t)); font-size: calc(11.46 * var(--t)); line-height: calc(13.75 * var(--t)); letter-spacing: calc(-.34 * var(--t)); }
+  html.altar-home-v3 .altar-v3-manifesto__title::after { content: ""; flex: auto; }
+  html.altar-home-v3 .altar-v3-manifesto .altar-v3-justified p + p { margin-top: calc(13.36 * var(--t)); }
+
+  html.altar-home-v3 .altar-v3-closing { min-height: calc(472 * var(--t)); }
+}
+
+/* Mobile (Figma "Home / Layout A — Mobile", 390 frame): 12 px margins. 01 hugs the film (98 px under the top,
+   18.5 px over the bottom); 02 is 291 tall with 14 px label and 12 px copy centred in it; 03 is a swipeable strip of full-width photos; 04 puts the copy
+   before the card; 05 tucks the stones 32 px under the photo. */
+@media (max-width: 749px) {
+  html.altar-home-v3 { --v3-statement-height: 291px; }
+  html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: calc(100% - 13px); }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(116.5px + (100vw - 24px) * .75); }
+  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: calc(100vw - 24px); left: 12px; top: 98px; }
+
+  html.altar-home-v3 .altar-v3-statement { min-height: 291px; padding: 24px 12px; }
+  html.altar-home-v3 .altar-v3-statement__body { gap: 19.26px; font-size: 12px; line-height: 21.67px; }
+  html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: 6px; font-size: 15px; }
+  html.altar-home-v3 .altar-v3-statement__label { font-size: 14px; line-height: 22.03px; letter-spacing: -.55px; }
+
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__gallery {
+    display: flex; margin: 13px 0; overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__gallery::-webkit-scrollbar { display: none; }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__photo { flex: 0 0 100%; scroll-snap-align: start; }
+
+  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: 0; padding: 24px 12px; }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { order: 1; }
+  html.altar-home-v3 .altar-manifesto__oracle { order: 2; width: min(73.85vw, 310px); }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-size: 74px; line-height: 73.46px; letter-spacing: 4px; }
+  html.altar-home-v3 .altar-v3-manifesto { margin-top: 34.25px; font-size: 12px; line-height: 18px; }
+  html.altar-home-v3 .altar-v3-manifesto__title { margin-bottom: 21.4px; font-size: 14px; line-height: 18px; letter-spacing: -.55px; }
+  html.altar-home-v3 .altar-v3-manifesto .altar-v3-justified p + p { margin-top: 21.4px; }
+
+  html.altar-home-v3 .altar-v3-closing { padding: 16px 12px 0; }
+  /* Stones 40% larger, same composition: the scene is 1.4× taller and solar-experience.js scales the view to match.
+     The bottom quarter of that view is empty ground, so it is cropped (--closing-stones-crop) to keep the footer close. */
+  html.altar-home-v3 .altar-v3-closing > .altar-closing-v2__scene { --closing-stones-scale: 1.4; --closing-stones-crop: .25; width: calc(100% + 24px); height: calc(72vw * 1.4 * .75); min-height: 294px; margin: -32px -12px 0; }
+}
+/* Tablet and mobile reflow the copy (Figma Tablet / Mobile): justified, with each paragraph's last line set left. */
+@media (max-width: 1199px) {
+  html.altar-home-v3 .altar-v3-justified p { text-align-last: left; }
+}

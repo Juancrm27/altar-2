@@ -128,7 +128,10 @@ body.template-home .altar-manifesto-v2 .altar-manifesto__oracle .altar-solar__fo
   --u: 1px; display: flex !important; position: relative; inset: auto; width: 100%; height: 100%; margin: 0;
   visibility: visible; opacity: 1; translate: none; scale: 1; transform: none; pointer-events: auto;
 }
-.altar-manifesto__oracle .altar-solar__fortune-flip { width: 100%; height: 100%; transform: none; border-radius: 12px; }
+.altar-manifesto__oracle .altar-solar__fortune-flip { width: 100%; height: 100%; transform: none; border-radius: calc(100% * 12 / 236) / calc(100% * 12 / 358); }
+/* The card is drawn on a 236 × 358 base with 12 px corners; at any other width the clip scales with it, so the
+   rounded mask stays concentric with the artwork's own corner instead of cutting it short. */
+.altar-manifesto__oracle :is(.altar-solar__fortune-card,.altar-solar__foil-canvas) { border-radius: calc(100% * 12 / 236) / calc(100% * 12 / 358); }
 .altar-manifesto__oracle .altar-solar__fortune-inner { width: 100%; height: 100%; }
 .altar-manifesto__oracle :is(.altar-solar__fortune-card,.altar-solar__foil-canvas,.altar-solar__fortune-card--artwork img,.altar-solar__fortune-message-fallback) { width: 100%; height: 100%; }
 .altar-manifesto__oracle :is(.altar-solar__fortune-cta-frame,.altar-solar__fortune-cta-text,.altar-solar__fortune-share,.altar-solar__fortune-close) { display: none !important; }
