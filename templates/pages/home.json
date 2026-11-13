@@ -33,13 +33,7 @@
     "altar_campaign": {
       "type": "altar-campaign",
       "settings": {
-        "season": "SS 27",
-        "line": "101 couture",
         "title": "ELEMENTAL",
-        "note_label": "As bordado",
-        "note": "Hecho despacio, a mano y con intención. Para quien sabe mirar más allá.",
-        "materia_label": "La materia",
-        "materia": "Cada material guarda una forma posible. El cuerpo termina de revelarla.",
         "background_color": "#0f0f0f"
       },
       "blocks": {
@@ -65,14 +59,6 @@
     "altar_manifesto": {
       "type": "altar-manifesto",
       "settings": {
-        "season": "SS 27",
-        "line": "101 couture",
-        "note_label": "El tejido",
-        "note": "Formas únicas que cuentan historias, entrelazadas con paciencia y cariño.",
-        "lead": "En 2026,  Manifiesto",
-        "place": "Argentina",
-        "author": "Sofía Guevara",
-        "final_line": "Un archivo de objetos para mundos interiores.",
         "background_color": "#c6ca9f"
       }
     }

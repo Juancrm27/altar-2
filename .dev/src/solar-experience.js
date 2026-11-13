@@ -7,7 +7,7 @@ const COMPACT_LAYOUT = window.matchMedia("(max-width: 749px)");
 const clampDpr = () => Math.min(window.devicePixelRatio || 1, 1.75);
 // Home v3 (Figma "Home / Layout A"): light gradient sky over three screens (film, statement, gallery).
 const IS_V3_HOME = document.documentElement.classList.contains("altar-home-v3");
-const LIGHTING_STORAGE_KEY = IS_V3_HOME ? "altar-lighting-v3" : "altar-lighting-v1";
+const LIGHTING_STORAGE_KEY = IS_V3_HOME ? "altar-lighting-v3-ab" : "altar-lighting-v1";
 // GUI changes are only remembered across reloads when "Recordar cambios" is checked.
 const LIGHTING_PERSIST_KEY = "altar-lighting-persist";
 
@@ -632,6 +632,16 @@ const DEFAULT_LIGHTING = {
   mixScale: 0.002,
   mixCoverage: 0,
   mixSoftness: 0.02,
+  // Panel "Cielo": the star field and every planet but the sun (moon and Saturn's ring included).
+  showStars: true,
+  showPlanets: true,
+  // Panel "Sol → Junto a la foto" (v3 only): the 3D sun, unchanged in look, is sized and placed against the hero
+  // film (client mock-up). Size (the sun's diameter) and X are % of the film's width (X from its right edge to
+  // the sun's centre), Y is where the sun's bottom edge sits, in % of the film's height from its top.
+  filmSun: false,
+  filmSunSize: 18.3,
+  filmSunX: 33.7,
+  filmSunY: 50,
   shootingEnabled: true,
   shootingPauseMin: 3,
   shootingPauseMax: 10,
@@ -692,6 +702,13 @@ const V3_LIGHTING = {
   hemisphereIntensity: 2,
   keyIntensity: 0.8,
   grainOpacity: 0.21,
+  // Day sky: only the sun, beside the film (layout B takes the defaults: stars, planets, the sun in the system).
+  showStars: false,
+  showPlanets: false,
+  filmSun: true,
+  // Pale yellow sun, tuned in the lighting panel (Sol → Apariencia) on layout A.
+  sunEmissive: 2.45,
+  sunEmissiveColor: "#fff3a3",
   // Stars tuned in the lighting panel (02 · 3D → Estrellas) on layout A.
   starCount: 3850,
   starSize: 2.4,
@@ -723,11 +740,20 @@ const V3_NIGHT_LIGHTING = {
   shootingPauseMin: V3_LIGHTING.shootingPauseMin,
   shootingPauseMax: V3_LIGHTING.shootingPauseMax,
 };
+function skyVisibility(settings) {
+  return { stars: settings.showStars !== false, planets: settings.showPlanets !== false };
+}
 const lightingDefaults = () => ({
   ...DEFAULT_LIGHTING,
   ...(IS_V3_HOME ? { ...V3_SHARED_LIGHTING, ...V3_LIGHTING } : {}),
   ...(COMPACT_LAYOUT.matches ? COMPACT_LIGHTING : {}),
 });
+// V3: layouts A and B each keep a full set of values, so the panel edits one without touching the other.
+// Only these stay common to both (panel helpers, not part of the look).
+const V3_LAYOUT_GLOBAL_KEYS = ["showSections", "lightingPresetVersion"];
+const v3LayoutDefaults = (layout) => (layout === "b" ? { ...lightingDefaults(), ...V3_NIGHT_LIGHTING } : lightingDefaults());
+const currentV3Layout = () => (document.documentElement.dataset.altarHomeLayout === "b" ? "b" : "a");
+const V3_LAYOUT_NAMES = { a: "A · Día", b: "B · Noche" };
 
 // UI palette (static/css/altar.css :root). The CSS follows the two variables; the SVG icons carry the primary
 // yellow inside the file, so they are re-tinted from their original source when it changes.
@@ -1358,6 +1384,8 @@ class SolarExperience {
     this.spinners = [];
     this.spinTweens = [];
     this.orbiters = [];
+    // Every planet mesh but the sun's (a planet can come as several meshes, plus Saturn's ring): "Cielo".
+    this.nightMeshes = [];
     this.orbitAxis = new THREE.Vector3(0, 0, 1);
     this.orbitQuaternion = new THREE.Quaternion();
     this.orbitBinormal = new THREE.Vector3();
@@ -1669,6 +1697,7 @@ class SolarExperience {
     const settings = this.effectSettings ?? DEFAULT_LIGHTING;
     if (Math.round(Number(settings.starCount)) !== this.starCount) this.createStars(settings);
 
+    this.stars.visible = skyVisibility(settings).stars;
     const uniforms = this.stars.material.uniforms;
     uniforms.uTime.value = time;
     uniforms.uSize.value = Number(settings.starSize);
@@ -1685,6 +1714,7 @@ class SolarExperience {
 
   readLightingSettings() {
     this.persistLighting = readStorage(LIGHTING_PERSIST_KEY) === "1";
+    if (IS_V3_HOME) return this.readV3LayoutSettings();
     if (!this.persistLighting) {
       writeStorage(LIGHTING_STORAGE_KEY, null);
       return lightingDefaults();
@@ -1698,8 +1728,35 @@ class SolarExperience {
     }
   }
 
+  // V3: storage holds { lightingPresetVersion, a: {...}, b: {...} }; returns the values of the layout on screen.
+  readV3LayoutSettings() {
+    let stored = null;
+    if (this.persistLighting) {
+      try {
+        stored = JSON.parse(readStorage(LIGHTING_STORAGE_KEY));
+      } catch {
+        stored = null;
+      }
+    } else writeStorage(LIGHTING_STORAGE_KEY, null);
+    const valid = stored && stored.lightingPresetVersion === LIGHTING_PRESET_VERSION;
+    this.v3Layouts = {
+      a: { ...v3LayoutDefaults("a"), ...(valid ? stored.a : {}) },
+      b: { ...v3LayoutDefaults("b"), ...(valid ? stored.b : {}) },
+    };
+    this.v3ActiveLayout = currentV3Layout();
+    return { ...this.v3Layouts[this.v3ActiveLayout] };
+  }
+
   saveLightingSettings(settings) {
-    if (this.persistLighting) writeStorage(LIGHTING_STORAGE_KEY, JSON.stringify(settings));
+    if (!this.persistLighting) return;
+    if (!IS_V3_HOME) {
+      writeStorage(LIGHTING_STORAGE_KEY, JSON.stringify(settings));
+      return;
+    }
+    const layouts = this.v3Layouts ?? {};
+    const active = this.v3ActiveLayout ?? "a";
+    layouts[active] = { ...settings };
+    writeStorage(LIGHTING_STORAGE_KEY, JSON.stringify({ lightingPresetVersion: LIGHTING_PRESET_VERSION, ...layouts }));
   }
 
   applyLightingSettings(settings) {
@@ -1906,6 +1963,14 @@ class SolarExperience {
     panel.className = "lighting-panel is-collapsed";
     panel.setAttribute("aria-label", "Controlador de iluminación");
     panel.innerHTML = `
+      ${IS_V3_HOME ? `<div class="lighting-panel__layouts">
+        <p>Editando</p>
+        <div role="group" aria-label="Layout que se edita">
+          <button type="button" data-panel-layout="a">${V3_LAYOUT_NAMES.a}</button>
+          <button type="button" data-panel-layout="b">${V3_LAYOUT_NAMES.b}</button>
+        </div>
+        <p class="lighting-panel__layouts-note">Los cambios solo afectan a este layout.</p>
+      </div>` : ""}
       <div class="lighting-panel__body">
         <label class="is-boolean">Recordar cambios <input type="checkbox" data-lighting-persist></label>
         <label class="is-boolean">Ver tramos <input type="checkbox" data-lighting="showSections"></label>
@@ -1950,7 +2015,7 @@ class SolarExperience {
           <label>Cepillado <span><input type="range" min="0" max="1" step="0.01" data-lighting="foilBrushed"><output></output></span></label>
           <label>Cepillado ° <span><input type="range" min="0" max="180" step="1" data-lighting="foilBrushedAngle"><output></output></span></label>
         </details>
-        <details><summary>Fondo</summary>
+        ${IS_V3_HOME ? "" : `<details><summary>Fondo</summary>
           <label class="is-color">Color espacio <input type="color" data-lighting="spaceColor"></label>
           <label class="is-color">Luz rosa <input type="color" data-lighting="glowRoseColor"></label>
           <label>Rosa intensidad <span><input type="range" min="0" max="5" step="0.05" data-lighting="glowRoseIntensity"><output></output></span></label>
@@ -1958,7 +2023,7 @@ class SolarExperience {
           <label>Celeste intensidad <span><input type="range" min="0" max="5" step="0.05" data-lighting="glowCyanIntensity"><output></output></span></label>
           <label class="is-color">Luz verde agua <input type="color" data-lighting="glowTealColor"></label>
           <label>Verde agua intensidad <span><input type="range" min="0" max="20" step="0.1" data-lighting="glowTealIntensity"><output></output></span></label>
-        </details>
+        </details>`}
         <details><summary>Piedras · luces</summary>
           <label>Ambiente <span><input type="range" min="0" max="3" step="0.05" data-lighting="tierra1Ambient"><output></output></span></label>
           <label class="is-color">Luz 1 color <input type="color" data-lighting="tierra1Light1Color"></label>
@@ -2057,8 +2122,16 @@ ${stonePositionsMarkup(1)}
           <label>Variación ° <span><input type="range" min="0" max="90" step="1" data-lighting="shootingAngleVariation"><output></output></span></label>
           <button class="lighting-panel__action" type="button" data-shooting-trigger>Lanzar una ahora</button>
         </details>
-        <details><summary>Sol</summary>
-          <label>Tamaño <span><input type="range" min="0.2" max="3" step="0.05" data-lighting="sunSize"><output></output></span></label>
+        <details><summary>Sol</summary>${IS_V3_HOME ? `
+          <p class="lighting-panel__status" data-sun-status></p>
+          <label class="is-boolean">Junto a la foto <input type="checkbox" data-lighting="filmSun"></label>
+          <details class="lighting-panel__subgroup" data-sun-mode="film" open><summary>Junto a la foto</summary>
+            <label>Tamaño % foto <span><input type="range" min="2" max="60" step="0.1" data-lighting="filmSunSize"><output></output></span></label>
+            <label>X % foto <span><input type="range" min="-150" max="150" step="0.1" data-lighting="filmSunX"><output></output></span></label>
+            <label>Y % foto <span><input type="range" min="-100" max="200" step="0.5" data-lighting="filmSunY"><output></output></span></label>
+          </details>
+          <details class="lighting-panel__subgroup" open><summary>Apariencia</summary>
+          <label>Tamaño <span><input type="range" min="0.2" max="3" step="0.01" data-lighting="sunSize"><output></output></span></label>
           <label>Emisión <span><input type="range" min="0" max="10" step="0.05" data-lighting="sunEmissive"><output></output></span></label>
           <label class="is-color">Color emisión <input type="color" data-lighting="sunEmissiveColor"></label>
           <label>Rotación <span><input type="range" min="0" max="5" step="0.05" data-lighting="sunSpin"><output></output></span></label>
@@ -2067,6 +2140,17 @@ ${stonePositionsMarkup(1)}
           <label class="is-color">Color halo <input type="color" data-lighting="sunGlowColor"></label>
           <label>Luz a planetas <span><input type="range" min="0" max="30" step="0.1" data-lighting="sunLightIntensity"><output></output></span></label>
           <label class="is-color">Color luz <input type="color" data-lighting="sunLightColor"></label>
+          </details>` : `
+          <label>Tamaño <span><input type="range" min="0.2" max="3" step="0.01" data-lighting="sunSize"><output></output></span></label>
+          <label>Emisión <span><input type="range" min="0" max="10" step="0.05" data-lighting="sunEmissive"><output></output></span></label>
+          <label class="is-color">Color emisión <input type="color" data-lighting="sunEmissiveColor"></label>
+          <label>Rotación <span><input type="range" min="0" max="5" step="0.05" data-lighting="sunSpin"><output></output></span></label>
+          <label>Halo tamaño <span><input type="range" min="1" max="8" step="0.05" data-lighting="sunGlowSize"><output></output></span></label>
+          <label>Halo intensidad <span><input type="range" min="0" max="3" step="0.05" data-lighting="sunGlowIntensity"><output></output></span></label>
+          <label class="is-color">Color halo <input type="color" data-lighting="sunGlowColor"></label>
+          <label>Luz a planetas <span><input type="range" min="0" max="30" step="0.1" data-lighting="sunLightIntensity"><output></output></span></label>
+          <label class="is-color">Color luz <input type="color" data-lighting="sunLightColor"></label>
+`}
         </details>
         <details><summary>Sistema</summary>
           <label>Giro auto °/s <span><input type="range" min="-30" max="30" step="0.5" data-lighting="systemSpin"><output></output></span></label>
@@ -2074,10 +2158,14 @@ ${stonePositionsMarkup(1)}
           <label>Vel. flotación <span><input type="range" min="0" max="3" step="0.05" data-lighting="systemFloatSpeed"><output></output></span></label>
           <label>Parallax mouse ° <span><input type="range" min="0" max="30" step="0.5" data-lighting="systemParallax"><output></output></span></label>
         </details>
-        <details><summary>Onda layout</summary>
+        ${IS_V3_HOME ? `<details><summary>Cielo</summary>
+          <label class="is-boolean">Estrellas <input type="checkbox" data-lighting="showStars"></label>
+          <label class="is-boolean">Planetas <input type="checkbox" data-lighting="showPlanets"></label>
+        </details>` : ""}
+        ${IS_V3_HOME ? "" : `<details><summary>Onda layout</summary>
           <label class="is-color">Color <input type="color" data-lighting="layoutWaveColor"></label>
-        </details>
-        <details><summary>Sistema · layout A</summary>
+        </details>`}
+        <details><summary>${IS_V3_HOME ? "Sistema · posición" : "Sistema · layout A"}</summary>
           <label>Posición X <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system1X"><output></output></span></label>
           <label>Posición Y <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system1Y"><output></output></span></label>
           <label>Posición Z <span><input type="range" min="-100" max="10" step="0.05" data-lighting="system1Z"><output></output></span></label>
@@ -2086,7 +2174,7 @@ ${stonePositionsMarkup(1)}
           <label>Rotación Z <span><input type="range" min="-180" max="180" step="1" data-lighting="system1RotZ"><output></output></span></label>
           <label>Escala <span><input type="range" min="0.2" max="100" step="0.05" data-lighting="system1Scale"><output></output></span></label>
         </details>
-        <details><summary>Sistema · layout B</summary>
+        ${IS_V3_HOME ? "" : `        <details><summary>Sistema · layout B</summary>
           <label>Posición X <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system2X"><output></output></span></label>
           <label>Posición Y <span><input type="range" min="-50" max="50" step="0.05" data-lighting="system2Y"><output></output></span></label>
           <label>Posición Z <span><input type="range" min="-100" max="10" step="0.05" data-lighting="system2Z"><output></output></span></label>
@@ -2094,7 +2182,7 @@ ${stonePositionsMarkup(1)}
           <label>Rotación Y <span><input type="range" min="-180" max="180" step="1" data-lighting="system2RotY"><output></output></span></label>
           <label>Rotación Z <span><input type="range" min="-180" max="180" step="1" data-lighting="system2RotZ"><output></output></span></label>
           <label>Escala <span><input type="range" min="0.2" max="100" step="0.05" data-lighting="system2Scale"><output></output></span></label>
-        </details>
+        </details>`}
         <details><summary>Estrellas</summary>
           <label>Cantidad <span><input type="range" min="0" max="5000" step="50" data-lighting="starCount"><output></output></span></label>
           <label>Tamaño <span><input type="range" min="0.5" max="10" step="0.1" data-lighting="starSize"><output></output></span></label>
@@ -2118,6 +2206,7 @@ ${stonePositionsMarkup(1)}
           <label>Exposición <span><input type="range" min="0.1" max="3" step="0.05" data-lighting="exposure"><output></output></span></label>
           <label class="is-select">Color mapping <select data-lighting="toneMapping">${Object.keys(TONE_MAPPINGS).map((name) => `<option>${name}</option>`).join("")}</select></label>
         </details>
+        ${IS_V3_HOME ? `<button class="lighting-panel__reset" type="button" data-lighting-copy>Copiar al layout B</button>` : ""}
         <button class="lighting-panel__reset" type="button" data-lighting-reset>Restablecer</button>
       </div>
       <button class="lighting-panel__toggle" type="button" aria-expanded="false">Open Controls</button>`;
@@ -2128,6 +2217,7 @@ ${stonePositionsMarkup(1)}
       {
         label: "02 · 3D",
         groups: [
+          "Cielo",
           "Ambiente",
           "Principal cálida",
           "Contraluz violeta",
@@ -2138,6 +2228,7 @@ ${stonePositionsMarkup(1)}
           "Sistema",
           "Sistema · layout A",
           "Sistema · layout B",
+          "Sistema · posición",
           "Onda layout",
           "Render",
         ],
@@ -2161,13 +2252,13 @@ ${stonePositionsMarkup(1)}
       const heading = document.createElement("p");
       heading.className = "lighting-panel__layer";
       heading.textContent = label;
-      orderedControls.appendChild(heading);
+      if (groups.some((name) => detailsByName.has(name))) orderedControls.appendChild(heading);
       groups.forEach((name) => {
         const details = detailsByName.get(name);
         if (details) orderedControls.appendChild(details);
       });
     });
-    panelBody.insertBefore(orderedControls, resetButton);
+    panelBody.insertBefore(orderedControls, panelBody.querySelector("[data-lighting-copy]") ?? resetButton);
 
     const setInputValue = (input, value) => {
       if (input.type === "checkbox") input.checked = Boolean(value);
@@ -2218,10 +2309,48 @@ ${stonePositionsMarkup(1)}
     // The object every panel input edits; v3's A ⇄ B swap writes into it too (applyV3Layout).
     this.panelSettings = settings;
     // V3: switching A ⇄ B changes values under the panel; this puts them back in its fields.
+    // V3: the bar on top shows which layout the panel edits and switches the page to the other one.
+    const copyButton = panel.querySelector("[data-lighting-copy]");
+    const refreshLayoutBar = () => {
+      if (!IS_V3_HOME) return;
+      const active = this.v3ActiveLayout ?? "a";
+      const other = active === "a" ? "b" : "a";
+      panel.querySelectorAll("[data-panel-layout]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.panelLayout === active));
+      });
+      panel.querySelector("[data-lighting-reset]").textContent = `Restablecer layout ${active.toUpperCase()}`;
+      if (copyButton) copyButton.textContent = `Copiar todo al layout ${other.toUpperCase()}`;
+    };
+    panel.querySelectorAll("[data-panel-layout]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.dataset.panelLayout === (this.v3ActiveLayout ?? "a")) return;
+        document.querySelector("[data-altar-layout-toggle]")?.click();
+      });
+    });
+    copyButton?.addEventListener("click", () => {
+      const other = (this.v3ActiveLayout ?? "a") === "a" ? "b" : "a";
+      if (!window.confirm(`¿Reemplazar todos los valores del layout ${other.toUpperCase()} por los de este?`)) return;
+      this.v3Layouts[other] = { ...settings };
+      this.saveLightingSettings(settings);
+    });
+    // Sol: says where the sun is and dims the controls that do nothing there.
+    const sunStatus = panel.querySelector("[data-sun-status]");
+    this.onSunMode = (mode) => {
+      if (!sunStatus) return;
+      sunStatus.textContent = {
+        film: "Sol junto a la foto. \"Tamaño\" lo escala (0.31 = tamaño del diseño).",
+        "3d": "Sol en el sistema solar.",
+        fallback: "Sol en el sistema solar: junto a la foto no entra en esta pantalla.",
+      }[mode];
+      panel.querySelector('[data-sun-mode="film"]')?.classList.toggle("is-idle", mode !== "film");
+    };
+    if (this.sunMode) this.onSunMode(this.sunMode);
     this.refreshLightingPanel = () => {
       panel.querySelectorAll("[data-lighting]").forEach((input) => setInputValue(input, settings[input.dataset.lighting]));
       updateOutputs();
+      refreshLayoutBar();
     };
+    refreshLayoutBar();
 
     panel.querySelectorAll("[data-lighting]").forEach((input) => {
       setInputValue(input, settings[input.dataset.lighting]);
@@ -2230,8 +2359,10 @@ ${stonePositionsMarkup(1)}
         settings[key] = input.type === "checkbox" ? input.checked : input.type === "range" ? Number(input.value) : input.value;
         const channelPose = key.match(/^system([1-4])(X|Y|Z|RotX|RotY|RotZ|Scale)$/);
         // V2: the channel 1·2 poses are layouts A·B, so the header switch follows the edited pose.
-        const layout = this.isV2Home && channelPose && { 1: "a", 2: "b" }[channelPose[1]];
-        if (layout) {
+        const layout = this.isV2Home && !IS_V3_HOME && channelPose && { 1: "a", 2: "b" }[channelPose[1]];
+        if (IS_V3_HOME) {
+          // V3: one pose per layout, kept with that layout's values.
+        } else if (layout) {
           const toggle = document.querySelector("[data-altar-layout-toggle]");
           if (toggle && (toggle.getAttribute("aria-checked") === "true") !== (layout === "b")) toggle.click();
         } else if (channelPose) this.showChannel?.(Number(channelPose[1]) - 1);
@@ -2248,7 +2379,8 @@ ${stonePositionsMarkup(1)}
     persistInput.addEventListener("change", () => {
       this.persistLighting = persistInput.checked;
       writeStorage(LIGHTING_PERSIST_KEY, this.persistLighting ? "1" : null);
-      writeStorage(LIGHTING_STORAGE_KEY, this.persistLighting ? JSON.stringify(settings) : null);
+      if (this.persistLighting) this.saveLightingSettings(settings);
+      else writeStorage(LIGHTING_STORAGE_KEY, null);
     });
 
     panel.querySelector(".lighting-panel__toggle").addEventListener("click", (event) => {
@@ -2260,7 +2392,10 @@ ${stonePositionsMarkup(1)}
       if (!this.shootingStars.length) this.spawnShootingStar(settings);
     });
     panel.querySelector("[data-lighting-reset]").addEventListener("click", () => {
-      Object.assign(settings, lightingDefaults());
+      if (IS_V3_HOME) {
+        const globals = Object.fromEntries(V3_LAYOUT_GLOBAL_KEYS.map((key) => [key, settings[key]]));
+        Object.assign(settings, v3LayoutDefaults(this.v3ActiveLayout ?? "a"), globals);
+      } else Object.assign(settings, lightingDefaults());
       this.saveLightingSettings(settings);
       panel.querySelectorAll("[data-lighting]").forEach((input) => {
         setInputValue(input, settings[input.dataset.lighting]);
@@ -2320,6 +2455,7 @@ ${stonePositionsMarkup(1)}
           node.userData.spinSpeed = 0.035 + Math.random() * 0.07;
           this.spinners.push(node);
 
+          if (key !== "sun") this.nightMeshes.push(node);
           planets[key] = node;
           if (key === "saturn") saturnPosition = node.position.clone();
         });
@@ -2330,6 +2466,7 @@ ${stonePositionsMarkup(1)}
           fitMeshToRadius(ring, 1.02 * 0.38);
           ring.userData.basePosition = ring.position.clone();
           this.spinners.push(ring);
+          this.nightMeshes.push(ring);
         });
 
         this.setupOrbits(planets, pendingRing);
@@ -2419,6 +2556,76 @@ ${stonePositionsMarkup(1)}
     this.sunGlow.position.copy(this.sun.position);
     this.sunLight.position.copy(this.sun.position);
     this.sun.parent.add(this.sunGlow, this.sunLight);
+
+    // Where the model puts the sun; "Junto a la foto" moves it away and back here.
+    this.sunHome = this.sun.position.clone();
+    this.filmSunFilm = IS_V3_HOME ? document.getElementById("altar-hero-campaign") : null;
+  }
+
+  // Tells the panel where the sun is: "film" (beside the film), "3d" (in the system), or "fallback" (beside the
+  // film is on but there is no room for it on this screen).
+  reportSunMode(mode) {
+    if (mode === this.sunMode) return;
+    this.sunMode = mode;
+    this.onSunMode?.(mode);
+  }
+
+  // "Junto a la foto" (on by default in layout A): the 3D sun keeps every setting of its look (texture, colour,
+  // glow, spin) but is sized and placed from the hero film's own box (its drag offset removed, so dragging the
+  // film leaves the sun where it is), at the depth it has in the system. Where it would not fit beside the film
+  // (tablet and phone, the film runs nearly edge to edge) it stays in the system, as before.
+  // Runs after updateSun: here the film sets the base size and "Tamaño" scales it (0.31, its default, = ×1).
+  updateFilmSun(settings) {
+    if (!this.sun || !this.sunHome) return;
+    const placed = this.placeSunBesideFilm(settings);
+    if (!placed) this.sun.position.copy(this.sunHome);
+    this.sunGlow.position.copy(this.sun.position);
+    this.sunLight.position.copy(this.sun.position);
+    this.reportSunMode(placed ? "film" : settings.filmSun && this.filmSunFilm ? "fallback" : "3d");
+  }
+
+  placeSunBesideFilm(settings) {
+    const film = this.filmSunFilm;
+    const canvas = this.renderer?.domElement;
+    if (!settings.filmSun || !film || !canvas) return false;
+    const box = film.getBoundingClientRect();
+    const view = canvas.getBoundingClientRect();
+    if (!box.width || !view.width || !view.height) return false;
+    const transform = getComputedStyle(film).transform;
+    const drag = new DOMMatrixReadOnly(transform === "none" ? undefined : transform);
+    const left = box.left - drag.e;
+    const top = box.top - drag.f;
+    const radius = (box.width * Number(settings.filmSunSize)) / 200;
+    const x = left + box.width + (box.width * Number(settings.filmSunX)) / 100 - view.left;
+    const y = top + (box.height * Number(settings.filmSunY)) / 100 - radius - view.top;
+    if (x - radius < 0 || x + radius > view.width) return false;
+
+    // The camera ray through (x, y), cut at the depth the sun has in the system; pixels → world units there.
+    const camera = this.camera;
+    const parent = this.sun.parent;
+    this.system.updateMatrixWorld(true);
+    camera.updateMatrixWorld();
+    const forward = camera.getWorldDirection(this.filmSunForward ??= new THREE.Vector3());
+    const origin = camera.getWorldPosition(this.filmSunOrigin ??= new THREE.Vector3());
+    const home = parent.localToWorld((this.filmSunHomeWorld ??= new THREE.Vector3()).copy(this.sunHome));
+    const depth = Math.max(home.sub(origin).dot(forward), 1);
+    const ray = (this.filmSunRay ??= new THREE.Vector3())
+      .set((x / view.width) * 2 - 1, -(y / view.height) * 2 + 1, 0.5)
+      .unproject(camera)
+      .sub(origin)
+      .normalize();
+    const target = (this.filmSunTarget ??= new THREE.Vector3()).copy(origin).addScaledVector(ray, depth / ray.dot(forward));
+    this.sun.position.copy(parent.worldToLocal(target));
+
+    const fullHeight = camera.view?.enabled ? camera.view.fullHeight : view.height;
+    const unitsPerPixel = (2 * depth * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)) / (camera.zoom * fullHeight);
+    const parentScale = parent.getWorldScale(this.filmSunScale ??= new THREE.Vector3()).x;
+    // "Tamaño" still scales it: at its default the sun has the film-relative size above.
+    const scale = Number(settings.sunSize) / DEFAULT_LIGHTING.sunSize;
+    const size = (radius * unitsPerPixel * scale) / (this.sunRadius * parentScale);
+    this.sun.scale.setScalar(this.sunBaseScale * size);
+    this.sunGlow.scale.setScalar(this.sunRadius * size * Number(settings.sunGlowSize) * 2);
+    return true;
   }
 
   updateSun(settings) {
@@ -2594,6 +2801,16 @@ ${stonePositionsMarkup(1)}
     );
     this.system.scale.setScalar(pose.Scale);
     this.updateSun(settings);
+    this.updateFilmSun(settings);
+  }
+
+  // Planets other than the sun (moon and Saturn's ring included) follow the "Cielo" panel group. Runs every frame, also with
+  // reduced motion, when updateOrbits is skipped.
+  updatePlanetVisibility() {
+    const settings = this.effectSettings ?? DEFAULT_LIGHTING;
+    const showPlanets = skyVisibility(settings).planets;
+    this.nightMeshes.forEach((mesh) => { mesh.visible = showPlanets; });
+    if (!showPlanets) this.orbiters.forEach((orbiter) => { orbiter.line.visible = false; });
   }
 
   updateOrbits(delta) {
@@ -2605,6 +2822,7 @@ ${stonePositionsMarkup(1)}
     const direction = settings.orbitDirection === "Horario" ? -1 : 1;
     const tilt = THREE.MathUtils.degToRad(Number(settings.orbitTilt));
     const lineOpacity = Number(settings.orbitLineOpacity);
+    const showPlanets = skyVisibility(settings).planets;
 
     this.orbitAxis.set(0, Math.sin(tilt), Math.cos(tilt));
     this.orbitQuaternion.setFromUnitVectors(Z_AXIS, this.orbitAxis);
@@ -2618,7 +2836,7 @@ ${stonePositionsMarkup(1)}
       this.placeOnOrbit(orbiter.mesh.position, this.sun.position, radius, orbiter.angle);
       orbiter.rings.forEach((ring) => ring.position.copy(orbiter.mesh.position));
 
-      orbiter.line.visible = lineOpacity > 0;
+      orbiter.line.visible = showPlanets && lineOpacity > 0;
       orbiter.line.material.opacity = lineOpacity;
       orbiter.line.material.color.set(settings.orbitLineColor);
       orbiter.line.quaternion.copy(this.orbitQuaternion);
@@ -3642,11 +3860,18 @@ ${stonePositionsMarkup(1)}
     this.resize();
   }
 
-  // V3: switching A ⇄ B swaps day and night lighting on the base settings object, the one the panel edits
-  // (applyLightingSettings keeps it in lightingBase; effectSettings is a per-channel copy of it).
+  // V3: switching A ⇄ B keeps what the layout being left has (panel edits included) and loads the other's own
+  // values into the base settings object, the one the panel edits (applyLightingSettings keeps it in
+  // lightingBase; effectSettings is a per-channel copy of it).
   applyV3Layout(layout) {
     const settings = this.panelSettings ?? this.lightingBase ?? this.effectSettings ?? lightingDefaults();
-    Object.assign(settings, layout === "b" ? V3_NIGHT_LIGHTING : V3_LIGHTING);
+    const layouts = (this.v3Layouts ??= { a: v3LayoutDefaults("a"), b: v3LayoutDefaults("b") });
+    const previous = this.v3ActiveLayout ?? "a";
+    if (previous === layout) return;
+    layouts[previous] = { ...settings };
+    const globals = Object.fromEntries(V3_LAYOUT_GLOBAL_KEYS.map((key) => [key, settings[key]]));
+    Object.assign(settings, layouts[layout], globals);
+    this.v3ActiveLayout = layout;
     this.applyLightingSettings(settings);
     this.refreshLightingPanel?.();
   }
@@ -3807,6 +4032,7 @@ ${stonePositionsMarkup(1)}
     if (!REDUCED_MOTION.matches) {
       this.updateOrbits(delta);
     }
+    this.updatePlanetVisibility();
     this.drawScene();
   };
 
