@@ -103,7 +103,7 @@
               } %}
             </div>
             <div class="contact-product-info">
-              <p>{{ 'contact.consulting_product' | t }} </br> {{ product.name | a_tag(product.url) }}</p>
+              <p><span class="contact-product-kicker"><span class="altar-es">Estás consultando por</span><span class="altar-en">You're asking about</span></span> {{ product.name | a_tag(product.url) }}</p>
             </div>
           </div>
         {% endif %}
@@ -111,13 +111,17 @@
         {% if contact %}
           {% if contact.success %}
             {% if is_order_cancellation %}
-              <div class="alert alert-success" data-component="order-cancellation-success-message">{{ 'contact.cancellation_sent' | t }} 
-              <br>
-              <p class="contact-success-followup">{{ 'contact.will_contact_you' | t }}</p>
-              <br> 
-              <strong>{{ 'contact.request_number' | t }} #{{ last_order_id }}</strong></div>
+              <div class="alert alert-success altar-contact-sent" data-component="order-cancellation-success-message">
+                <strong class="altar-contact-sent__title"><span class="altar-es">¡Tu pedido de cancelación fue enviado!</span><span class="altar-en">Your cancellation request was sent!</span></strong>
+                <p class="contact-success-followup"><span class="altar-es">Vamos a ponernos en contacto con vos apenas veamos tu mensaje.</span><span class="altar-en">We'll get in touch as soon as we see your message.</span></p>
+                <span class="altar-contact-sent__code"><span class="altar-es">Tu código de trámite es</span><span class="altar-en">Your request code is</span> #{{ last_order_id }}</span>
+              </div>
+              <a class="altar-page-link" href="{{ store.products_url }}"><span class="altar-es">Volver a la colección</span><span class="altar-en">Back to the collection</span></a>
             {% else %}
-              <div class="alert alert-success" data-component="contact-success-message">{{ 'contact.thanks' | t }}</div>
+              <div class="alert alert-success altar-contact-sent" data-component="contact-success-message">
+                <strong class="altar-contact-sent__title"><span class="altar-es">¡Gracias por escribirnos!</span><span class="altar-en">Thanks for writing to us!</span></strong>
+                <p class="contact-success-followup"><span class="altar-es">Vamos a responderte apenas veamos tu mensaje.</span><span class="altar-en">We'll reply as soon as we see your message.</span></p>
+              </div>
             {% endif %}
           {% else %}
             <div class="alert alert-danger">{{ 'contact.need_name_email' | t }}</div>
@@ -125,10 +129,15 @@
         {% endif %}
 
         {% if is_order_cancellation_without_id %}
-          <p class="contact-disclaimer" data-component="order-cancellation-disclaimer">{{ 'contact.cancellation_disclaimer_with_order' | t | raw }}</p>
+          <p class="contact-disclaimer altar-page-lead" data-component="order-cancellation-disclaimer"><span class="altar-es">Si te arrepentiste de una compra, podés pedir la cancelación enviando este formulario <strong>con tu número de orden.</strong> Tenés como máximo hasta 10 días corridos desde que recibiste el producto.</span><span class="altar-en">If you changed your mind about a purchase, you can request its cancellation by sending this form <strong>with your order number.</strong> You have up to 10 calendar days from the day you received the product.</span></p>
         {% endif %}
 
-        {% embed "snippets/forms/form.tpl" with{form_id: 'contact-form', form_custom_class: 'js-winnie-pooh-form', form_action: '/winnie-pooh', submit_custom_class: 'btn-block', submit_name: 'contact', submit_text: 'general.send' | t, data_store: 'contact-form' } %}
+        {% set altar_send %}<span class="altar-es">Enviar</span><span class="altar-en">Send</span>{% endset %}
+        {% set altar_l_name %}<span class="altar-es">Nombre</span><span class="altar-en">Name</span>{% endset %}
+        {% set altar_l_email %}Email{% endset %}
+        {% set altar_l_phone %}<span class="altar-es">Teléfono</span><span class="altar-en">Phone</span>{% endset %}
+        {% set altar_l_message %}<span class="altar-es">Mensaje</span><span class="altar-en">Message</span>{% endset %}
+        {% embed "snippets/forms/form.tpl" with{form_id: 'contact-form', form_custom_class: 'js-winnie-pooh-form altar-contact-form', form_action: '/winnie-pooh', submit_custom_class: 'btn-block', submit_name: 'contact', submit_text: 'general.send' | t, submit_html: altar_send, data_store: 'contact-form' } %}
           {% block form_body %}
             <div class="winnie-pooh hidden">
               <label for="winnie-pooh">{{ 'contact.do_not_fill' | t }}:</label>
@@ -142,17 +151,17 @@
               <input type="hidden" name="type" value="contact" />
             {% endif %}
 
-            {% embed "snippets/forms/form-input.tpl" with{input_for: 'name', type_text: true, input_name: 'name', input_id: 'name', input_label_text: 'contact.name' | t, input_placeholder: 'contact.name_placeholder' | t } %}
+            {% embed "snippets/forms/form-input.tpl" with{input_for: 'name', type_text: true, input_name: 'name', input_id: 'name', input_label_text: altar_l_name, input_placeholder: 'contact.name_placeholder' | t } %}
             {% endembed %}
 
-            {% embed "snippets/forms/form-input.tpl" with{input_for: 'email', type_email: true, input_name: 'email', input_id: 'email', input_label_text: 'contact.email' | t, input_placeholder: 'contact.email_placeholder' | t } %}
+            {% embed "snippets/forms/form-input.tpl" with{input_for: 'email', type_email: true, input_name: 'email', input_id: 'email', input_label_text: altar_l_email, input_placeholder: 'contact.email_placeholder' | t } %}
             {% endembed %}
 
             {% if not is_order_cancellation %}
-              {% embed "snippets/forms/form-input.tpl" with{input_for: 'phone', type_tel: true, input_name: 'phone', input_id: 'phone', input_label_text: 'contact.phone' | t, input_placeholder: 'contact.phone_placeholder' | t } %}
+              {% embed "snippets/forms/form-input.tpl" with{input_for: 'phone', type_tel: true, input_name: 'phone', input_id: 'phone', input_label_text: altar_l_phone, input_placeholder: 'contact.phone_placeholder' | t } %}
               {% endembed %}
 
-              {% embed "snippets/forms/form-input.tpl" with{text_area: true, input_for: 'message', input_name: 'message', input_id: 'message', input_rows: '7', input_label_text: 'contact.message' | t, input_placeholder: 'contact.message_placeholder' | t } %}
+              {% embed "snippets/forms/form-input.tpl" with{text_area: true, input_for: 'message', input_name: 'message', input_id: 'message', input_rows: '7', input_label_text: altar_l_message, input_placeholder: 'contact.message_placeholder' | t } %}
               {% endembed %}
             {% endif %}
           {% endblock %}

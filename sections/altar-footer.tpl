@@ -15,143 +15,70 @@
 
 {{ component('nubesdk-slot', { type: "before_footer" }) }}
 {% if template == 'home' %}
-<div class="altar-closing-v2" id="closing" style="--closing-bg-a: {{ footer_settings.background_color | default('#c6ca9f') }}; --closing-fg-a: {{ footer_settings.text_color | default('#091e2b') }}; --closing-bg-b: {{ footer_settings.alternate_background | default('#091e2b') }}; --closing-fg-b: {{ footer_settings.alternate_text | default('#c6ca9f') }};"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>{% include 'snippets/altar-grain.tpl' with { grain_id: 'closing-footer', grain_class: '' } %}{% endif %}
+<div class="altar-closing-v2 altar-v3-closing" id="closing" style="--closing-bg-a: {{ footer_settings.background_color | default('#c6ca9f') }}; --closing-fg-a: {{ footer_settings.text_color | default('#091e2b') }}; --closing-bg-b: {{ footer_settings.alternate_background | default('#091e2b') }}; --closing-fg-b: {{ footer_settings.alternate_text | default('#c6ca9f') }};"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>{% include 'snippets/altar-grain.tpl' with { grain_id: 'closing-footer', grain_class: '' } %}{% endif %}
 
+{#
+  Footer v3 · Figma "Footer / Illustrator" (819:4095), from Sofi's Illustrator. Same on every page, in the
+  page language: ES on #C6CA9F, EN on #091E2B (html[data-altar-home-layout="b"]). Newsletter always open on top
+  (EMAIL ____ ENVIAR) — Cartas / Newsletter just takes you to that field —, one row of links (mobile shortens IG · TT · YT), then Tiendanube's required legal row.
+  No Contacto and no Info (Sofi). Social URLs come from the store admin, with Altar's accounts as fallback.
+#}
+{% set altar_instagram = store.instagram | default('https://www.instagram.com/altarmundi/') %}
+{% set altar_tiktok = store.tiktok | default('https://www.tiktok.com/@altarmundi') %}
+{% set altar_youtube = store.youtube | default('https://www.youtube.com/@sofiaguevara') %}
+{% set altar_whatsapp = store.whatsapp | default('https://wa.me/541157991078') %}
 <div
-  class="altar-footer altar-footer--v2 {{ footer_theme_class }} js-hide-footer-while-scrolling"
+  class="altar-footer altar-footer--v3 js-hide-footer-while-scrolling"
   data-store="footer"
   data-section-id="{{ section.id }}"
-  data-header-theme="light"
-  style="--footer-background: {{ background_color }}; --footer-foreground: {{ text_color }}; --footer-foreground-opacity-10: {{ text_color }}1A; --footer-foreground-opacity-20: {{ text_color }}33; --footer-foreground-opacity-40: {{ text_color }}66; --footer-foreground-opacity-60: {{ text_color }}99; background-color: {{ background_color }}; color: {{ text_color }};"
 >
+  {% include 'snippets/altar-grain.tpl' with { grain_id: 'footer', grain_class: 'altar-footer__grain' } %}
   {% if not password_page %}
-    <div class="altar-footer__top">
-      {% if show_newsletter or show_social %}
-        <div class="altar-footer__newsletter{% if not show_newsletter %} altar-footer__newsletter--social-only{% endif %}">
-          {% if show_newsletter %}
-            <div class="altar-footer__newsletter-copy">
-              <p class="altar-footer__label">{{ footer_settings.newsletter_label | default('[ NEWSLETTER ]') }}</p>
-              <p class="altar-footer__body">{{ footer_settings.newsletter_text | default('Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.') }}</p>
-            </div>
-
-            <form class="altar-footer__form newsletter-form" method="post" action="/winnie-pooh" onsubmit="this.setAttribute('action', '');" data-store="newsletter-form">
-              <div class="altar-footer__field newsletter-form-wrapper input-append">
-                <label class="visually-hidden" for="altar-newsletter-email">{{ 'footer.email_placeholder' | t }}</label>
-                <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input newsletter-form-input form-control" placeholder="{{ footer_settings.newsletter_placeholder | default('Tu correo') }}" autocomplete="email" required aria-label="{{ 'footer.email_placeholder' | t }}">
-                <div class="winnie-pooh" style="display: none;">
-                  <label for="winnie-pooh-newsletter-altar">{{ 'contact.do_not_fill' | t }}</label>
-                  <input id="winnie-pooh-newsletter-altar" type="text" name="winnie-pooh">
-                </div>
-                <input type="hidden" name="name" value="{{ 'newsletter.anonymous_name' | t }}">
-                <input type="hidden" name="message" value="{{ 'newsletter.subscription_request' | t }}">
-                <input type="hidden" name="type" value="newsletter">
-                <button type="submit" name="contact" class="altar-footer__submit newsletter-form-button">
-                  <span>{{ footer_settings.newsletter_submit_label | default('Suscribirme') }}</span>
-                  <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h5v5M3.5 8.5l5-5"/></svg>
-                </button>
-              </div>
-              {% if contact and contact.type == 'newsletter' %}
-                {% if contact.success %}
-                  <div class="altar-footer__status alert alert-success newsletter-form-alert" role="status">{{ 'footer.thanks_subscribe' | t }}</div>
-                {% else %}
-                  <div class="altar-footer__status alert alert-danger newsletter-form-alert" role="alert">{{ 'newsletter.email_required' | t }}</div>
-                {% endif %}
-              {% endif %}
-            </form>
+    {% if show_newsletter %}
+      <form class="altar-footer__newsletter newsletter-form" method="post" action="/winnie-pooh" onsubmit="this.setAttribute('action', '');" data-store="newsletter-form">
+        <div class="altar-footer__field">
+          <label class="visually-hidden" for="altar-newsletter-email">Email</label>
+          <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input newsletter-form-input" placeholder="EMAIL" autocomplete="email" required>
+          <div class="winnie-pooh" style="display: none;">
+            <label for="winnie-pooh-newsletter-altar">{{ 'contact.do_not_fill' | t }}</label>
+            <input id="winnie-pooh-newsletter-altar" type="text" name="winnie-pooh">
+          </div>
+          <input type="hidden" name="name" value="{{ 'newsletter.anonymous_name' | t }}">
+          <input type="hidden" name="message" value="{{ 'newsletter.subscription_request' | t }}">
+          <input type="hidden" name="type" value="newsletter">
+          <button type="submit" name="contact" class="altar-footer__submit newsletter-form-button"><span class="altar-es">Enviar</span><span class="altar-en">Send</span></button>
+        </div>
+        {% if contact and contact.type == 'newsletter' %}
+          {% if contact.success %}
+            <p class="altar-footer__status" role="status">{{ 'footer.thanks_subscribe' | t }}</p>
+          {% else %}
+            <p class="altar-footer__status" role="alert">{{ 'newsletter.email_required' | t }}</p>
           {% endif %}
+        {% endif %}
+      </form>
+    {% endif %}
 
-          {% if show_social %}
-          <nav class="altar-footer__social" aria-label="Redes sociales">
-            {% for social_network in ['instagram', 'facebook', 'youtube', 'tiktok', 'twitter', 'pinterest'] %}
-              {% set social_url = attribute(store, social_network) %}
-              {% if social_url %}
-                <a href="{{ social_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social_network }} {{ store.name }}">
-                  {% if social_network == 'instagram' %}
-                    <img class="altar-footer__social-mask" src="{{ 'images/altar-instagram.svg' | static_url }}" alt="" width="24" height="24" style="--altar-social-mask: url('{{ 'images/altar-instagram.svg' | static_url }}');">
-                  {% else %}
-                    <svg class="icon-inline" aria-hidden="true"><use xlink:href="#{{ social_network }}"/></svg>
-                  {% endif %}
-                </a>
-              {% endif %}
-            {% endfor %}
-          </nav>
-          {% endif %}
+    <nav class="altar-footer__links" aria-label="Altar">
+      <a href="#altar-newsletter-email" data-altar-newsletter-focus><span class="altar-es">Cartas</span><span class="altar-en">Newsletter</span></a>
+      <a href="{{ altar_instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span class="altar-footer__long">Instagram</span><span class="altar-footer__short" aria-hidden="true">IG</span></a>
+      <a href="{{ altar_tiktok }}" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><span class="altar-footer__long">TikTok</span><span class="altar-footer__short" aria-hidden="true">TT</span></a>
+      <a href="{{ altar_youtube }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><span class="altar-footer__long">YouTube</span><span class="altar-footer__short" aria-hidden="true">YT</span></a>
+      <a href="{{ altar_whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    </nav>
+
+    <div class="altar-footer__legal-row">
+      <div class="altar-footer__brand">
+        <p>©{{ 'now' | date('Y') }} {{ footer_settings.copyright_name | default('altar') }}</p>
+        {% if new_powered_by_link %}<span class="altar-footer__powered">{{ new_powered_by_link }}</span>{% endif %}
+      </div>
+      {% if store.country == 'AR' %}
+        {% set order_cancellation_url = status_page_url_regret ? '?order_cancellation=true' : '?order_cancellation_without_id=true' %}
+        <div class="altar-footer__consumer">
+          <a href="https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario" target="_blank" rel="noopener noreferrer" data-component="consumer-defense">Defensa de las y los consumidores. Para reclamos ingresá acá.</a>
+          <span class="altar-footer__separator" aria-hidden="true">/</span>
+          <a href="{{ store.contact_url }}{{ order_cancellation_url }}" data-component="order-cancellation">Botón de arrepentimiento</a>
         </div>
       {% endif %}
-
-      <div class="altar-footer__groups">
-        <nav class="altar-footer__group altar-footer__group--help" aria-label="{{ footer_settings.help_label | default('Ayuda') }}">
-          <p class="altar-footer__label">{{ footer_settings.help_label | default('Ayuda') }}</p>
-          {% if footer_settings.shipping_label %}
-            <a href="{{ footer_settings.shipping_url | default(store.contact_url) }}">{{ footer_settings.shipping_label }}</a>
-          {% endif %}
-          {% if footer_settings.returns_label %}
-            <a href="{{ footer_settings.returns_url | default(store.contact_url ~ '?order_cancellation_without_id=true') }}">{{ footer_settings.returns_label }}</a>
-          {% endif %}
-          {% if footer_settings.faq_label %}
-            <a class="altar-footer__keep-case" href="{{ footer_settings.faq_url | default(store.contact_url) }}">{{ footer_settings.faq_label }}</a>
-          {% endif %}
-        </nav>
-
-        {% if show_contact %}
-          <div class="altar-footer__group altar-footer__group--address">
-            <p class="altar-footer__label">{{ footer_settings.contact_label | default('Contacto') }}</p>
-            {% if footer_settings.address or store.address %}
-              {% if footer_settings.address_url %}
-                <a href="{{ footer_settings.address_url }}" target="_blank" rel="noopener noreferrer">{{ footer_settings.address | default(store.address) }}</a>
-              {% else %}
-                <span>{{ footer_settings.address | default(store.address) }}</span>
-              {% endif %}
-            {% endif %}
-            {% if store.whatsapp %}<a href="{{ store.whatsapp }}">{{ footer_settings.whatsapp_label | default('WhatsApp') }}</a>{% endif %}
-            {% if store.email %}<a href="mailto:{{ store.email }}">{{ footer_settings.email_label | default('Correo') }}</a>{% endif %}
-          </div>
-        {% endif %}
-
-        {% for block in section.blocks %}
-          {% if block.type == 'footer-menu' %}
-            {% set menu_id = block.settings.menu %}
-            <nav class="altar-footer__group altar-footer__group--explore" aria-label="{{ block.settings.title | default('Explorar') | striptags }}" {{ block | block_attributes }}>
-              <p class="altar-footer__label">{{ block.settings.title | default('Explorar') | raw }}</p>
-              {% if menu_id and menus[menu_id] %}
-                {% for item in menus[menu_id] %}
-                  <a href="{{ item.url }}" {% if item.url | is_external %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a>
-                {% endfor %}
-              {% else %}
-                <a href="{{ footer_settings.explore_store_url | default(store.products_url) }}">{{ footer_settings.explore_store_label | default('Store') }}</a>
-                <a href="{{ footer_settings.explore_about_url | default(store.url ~ '/#about') }}">{{ footer_settings.explore_about_label | default('About') }}</a>
-                <a href="{{ footer_settings.explore_makers_url | default(store.url ~ '/#makers') }}">{{ footer_settings.explore_makers_label | default('Makers') }}</a>
-              {% endif %}
-            </nav>
-          {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-
-    {% if footer_settings.descriptor %}<p class="altar-footer__descriptor">{{ footer_settings.descriptor }}</p>{% endif %}
-
-    <div class="altar-footer__bottom">
-      <div class="altar-footer__meta">
-        <div class="altar-footer__meta-left">
-          <p class="altar-footer__copyright">©{{ 'now' | date('Y') }} {{ footer_settings.copyright_name | default('altar') }}</p>
-          {% if new_powered_by_link %}<span class="altar-footer__powered">{{ new_powered_by_link }}</span>{% endif %}
-        </div>
-      </div>
-
-      <div class="altar-footer__legal">
-        {% if footer_settings.terms_url or footer_settings.privacy_url %}
-          <nav class="altar-footer__editorial-legal" aria-label="Legales">
-            {% if footer_settings.terms_url %}<a href="{{ footer_settings.terms_url }}">{{ footer_settings.terms_label | default('Términos y condiciones') }}</a>{% endif %}
-            {% if footer_settings.privacy_url %}<a href="{{ footer_settings.privacy_url }}">{{ footer_settings.privacy_label | default('Política de privacidad') }}</a>{% endif %}
-          </nav>
-        {% endif %}
-
-        {% include 'snippets/footer/claim-info.tpl' %}
-      </div>
-
-      <div class="altar-footer__platform footer-secondary-info">
-        {% include 'snippets/footer/footer-legal.tpl' with { password_page: password_page } %}
-      </div>
     </div>
 
     {% include 'snippets/footer/footer-country-selector.tpl' %}

@@ -5,8 +5,10 @@
 :root {
   --altar-primary: #fff3a9;
   --altar-secondary: #601e2a;
-  --altar-commerce-background: #fbf7e7;
-  --altar-commerce-foreground: #000000;
+  /* v3: commerce surfaces follow the language (altar-chrome-v3.css: ES #091E2B on #C6CA9F, EN the reverse); cream and
+     black are only the fallback if that file is missing. */
+  --altar-commerce-background: var(--chrome-bg, #fbf7e7);
+  --altar-commerce-foreground: var(--chrome-fg, #000000);
   --altar-commerce-gray-dark: #54544f;
   --altar-commerce-gray: #777771;
   --altar-commerce-gray-light: #d2d0c6;
@@ -61,7 +63,6 @@ html.is-altar-home :is(.js-modal-private, .notification-cart-container) {
 .visually-hidden { position: absolute !important; width: calc(1 * var(--u)); height: calc(1 * var(--u)); padding: 0; margin: calc(-1 * var(--u)); overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .altar-solar { position: relative; min-height: 200svh; overflow: clip; background: var(--space-color, #080808); isolation: isolate; }
 .altar-page-section { position: relative; isolation: isolate; }
-.section-altar-campaign, .section-altar-manifesto { position: relative; overflow: visible; background: var(--altar-secondary); }
 .altar-solar__stage { position: relative; width: 100%; height: 200svh; min-height: calc(1080 * var(--u)); margin-bottom: min(-100svh, calc(-540 * var(--u))); overflow: clip; background: transparent; }
 .altar-solar__sky { position: absolute; inset: 0; z-index: 0; opacity: 0; pointer-events: none; transition: opacity 700ms ease; }
 .altar-solar.is-ready .altar-solar__sky, .altar-solar.is-fallback .altar-solar__sky { opacity: 1; }
@@ -506,11 +507,10 @@ body.is-altar-commerce .altar-nav :is(.altar-nav__action-icon, .altar-nav__logo-
 body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hidden; }
 
 /* Sorting popover / bottom sheet (Figma 496:2322, 496:2427 and 496:2506). */
-.altar-sort-modal { color: var(--altar-commerce-foreground, #000); background: var(--altar-commerce-background, #fbf7e7); border: .42px dashed #000; border-radius: 0; font-family: "Inter", sans-serif; box-shadow: 0 8px 12px rgba(0, 0, 0, .08); }
-.altar-sort-modal__header { flex: 0 0 auto; height: 40.42px; padding: 0 16px; background: transparent; border-bottom: .42px dashed #000; }
+.altar-sort-modal { color: var(--altar-commerce-foreground, #000); background: var(--altar-commerce-background, #fbf7e7); border: .42px dashed currentColor; border-radius: 0; font-family: "Inter", sans-serif; box-shadow: 0 8px 12px rgba(0, 0, 0, .08); }
+.altar-sort-modal__header { flex: 0 0 auto; height: 40.42px; padding: 0 16px; background: transparent; border-bottom: .42px dashed currentColor; }
 .altar-sort-modal__title { width: auto; margin: 0; font: 400 10px/16px "Inter", sans-serif; letter-spacing: 0; text-transform: uppercase; }
 .altar-sort-modal__close { display: inline-flex; align-items: center; justify-content: center; margin: 0; padding: 0; color: inherit; font: 400 10px/16px "Inter", sans-serif; text-transform: uppercase; }
-.altar-sort-modal__close::after { content: "CLOSE"; }
 .altar-sort-modal__close-icon { display: none; }
 .altar-sort-modal__body { height: auto; padding: 8px 0; overflow: hidden; }
 .altar-sort-modal .sort-by-options { width: 100%; margin: 0; gap: 0; }
@@ -532,39 +532,39 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-shop-grid .product-item-image { width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center; }
 /* Card information is a 120px slot (Figma 438:637). With every optional line
    (transfer, stock, variants) it grows instead of overlapping the next row. */
-:is(.altar-shop-grid, .section-related-products) .product-item-information { min-height: 80.5px; padding: 8px 0 0; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-information { min-height: 80.5px; padding: 8px 0 0; }
 .altar-shop-grid .product-item-information { height: auto; min-height: 120px; padding-top: 16px; text-align: center; }
 .altar-shop-grid .product-item-information-inner,
 .altar-shop-grid .product-item-link { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 6px; }
 /* Empty app slots are zero-height flex children; hiding only the empty ones
    prevents phantom 6px gaps while preserving any content injected by apps. */
 .altar-shop-grid .product-item-link > .js-nubesdk-slot:empty { display: none; }
-:is(.altar-shop-grid, .section-related-products) .product-item-name { margin: 0; font-size: 14px; line-height: 17px; }
-:is(.altar-shop-grid, .section-related-products) .product-item-price-container { display: flex; flex-direction: column; align-items: flex-start; padding-top: 7px; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-name { margin: 0; font-size: 14px; line-height: 17px; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-price-container { display: flex; flex-direction: column; align-items: flex-start; padding-top: 7px; }
 .altar-shop-grid .product-item-price-container { align-items: center; padding-top: 0; }
-:is(.altar-shop-grid, .section-related-products) .product-item-price { font-size: 16px; font-weight: 500; line-height: 19.5px; }
-:is(.altar-shop-grid, .section-related-products) .product-item-price-compare { order: -1; margin: 0; color: #777771; font-size: 12px; font-weight: 500; line-height: 17px; text-decoration: none; opacity: 1; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-price { font-size: 16px; font-weight: 500; line-height: 19.5px; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-price-compare { order: -1; margin: 0; color: #777771; font-size: 12px; font-weight: 500; line-height: 17px; text-decoration: none; opacity: 1; }
 /* Card / Producto has no installments line; cuotas stay in the Ficha's payment details. */
-:is(.altar-shop-grid, .section-related-products) .product-item-installments { display: none; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-installments { display: none; }
 /* Card / Producto (Figma 438:657) exposes one price line. The former price
    and percentage badge belong to Ipanema's native card, not this variant. */
-:is(.altar-shop-grid, .section-related-products) :is(.product-item-price-compare, .product-item-discount) { display: none !important; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) :is(.product-item-price-compare, .product-item-discount) { display: none !important; }
 /* Payment discount, low stock and inline discounts use one restrained family of grays. */
-:is(.altar-shop-grid, .section-related-products) :is(.product-item-payment-discount, .product-item-stock-notice, .product-item-discount) { color: #777771; }
-:is(.altar-shop-grid, .section-related-products) :is(.product-item-payment-discount, .product-item-stock-notice) { margin: 0; font-size: 12px; line-height: 15px; }
-:is(.altar-shop-grid, .section-related-products) .product-item-payment-discount { font-weight: 500; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) :is(.product-item-payment-discount, .product-item-stock-notice, .product-item-discount) { color: #777771; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) :is(.product-item-payment-discount, .product-item-stock-notice) { margin: 0; font-size: 12px; line-height: 15px; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-payment-discount { font-weight: 500; }
 /* Ipanema marks color variants as order-first and adds a 16px bottom margin.
    The Altar card keeps them last: name → price → transfer → stock → variants,
    shown as a 16px swatch and "+N" 8px apart. */
-:is(.altar-shop-grid, .section-related-products) .product-item-colors-container { order: 0; display: flex; align-items: center; padding-bottom: 6px; overflow: hidden; }
-:is(.altar-shop-grid, .section-related-products) .product-item-colors { display: flex; margin-bottom: 0; align-items: center; gap: 8px; }
-:is(.altar-shop-grid, .section-related-products) .product-item-colors-bullet { width: 16px; height: 16px; margin: 0; border: 0; border-radius: 50%; cursor: default; }
-:is(.altar-shop-grid, .section-related-products) .product-item-colors-bullet-text { color: currentColor; font-size: 10px; font-weight: 400; line-height: 12px; cursor: default; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-colors-container { order: 0; display: flex; align-items: center; padding-bottom: 6px; overflow: hidden; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-colors { display: flex; margin-bottom: 0; align-items: center; gap: 8px; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-colors-bullet { width: 16px; height: 16px; margin: 0; border: 0; border-radius: 50%; cursor: default; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-colors-bullet-text { color: currentColor; font-size: 10px; font-weight: 400; line-height: 12px; cursor: default; }
 /* Badges sit 8px from the image's bottom-left corner, square, without the shipping icon. */
-:is(.altar-shop-grid, .section-related-products) .product-labels { top: auto; bottom: 8px; left: 8px; gap: 4px; }
-:is(.altar-shop-grid, .section-related-products) .label { margin: 0; padding: 3px 6px; font-size: 10px; line-height: 12px; border-radius: 0; }
-:is(.altar-shop-grid, .section-related-products) .label-icon { display: none; }
-:is(.altar-shop-grid, .section-related-products) .product-item-no-stock { color: var(--altar-commerce-background); background: var(--altar-commerce-gray-dark); }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-labels { top: auto; bottom: 8px; left: 8px; gap: 4px; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .label { margin: 0; padding: 3px 6px; font-size: 10px; line-height: 12px; border-radius: 0; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .label-icon { display: none; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-no-stock { color: var(--altar-commerce-background); background: var(--altar-commerce-gray-dark); }
 .altar-shop-grid .is-altar-editorial-card { position: relative; cursor: pointer; }
 .altar-shop-grid .altar-editorial-card-hitarea { position: absolute; inset: 0; z-index: 1; }
 .altar-shop-grid .is-altar-editorial-card :is(.product-item-image-container, .product-item-information) { position: relative; z-index: 2; }
@@ -578,8 +578,8 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
   .altar-shop-grid .product-item-information { height: auto; min-height: 0; padding-top: 12px; overflow: visible; }
   .altar-shop-grid > .product-item { grid-column: auto; grid-row: auto; }
   .altar-shop-grid :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 498 / 655; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) { grid-column: 1 / -1; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 1018 / 1495; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3 of .product-item)) { grid-column: 1 / -1; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3 of .product-item)) :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 1018 / 1495; }
   .altar-sort-modal { top: auto !important; right: 0 !important; bottom: -100% !important; left: 0 !important; z-index: 20001; width: 100% !important; height: auto !important; max-height: calc(100vh - 24px); padding-bottom: 12px; box-shadow: none; transform: none !important; }
   .altar-sort-modal.modal-visible { bottom: 0 !important; }
   .altar-sort-modal__header { height: 52.42px; padding: 0 24px; }
@@ -593,7 +593,7 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .section-main-product,
 .section-main-product :is(button, input, select, textarea, .btn, .form-control),
 .section-related-products { font-family: "Inter", sans-serif; }
-.section-main-product { --ficha-rule: 1px solid rgba(0, 0, 0, .2); }
+.section-main-product { --ficha-rule: 1px solid color-mix(in srgb, var(--altar-commerce-foreground) 20%, transparent); } /* the page colour at 20 % (Figma), not black: it must read on the navy EN page too */
 /* Figma 548:6520: gallery and information share the product grid exactly. */
 @media (min-width: 768px) {
   :is(.section-main-product, .section-related-products) .container { max-width: none; padding-right: 24px; padding-left: 21px; }
@@ -634,7 +634,6 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 
 .altar-product-head { display: flex; min-height: 52px; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .altar-product-head-price { display: flex; min-width: 0; align-items: flex-start; gap: 5px; }
-.altar-product-marker { width: 10px; height: 10px; flex: 0 0 10px; margin-top: 5px; background: currentColor; border-radius: 1px; }
 /* Figma 528:3512: price row (price · % OFF · compare) over the transfer price. */
 .altar-product .product-price { display: flex; min-height: 52px; flex-direction: column; align-items: flex-start; gap: 0; margin: 0; }
 .altar-product .product-price-main { display: flex; flex-wrap: nowrap; align-items: baseline; column-gap: 8px; }
@@ -662,7 +661,7 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-product .product-detail-variants-group .form-label strong { display: none; }
 .altar-product .btn-variant { display: inline-flex; align-items: center; justify-content: center; min-width: 0; height: 42px; margin: 0; padding: 0 14px; color: currentColor; background: transparent; border: var(--ficha-rule); border-radius: 4px; font-size: 10px; font-weight: 500; line-height: 12px; letter-spacing: -.36px; text-transform: uppercase; }
 .altar-product .btn-variant .btn-variant-content { min-height: 0; margin: 0; padding: 0; font: inherit; line-height: 12px; }
-.altar-product .btn-variant.selected { background: rgba(0, 0, 0, .08); border-color: currentColor; }
+.altar-product .btn-variant.selected { background: color-mix(in srgb, var(--altar-commerce-foreground) 8%, transparent); border-color: currentColor; }
 .altar-product .btn-variant.btn-variant-no-stock { opacity: .4; text-decoration: line-through; }
 
 /* Quantity + add to cart (out of stock: grey "Sin stock" block) */
@@ -680,7 +679,7 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-product .js-addtocart { width: 100%; height: 42px; padding: 0 14px; color: var(--altar-commerce-background); background: var(--altar-commerce-foreground); border: 0; border-radius: 4px; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: -.36px; text-transform: uppercase; }
 /* Out of stock: same block as the CTA, greyed out */
 .altar-product .js-addtocart.nostock,
-.altar-product .js-addtocart.nostock:disabled { width: 100%; color: rgba(0, 0, 0, .45); background: rgba(0, 0, 0, .08); border: 0; opacity: 1; cursor: not-allowed; }
+.altar-product .js-addtocart.nostock:disabled { width: 100%; color: color-mix(in srgb, var(--altar-commerce-foreground) 45%, transparent); background: color-mix(in srgb, var(--altar-commerce-foreground) 8%, transparent); border: 0; opacity: 1; cursor: not-allowed; }
 
 /* Native product data remains in the DOM, but Figma's final Ficha only exposes
    payment methods after the description. Maker, SKU, installments and stock
@@ -750,7 +749,7 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-product-info > .product-purchase-info .icon-text-item-description { margin: 0; padding: 10px 0; font-size: 10px !important; line-height: 16px; letter-spacing: -.12px; opacity: .75; }
 
 /* Related products: label row with a hairline (cards share the shop typography) */
-.section-related-products .heading-block { width: 100%; margin: 0; padding-top: 10px; border-top: 1px solid rgba(0, 0, 0, .2); font-family: "Inter", sans-serif; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
+.section-related-products .heading-block { width: 100%; margin: 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--altar-commerce-foreground) 20%, transparent); font-family: "Inter", sans-serif; font-size: 12px; font-weight: 500; line-height: 12px; letter-spacing: .6px; text-transform: uppercase; }
 
 /* Figma 548:6520: recommendations are a responsive grid, not a nested
    carousel. The column controls remain editable in Tiendanube. */
@@ -829,17 +828,17 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 }
 .altar-product-specs .altar-spec-row--single { grid-template-columns: minmax(0, 1fr); }
 
-/* Shop (Figma 438:658): centred 1290px content area at 1728px, featured cards
-   span exactly two columns and two 499px rows. */
+/* Shop (Figma 755:3784): featured cards span two columns and two rows; the cycle repeats every 14 pieces
+   (3 on the right, 10 on the left), five rows per cycle. */
 @media (min-width: 1200px) {
   body.is-altar-commerce .site-header { z-index: 20001; }
   .section-main-products-grid.is-altar-editorial .container,
   body.template-category[data-sim] .sim-section.container { width: calc(100% - 64px); max-width: 1290px; margin-right: auto; margin-left: auto; padding-right: 0; padding-left: 0; }
   .altar-shop-grid { grid-auto-rows: 499px; column-gap: 46px; row-gap: 36px; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(16n + 3), .is-altar-featured-desktop-left, :nth-child(16n + 10)) { display: flex; flex-direction: column; grid-row: span 2; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(16n + 3)) { grid-column: 3 / span 2; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-left, :nth-child(16n + 10)) { grid-column: 1 / span 2; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(16n + 3), .is-altar-featured-desktop-left, :nth-child(16n + 10)) :is(.product-item-image-container, .sim-product-image) { flex: 1 1 0; min-height: 0; aspect-ratio: auto; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(14n + 3 of .product-item), .is-altar-featured-desktop-left, :nth-child(14n + 10 of .product-item)) { display: flex; flex-direction: column; grid-row: span 2; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(14n + 3 of .product-item)) { grid-column: 3 / span 2; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-left, :nth-child(14n + 10 of .product-item)) { grid-column: 1 / span 2; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-desktop-right, :nth-child(14n + 3 of .product-item), .is-altar-featured-desktop-left, :nth-child(14n + 10 of .product-item)) :is(.product-item-image-container, .sim-product-image) { flex: 1 1 0; min-height: 0; aspect-ratio: auto; }
   .altar-sort-modal,
   .altar-sort-modal.modal-visible { position: absolute; top: 156.68px !important; right: max(32px, calc((100vw - 1290px) / 2)) !important; bottom: auto !important; left: auto !important; width: 240px !important; height: auto !important; max-height: none; transform: none !important; }
   .altar-sort-modal__body { height: auto; }
@@ -856,8 +855,8 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
   .altar-shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; row-gap: 24px; }
   .altar-shop-grid > .product-item { grid-column: auto; grid-row: auto; }
   .altar-shop-grid :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 498 / 655; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) { grid-column: 1 / -1; }
-  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3)) :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 1018 / 1495; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3 of .product-item)) { grid-column: 1 / -1; }
+  .altar-shop-grid > .product-item:is(.is-altar-featured-compact, :nth-child(7n + 3 of .product-item)) :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 1018 / 1495; }
   .altar-sort-modal,
   .altar-sort-modal.modal-visible { position: absolute; top: 150.68px !important; right: 24px !important; bottom: auto !important; left: auto !important; width: 280px !important; height: auto !important; max-height: none; transform: none !important; }
   .altar-sort-modal__body { height: auto; padding: 8px 0; }

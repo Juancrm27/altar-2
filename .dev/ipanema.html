@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es" class="is-altar-commerce">
   <head>
+    <script>try { if (sessionStorage.getItem('altar-lang') === 'en') document.documentElement.dataset.altarHomeLayout = 'b'; } catch (e) {}</script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
@@ -15,6 +16,8 @@
     <link rel="stylesheet" href="../static/css/style-async.css">
     <link rel="stylesheet" href="../static/css/altar.css">
     <link rel="stylesheet" href="../static/css/altar-header-v2.css">
+    <link rel="stylesheet" href="../static/css/altar-chrome-v3.css">
+    <link rel="stylesheet" href="../static/css/altar-pages-v3.css">
     <link rel="stylesheet" href="../static/css/altar-footer.css">
     <link rel="stylesheet" href="./ipanema-sim.css">
   </head>
@@ -26,62 +29,44 @@
 
     <!-- Header Altar: same markup as sections/altar-header.tpl renders -->
     <header class="js-header header site-header">
-      <div class="altar-nav altar-nav--v2" data-altar-page="shop">
-        <svg class="altar-solar__grain altar-section-grain altar-nav__grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-header" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-header)"></rect></svg>
-        <div class="altar-nav__rule altar-nav__rule--top" aria-hidden="true"></div>
-        <div class="altar-nav__content">
-          <div class="altar-nav__brand">
-            <a class="altar-nav__logo" href="./preview.html" aria-label="Altar">
-              <img class="altar-nav__logo-image altar-nav__logo-image--default" src="../static/images/altar-logo.svg" alt="" width="40" height="39">
-            </a>
-            <span class="altar-nav__divider altar-nav__divider--brand" aria-hidden="true"></span>
-            <div class="altar-nav__wordmark-block">
-              <span class="altar-nav__eyebrow">[  CONCEPT_STORE  ]</span>
-              <a class="altar-nav__wordmark" href="./preview.html"><span>altar</span><sup>©</sup></a>
+      <!-- Same markup as snippets/header/altar-header.tpl (Figma Navigation / Site, v3). -->
+      <div class="altar-nav altar-nav--v2 altar-nav--v3" data-altar-page="shop">
+        <div class="altar-nav__bar">
+          <a class="altar-nav__logo" href="./preview.html" aria-label="Altar"><img class="altar-nav__logo-image" src="../static/images/altar-logo.svg" alt="" width="40" height="39"></a>
+          <div class="altar-nav__controls">
+            <div class="altar-nav__experience">
+              <button type="button" class="altar-nav__layout-switch" data-altar-layout-toggle role="switch" aria-checked="false" aria-label="English"><span aria-hidden="true"></span></button>
+              <button type="button" class="altar-nav__spotify" data-altar-spotify-toggle data-spotify-url="https://open.spotify.com/playlist/4u5jTDz4fqFHfjSqXiAtNN?si=ca78c9d4614a4abe" aria-label="Spotify (abre una pestaña nueva)">PLAY</button>
             </div>
-            <span class="altar-nav__divider altar-nav__divider--metadata" aria-hidden="true"></span>
-            <div class="altar-nav__metadata"><time data-live-date>OCT/03/26</time><span>C.A.B.A. (ARG)</span></div>
-            <span class="altar-nav__divider altar-nav__divider--navigation" aria-hidden="true"></span>
-          </div>
-          <nav class="altar-nav__menu" aria-label="Navegación principal">
-            <a href="#/tienda" data-altar-page-link="shop">Collection</a>
-            <a href="#/the-star" data-altar-page-link="star">The Star</a>
-            <a href="#/contacto" data-altar-page-link="contacto">Contact</a>
-          </nav>
-          <div class="altar-nav__actions">
-            <div class="js-search-container altar-nav__action altar-nav__search-container">
-              <button type="button" class="js-search-trigger altar-nav__search" aria-label="Buscar" aria-expanded="false">
-                <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span>
-              </button>
-              <div class="js-search-expand-form search-floating-container altar-nav__search-panel" aria-hidden="true" data-sim-search-slot></div>
+            <span class="altar-nav__experience-divider" aria-hidden="true"></span>
+            <nav class="altar-nav__menu" aria-label="Navegación principal">
+            <a href="#/tienda" data-altar-page-link="shop"><span class="altar-es">Colección</span><span class="altar-en">Collection</span></a>
+            <a href="#/the-star" data-altar-page-link="star"><span class="altar-es">Collab</span><span class="altar-en">Collab</span></a>
+            <a href="mailto:altarmundi@gmail.com"><span class="altar-es">Hola</span><span class="altar-en">Hello</span></a>
+            </nav>
+            <button type="button" class="altar-nav__menu-toggle" data-altar-menu-toggle aria-expanded="false" aria-controls="altar-nav-panel"><span class="altar-nav__menu-open">Menu</span><span class="altar-nav__menu-close"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></span></button>
+            <div class="altar-nav__commerce">
+              <div class="altar-nav__search-slot">
+                <button type="button" class="altar-nav__search" data-altar-search-open aria-expanded="false" aria-controls="altar-search"><span class="altar-es">Buscar</span><span class="altar-en">Search</span></button>
+                <form class="altar-nav__search-form" id="altar-search" action="#/busqueda" method="get" role="search" data-altar-search-form hidden>
+                  <input class="altar-nav__search-input" type="search" name="q" autocomplete="off" placeholder="Buscar" data-placeholder-es="Buscar" data-placeholder-en="Search" aria-label="Buscar">
+                  <button type="submit" class="altar-nav__search-submit" aria-label="Buscar"><svg class="altar-nav__search-icon" viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><circle cx="5" cy="5" r="3.9"/><path d="M7.9 7.9 11 11"/></svg></button>
+                </form>
+              </div>
+              <a class="altar-nav__account" href="#/cuenta/login"><span class="altar-es">Ingresar</span><span class="altar-en">Log in</span></a>
+              <span id="ajax-cart" class="js-cart-container altar-nav__cart-wrap" data-component="cart-button"><button type="button" class="js-modal-open-private altar-nav__cart" data-target="#modal-cart" aria-label="Carrito de compras"><span class="js-cart-widget-amount altar-nav__count">0</span></button></span>
             </div>
-            <span class="altar-nav__divider altar-nav__divider--actions" aria-hidden="true"></span>
-            <div class="altar-nav__action-stack">
-              <a class="altar-nav__account" href="#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
-              <span id="ajax-cart" class="js-cart-container altar-nav__action" data-component="cart-button">
-                <button type="button" class="js-modal-open-private altar-nav__cart" data-target="#modal-cart" aria-label="Carrito de compras">
-                  <img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span>
-                </button>
-              </span>
-            </div>
-            <button type="button" class="altar-nav__menu-toggle" data-altar-menu-toggle aria-expanded="false" aria-controls="altar-nav-panel" data-label-open="Menu" data-label-close="Close"><span data-altar-menu-label>Menu</span></button>
           </div>
         </div>
-        <div class="altar-nav__menu-rule" aria-hidden="true"></div>
         <div class="altar-nav__panel" id="altar-nav-panel" data-altar-menu-panel hidden>
-          <nav class="altar-nav__panel-menu" aria-label="Navegación principal">
-            <a href="#/tienda" data-altar-page-link="shop">Collection</a>
-            <a href="#/the-star" data-altar-page-link="star">The Star</a>
-            <a href="#/contacto" data-altar-page-link="contacto">Contact</a>
+          <nav class="altar-nav__panel-row" aria-label="Navegación principal">
+            <a href="#/tienda" data-altar-page-link="shop"><span class="altar-es">Colección</span><span class="altar-en">Collection</span></a>
+            <a href="#/the-star" data-altar-page-link="star"><span class="altar-es">Collab</span><span class="altar-en">Collab</span></a>
+            <a href="mailto:altarmundi@gmail.com"><span class="altar-es">Hola</span><span class="altar-en">Hello</span></a>
+            <a href="#/cuenta/login"><span class="altar-es">Ingresar</span><span class="altar-en">Log in</span></a>
+            <button type="button" class="altar-nav__panel-search" data-altar-search-open aria-controls="altar-search" aria-label="Buscar"><svg class="altar-nav__search-icon" viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><circle cx="5" cy="5" r="3.9"/><path d="M7.9 7.9 11 11"/></svg></button>
           </nav>
-          <div class="altar-nav__panel-rule" aria-hidden="true"></div>
-          <div class="altar-nav__panel-utilities">
-            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-search"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Search</span></button>
-            <button type="button" class="js-modal-open-private altar-nav__panel-item" data-target="#modal-cart"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Cart</span><span class="js-cart-widget-amount altar-nav__count">0</span></button>
-            <a class="altar-nav__panel-item" href="#/cuenta/login"><img class="altar-nav__action-icon" src="../static/images/altar-arrow-up-right.svg" alt="" width="12" height="12"><span>Log in</span></a>
-          </div>
         </div>
-        <div class="altar-nav__rule altar-nav__rule--bottom" aria-hidden="true"></div>
       </div>
     </header>
 
@@ -91,61 +76,26 @@
     <main id="MainContent" class="main-content main-container" role="main" data-sim-view></main>
 
     <footer class="site-footer">
-      <!-- Same structure as sections/altar-footer.tpl (Figma Footer / Site). -->
-      <div class="altar-footer altar-footer--v2 altar-footer--light" data-header-theme="light" style="--footer-background:#FBF7E7;--footer-foreground:#000;">
-        <div class="altar-footer__top">
-          <div class="altar-footer__newsletter">
-            <div class="altar-footer__newsletter-copy">
-              <p class="altar-footer__label">[ NEWSLETTER ]</p>
-              <p class="altar-footer__body">Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.</p>
-            </div>
-            <form class="altar-footer__form" data-newsletter-form>
-              <div class="altar-footer__field">
-                <label class="visually-hidden" for="altar-newsletter-email">Tu correo</label>
-                <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input" placeholder="Tu correo" autocomplete="email" required>
-                <button type="submit" class="altar-footer__submit"><span>Suscribirme</span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 3.5h5v5M3.5 8.5l5-5"/></svg></button>
-              </div>
-              <p class="altar-footer__status" role="status"></p>
-            </form>
-            <nav class="altar-footer__social" aria-label="Redes sociales">
-              <a href="https://www.instagram.com/altarmundi/" target="_blank" rel="noopener" aria-label="Instagram"><img class="altar-footer__social-mask" src="../static/images/altar-instagram.svg" alt="" width="24" height="24" style="--altar-social-mask: url('/static/images/altar-instagram.svg');"></a>
-            </nav>
+      <!-- Same markup as sections/altar-footer.tpl (Figma Footer / Illustrator 819:4095). -->
+      <div class="altar-footer altar-footer--v3">
+        <svg class="altar-solar__grain altar-section-grain altar-footer__grain" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><filter id="altar-grain-footer" x="0" y="0" width="100%" height="100%"><feTurbulence data-grain-turbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="1" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#altar-grain-footer)"></rect></svg>
+        <form class="altar-footer__newsletter" data-newsletter-form>
+          <div class="altar-footer__field">
+            <label class="visually-hidden" for="altar-newsletter-email">Email</label>
+            <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input" placeholder="EMAIL" autocomplete="email" required>
+            <button type="submit" class="altar-footer__submit"><span class="altar-es">Enviar</span><span class="altar-en">Send</span></button>
           </div>
-          <div class="altar-footer__groups">
-            <nav class="altar-footer__group altar-footer__group--help" aria-label="Ayuda">
-              <p class="altar-footer__label">Ayuda</p>
-              <a href="#/pagina/envios">Envíos y devoluciones</a>
-              <a href="#/contacto">Solicitud de devolución</a>
-              <a class="altar-footer__keep-case" href="#/pagina/faqs">FAQs</a>
-            </nav>
-            <div class="altar-footer__group altar-footer__group--address">
-              <p class="altar-footer__label">Contacto</p>
-              <span>Buenos Aires, Arg.</span>
-              <a href="https://wa.me/541157991078">WhatsApp</a>
-              <a href="mailto:hola@altarmundi.com">Correo</a>
-            </div>
-            <nav class="altar-footer__group altar-footer__group--explore" aria-label="Explorar">
-              <p class="altar-footer__label">Explorar</p>
-              <a href="#/tienda">Store</a>
-              <a href="./preview.html">About</a>
-              <a href="#/pagina/makers">Makers</a>
-            </nav>
-          </div>
-        </div>
-        <p class="altar-footer__descriptor">CONCEPT STORE  /  C.A.B.A. (ARG)</p>
-        <div class="altar-footer__bottom">
-          <div class="altar-footer__meta">
-            <div class="altar-footer__meta-left">
-              <p class="altar-footer__copyright">©2026 altar</p>
-              <span class="altar-footer__powered"><span class="sim-powered-by">Creado con Tiendanube</span></span>
-            </div>
-          </div>
-          <div class="altar-footer__legal">
-            <div class="claim-link"><span class="claim-text">Defensa de las y los consumidores.</span><a href="#/pagina/consumidores">Para reclamos ingresá acá.</a><span>/</span><a href="#/contacto">Botón de arrepentimiento</a></div>
-          </div>
-          <div class="altar-footer__platform footer-secondary-info">
-            <div class="footer-legal-container"><div class="claim-link"><span class="claim-text">Defensa de las y los consumidores.</span><a href="#/pagina/consumidores">Para reclamos ingresá acá.</a><span>/</span><a href="#/contacto">Botón de arrepentimiento</a></div></div>
-          </div>
+        </form>
+        <nav class="altar-footer__links" aria-label="Altar">
+          <a href="#altar-newsletter-email" data-altar-newsletter-focus><span class="altar-es">Cartas</span><span class="altar-en">Newsletter</span></a>
+          <a href="https://www.instagram.com/altarmundi/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span class="altar-footer__long">Instagram</span><span class="altar-footer__short" aria-hidden="true">IG</span></a>
+          <a href="https://www.tiktok.com/@altarmundi" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><span class="altar-footer__long">TikTok</span><span class="altar-footer__short" aria-hidden="true">TT</span></a>
+          <a href="https://www.youtube.com/@sofiaguevara" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><span class="altar-footer__long">YouTube</span><span class="altar-footer__short" aria-hidden="true">YT</span></a>
+          <a href="https://wa.me/541157991078" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        </nav>
+        <div class="altar-footer__legal-row">
+          <div class="altar-footer__brand"><p>©2026 altar</p><span class="altar-footer__powered"><a href="https://www.tiendanube.com" target="_blank" rel="noopener noreferrer">creado con Tiendanube</a></span></div>
+          <div class="altar-footer__consumer"><a href="https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario" target="_blank" rel="noopener noreferrer">Defensa de las y los consumidores. Para reclamos ingresá acá.</a><span class="altar-footer__separator" aria-hidden="true">/</span><a href="#/contacto?arrepentimiento">Botón de arrepentimiento</a></div>
         </div>
       </div>
     </footer>

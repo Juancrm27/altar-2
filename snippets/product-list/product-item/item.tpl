@@ -187,6 +187,12 @@
 				{% endif %}
 			{% endif %}
 
+			{# Altar v3: suggestions in "Agregaste al carrito" (reduced items) end in an outlined button; the whole card links
+			   to the product, where the size / colour is chosen. #}
+			{% if reduced_item %}
+				<span class="altar-suggest-btn"><span class="altar-es">Ver producto</span><span class="altar-en">View product</span></span>
+			{% endif %}
+
 			{# Variation bullets colors #}
 			{% include 'snippets/product-list/product-item/item-colors.tpl' with {
 				color_variants: show_color_variants_settings_value,

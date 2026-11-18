@@ -1,8 +1,10 @@
 {# Every storefront page except the immersive home and password screen uses Altar's commercial palette. #}
 {% set is_altar_commerce = template != 'home' and template != 'password' %}
 <!DOCTYPE html>
-<html lang="{{ html_lang }}" class="{% if template == 'home' %}is-altar-home{% elseif is_altar_commerce %}is-altar-commerce{% endif %}">
+<html lang="{{ html_lang }}" class="{% if template == 'home' %}is-altar-home altar-home-v3 has-worn-text{% elseif is_altar_commerce %}is-altar-commerce{% endif %}">
   <head>
+    {# Language for the visit (nav switch): EN = layout B. Set before paint so the page never flashes the other one. #}
+    <script>try { if (sessionStorage.getItem('altar-lang') === 'en') document.documentElement.dataset.altarHomeLayout = 'b'; } catch (e) {}</script>
     {# Meta tags component #}
     {{ component('head-tags') }}
 
@@ -90,7 +92,19 @@
 
     {# Altar: film grain behind the content of every page other than the home (the home grains each section itself):
        over the ivory, under the images and text. #}
-    {% if settings.altar_commerce_grain is not same as(false) and is_altar_commerce %}
+    {% if template == 'home' %}
+      {# Home v3 · worn print on the statement (02) and manifesto (04). solar-experience.js keeps these values in sync. #}
+      <svg class="altar-v3-filters" width="0" height="0" aria-hidden="true" focusable="false">
+        <filter id="altar-worn-text" x="-2%" y="-10%" width="104%" height="120%" color-interpolation-filters="sRGB">
+          <feTurbulence data-worn-noise type="fractalNoise" baseFrequency="2.300" numOctaves="2" seed="7" result="noise"></feTurbulence>
+          <feDisplacementMap data-worn-displace in="SourceGraphic" in2="noise" scale="1.20" xChannelSelector="R" yChannelSelector="G" result="rough"></feDisplacementMap>
+          <feColorMatrix data-worn-erode in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  8 0 0 0 -0.784" result="mask"></feColorMatrix>
+          <feComposite in="rough" in2="mask" operator="in" result="worn"></feComposite>
+          <feGaussianBlur data-worn-blur in="worn" stdDeviation="0.10"></feGaussianBlur>
+        </filter>
+      </svg>
+    {% endif %}
+    {% if settings.altar_commerce_grain is not same as(false) and (is_altar_commerce or template == 'password') %}
       <div class="altar-page-grain" aria-hidden="true">
         {% include 'snippets/altar-grain.tpl' with { grain_id: 'page', grain_class: '' } %}
       </div>
@@ -166,6 +180,12 @@
 
     {# Lightweight shared behaviour; the heavy 3D bundle is exclusive to the home. #}
     <link rel="stylesheet" href="{{ 'css/altar-header-v2.css' | static_url }}">
+    <link rel="stylesheet" href="{{ 'css/altar-chrome-v3.css' | static_url }}">
+    <link rel="stylesheet" href="{{ 'css/altar-pages-v3.css' | static_url }}">
+    {% if template == 'home' %}
+      {# Home v3 (Figma 964:17981: día ES · noche EN), last so it wins over the shared sheets, as in .dev/preview.html. #}
+      <link rel="stylesheet" href="{{ 'css/altar-home-v3.css' | static_url }}">
+    {% endif %}
     <script src="{{ 'js/altar-header.js' | static_url }}" defer></script>
     <script src="{{ 'js/altar-site.js' | static_url }}" defer></script>
     {% if template == 'home' %}

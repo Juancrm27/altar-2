@@ -26,8 +26,6 @@
 {% set horizontal_padding_mobile = full_width and use_different_mobile_padding ? section.settings.horizontal_padding_mobile | default(horizontal_padding) : horizontal_padding %}
 {% set background_color = section.settings.background_color %}
 {% set text_color = section.settings.text_color %}
-{% set altar_commerce_background = section.settings.altar_commerce_background | default('#FBF7E7') %}
-{% set altar_commerce_foreground = section.settings.altar_commerce_foreground | default('#000000') %}
 
 {# Logo settings for CSS variables #}
 {% set logo_height = logo_block ? logo_block.settings.height | default(50) : 50 %}
@@ -85,8 +83,7 @@
 	{% if utilities_icon_foreground %}--header-utilities-foreground: {{ utilities_icon_foreground }};{% endif %}
 	{% if featured_link_color %}--header-featured-link-foreground: {{ featured_link_color }};{% endif %}
 	{% if nav_divider_color %}--header-nav-divider-color: {{ nav_divider_color }};{% endif %}
-	--altar-commerce-background: {{ altar_commerce_background }};
-	--altar-commerce-foreground: {{ altar_commerce_foreground }};
+	{# v3: commerce colours follow the language (altar-chrome-v3.css), no longer a header setting #}
 	--logo-height-mobile: {{ logo_height_mobile }}px;
 	--logo-height-desktop: {{ logo_height }}px;
 	--utility-icon-size: {{ utilities_icon_size }}px;
@@ -320,22 +317,6 @@
 	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
 	  },
 	  {
-	    "type": "setting",
-	    "setting_type": "color",
-	    "id": "altar_commerce_background",
-	    "label": "Fondo",
-	    "default": "#FBF7E7",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "color",
-	    "id": "altar_commerce_foreground",
-	    "label": "Texto e íconos",
-	    "default": "#000000",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
       "type": "header",
       "content": "t:names.disposition"
     },
@@ -478,7 +459,21 @@
       "type": "setting",
       "setting_type": "url",
       "id": "altar_star_url",
-      "label": "V2 · Enlace The Star"
+      "label": "Enlace Collab (categoría o página)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "altar_contact_email",
+      "label": "V2 · Correo de Contacto (el link Contacto abre un mail)",
+      "default": "altarmundi@gmail.com"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "altar_spotify_url",
+      "label": "V2 · Link de PLAY (playlist de Spotify)",
+      "default": "https://open.spotify.com/playlist/4u5jTDz4fqFHfjSqXiAtNN?si=ca78c9d4614a4abe"
     }
   ],
   "default": {

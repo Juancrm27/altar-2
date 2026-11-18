@@ -1,12 +1,50 @@
-// Header Altar · tablet and mobile menu (Figma "Header / Site", Menu=Open).
-// The panel unfolds inside the header; Menu turns into Close. Search and Cart inside it keep Ipanema's
-// own modals (js-modal-open-private), so the panel just closes itself before they open.
+// Header Altar v3 · Figma "Navigation / Site / Desktop" (768:1698) and "/ Mobile" (773:3948).
+// - The switch is the language for the whole visit: off = ES (layout A), on = EN (layout B), kept in
+//   sessionStorage("altar-lang") and applied before paint by layouts/layout.tpl. On the home it also swaps A / B.
+// - Search opens inline (Estado=Buscar abierto); tablet/mobile MENU unfolds one row (Estado=Menú abierto).
+//   While either is open, MENU reads CERRAR / CLOSE and closes it.
 (function () {
   if (window.__altarHeaderInitialized) return;
   window.__altarHeaderInitialized = true;
-  window.__altarHeaderVersion = "2026-10-14";
+  window.__altarHeaderVersion = "2026-11-17";
 
-  var DESKTOP = window.matchMedia("(min-width: 1200px)");
+  var DESKTOP = window.matchMedia("(min-width: 1024px)");
+  var root = document.documentElement;
+
+  function isEnglish() { return root.dataset.altarHomeLayout === "b"; }
+
+  // Switch state, search placeholders and <html lang> follow the language.
+  function syncLanguage() {
+    var en = isEnglish();
+    document.querySelectorAll("[data-altar-layout-toggle]").forEach(function (button) {
+      button.setAttribute("aria-checked", String(en));
+      button.setAttribute("aria-label", en ? "Español" : "English");
+    });
+    document.querySelectorAll("[data-placeholder-es]").forEach(function (input) {
+      var text = en ? input.dataset.placeholderEn : input.dataset.placeholderEs;
+      input.placeholder = text;
+      input.setAttribute("aria-label", text);
+    });
+    if (document.querySelector(".altar-nav--v3")) root.lang = en ? "en" : "es";
+  }
+
+  function setSearch(nav, open) {
+    var form = nav && nav.querySelector("[data-altar-search-form]");
+    if (!form) return;
+    if (open) setOpen(nav, false);
+    nav.classList.toggle("is-search-open", open);
+    form.hidden = !open;
+    nav.querySelectorAll("[data-altar-search-open]").forEach(function (button) {
+      button.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    var toggle = nav.querySelector("[data-altar-menu-toggle]");
+    if (toggle && !nav.classList.contains("is-menu-open")) toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    var input = form.querySelector("input[name='q']");
+    if (open && input) input.focus();
+    if (!open && input) input.value = "";
+    // On the search results page, closing the search goes back to the whole collection (Figma).
+    if (!open && form.dataset.altarSearchResults) window.location.href = form.dataset.altarSearchResults;
+  }
 
   function setOpen(nav, open) {
     var toggle = nav.querySelector("[data-altar-menu-toggle]");
@@ -17,6 +55,10 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     var label = toggle.querySelector("[data-altar-menu-label]");
     if (label) label.textContent = open ? toggle.dataset.labelClose : toggle.dataset.labelOpen;
+  }
+
+  function closeSearches(except) {
+    document.querySelectorAll(".altar-nav.is-search-open").forEach(function (nav) { if (nav !== except) setSearch(nav, false); });
   }
 
   // Home v3: A ⇄ B (colours, copy, sky, 3D lighting) is revealed as one circle growing from the hero film,
@@ -48,6 +90,7 @@
 
   function closeAll() {
     document.querySelectorAll(".altar-nav.is-menu-open").forEach(function (nav) { setOpen(nav, false); });
+    closeSearches();
   }
 
   document.addEventListener("click", function (event) {
@@ -55,9 +98,9 @@
     if (layout) {
       var alternate = layout.getAttribute("aria-checked") !== "true";
       var swap = function () {
-        layout.setAttribute("aria-checked", String(alternate));
-        layout.setAttribute("aria-label", alternate ? "Usar layout inicial" : "Usar layout alternativo");
-        document.documentElement.dataset.altarHomeLayout = alternate ? "b" : "a";
+        root.dataset.altarHomeLayout = alternate ? "b" : "a";
+        try { sessionStorage.setItem("altar-lang", alternate ? "en" : "es"); } catch (error) {}
+        syncLanguage();
         document.dispatchEvent(new CustomEvent("altar:home-layout", { detail: { layout: alternate ? "b" : "a" } }));
       };
       revealLayout(swap);
@@ -65,24 +108,55 @@
     }
     var spotify = event.target.closest("[data-altar-spotify-toggle]");
     if (spotify) {
-      // PLAY opens the track of the current moment of the day straight in Spotify (app or web), in a new tab.
+      // PLAY opens Altar's Spotify playlist (set in the header section) in a new tab, on every page.
       var player = document.querySelector(".altar-solar__open-player");
-      var url = player && (player.dataset.currentSpotifyUrl || player.dataset.spotifyUrl);
+      var url = spotify.dataset.spotifyUrl || (player && (player.dataset.currentSpotifyUrl || player.dataset.spotifyUrl));
       if (url) window.open(url, "_blank", "noopener");
+      return;
+    }
+    // Footer "Cartas / Newsletter": the form is always open, so the link just takes you to the email field.
+    var newsletter = event.target.closest("[data-altar-newsletter-focus]");
+    if (newsletter) {
+      var field = document.getElementById("altar-newsletter-email");
+      if (field) { event.preventDefault(); field.focus({ preventScroll: true }); field.scrollIntoView({ block: "center", behavior: "smooth" }); }
+      return;
+    }
+    var searchOpen = event.target.closest("[data-altar-search-open]");
+    if (searchOpen) {
+      setSearch(searchOpen.closest(".altar-nav"), true);
       return;
     }
     var toggle = event.target.closest("[data-altar-menu-toggle]");
     if (toggle) {
       var nav = toggle.closest(".altar-nav");
-      setOpen(nav, !nav.classList.contains("is-menu-open"));
+      if (nav.classList.contains("is-search-open")) setSearch(nav, false);
+      else setOpen(nav, !nav.classList.contains("is-menu-open"));
       return;
     }
-    if (event.target.closest("[data-altar-menu-panel] a, [data-altar-menu-panel] button")) closeAll();
+    if (event.target.closest("[data-altar-menu-panel] a, [data-altar-menu-panel] button")) {
+      document.querySelectorAll(".altar-nav.is-menu-open").forEach(function (open) { setOpen(open, false); });
+      return;
+    }
+    // A click outside an open, empty search field closes it.
+    document.querySelectorAll(".altar-nav.is-search-open").forEach(function (open) {
+      var input = open.querySelector("[data-altar-search-form] input[name='q']");
+      if (!open.querySelector("[data-altar-search-form]").contains(event.target) && input && !input.value.trim()) setSearch(open, false);
+    });
+  });
+
+  // An empty search does nothing.
+  document.addEventListener("submit", function (event) {
+    var form = event.target.closest && event.target.closest("[data-altar-search-form]");
+    var input = form && form.querySelector("input[name='q']");
+    if (input && !input.value.trim()) { event.preventDefault(); input.focus(); }
   });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") closeAll();
   });
+
+  syncLanguage();
+  document.addEventListener("section:load", syncLanguage);
 
   // Share the hero's actual media with its continuation, including editor updates.
   function syncHeroMedia() {

@@ -55,11 +55,11 @@
 					<div class="notification-info-line">
 						<span class="js-cart-notification-item-name-private"></span>
 						<span class="js-cart-notification-item-variant-container-private" style="display: none;">
-							(<span class="js-cart-notification-item-variant-private"></span>)
+							<span class="notification-paren">(</span><span class="js-cart-notification-item-variant-private"></span><span class="notification-paren">)</span>
 						</span>
 					</div>
 					<div class="notification-info-line">
-						<span>
+						<span class="notification-quantity">
 							<span class="js-cart-notification-item-quantity-private"></span>
 							<span> x </span>
 						</span>

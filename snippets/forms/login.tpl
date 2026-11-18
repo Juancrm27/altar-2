@@ -46,49 +46,27 @@
 	<span class="js-too-many-attempts-countdown"></span>
 </div>
 
-{# Login form #}
+{# Login form · Figma "Ingresar — ES (Layout A) · EN (Layout B)" (755:3820): Email, Contraseña, Entrá, then a rule
+   and "Recuperar contraseña · Crear cuenta". Labels in both languages (.altar-es / .altar-en, the nav switch). #}
 
-<form id="login-form" action="" method="post" class="js-form form" data-store="account-login">
-
-	{# Email #}
-
-	<div class="form-group">
-		<label class="form-label" for="email">{{ 'forms.email.label' | t }}</label>
-		<input type="email" name="email" value="{{ result.email }}" autocorrect="off" autocapitalize="off" class="js-account-input form-control" required placeholder="{{ 'forms.email.placeholder' | t }}">
-	</div>
-
-	{# Password #}
+<form id="login-form" action="" method="post" class="js-form form altar-login-form" data-store="account-login">
 
 	<div class="form-group">
-		<label class="form-label" for="password">{{ 'forms.password.label' | t }}</label>
-		<input type="password" name="password" autocorrect="off" autocapitalize="off" autocomplete="off" class="js-account-input js-password-input form-control" required placeholder="{{ 'forms.password.placeholder' | t }}">
-
-		<a aria-label="{{ 'forms.password.aria_label' | t }}" class="js-password-toggle password-toggle btn">
-			<span class="js-password-visible password-toggle-show" style="display: none;">
-				<svg class="password-toggle-icon icon-inline"><use xlink:href="#password-show"/></svg>
-			</span>
-			<span class="js-password-hidden password-toggle-hide">
-				<svg class="password-toggle-icon icon-inline"><use xlink:href="#password-hide"/></svg>
-			</span>
-		</a>
-
-		<div class="login-password-help">
-			<a href="{{ store.customer_reset_password_url }}" class="login-password-help-link btn-link">{{ 'forms.password_help' | t }}</a>
-		</div>
+		<label class="form-label" for="email">Email</label>
+		<input type="email" id="email" name="email" value="{{ result.email }}" autocorrect="off" autocapitalize="off" autocomplete="email" class="js-account-input form-control" required>
 	</div>
-	
+
+	<div class="form-group">
+		<label class="form-label" for="password"><span class="altar-es">Contraseña</span><span class="altar-en">Password</span></label>
+		<input type="password" id="password" name="password" autocorrect="off" autocapitalize="off" autocomplete="current-password" class="js-account-input js-password-input form-control" required>
+	</div>
+
 	<button class="btn btn-primary btn-big btn-block" type="submit" value="{{ 'forms.login.submit' | t }}" name="">
-		{{ 'forms.login.submit' | t }}
+		<span class="altar-es">Entrá</span><span class="altar-en">Log in</span>
 		<span class="js-form-spinner form-spinner" style="display:none;">
 			{% include 'snippets/icon.tpl' with { name: 'spinner', size: 16, class: 'icon-loading' } %}
 		</span>
 	</button>
-
-	{% if 'mandatory' not in store.customer_accounts %}
-		<div class="form-login-help">{{ 'forms.login.login_help' | t }}
-			<a href="{{ store.customer_register_url }}" class="form-login-help-link btn-link">{{ 'forms.login.login_help_link' | t }}</a>
-		</div>
-	{% endif %}
 
 	{% if result.invalid %}
 		{% include 'snippets/forms/alert.tpl' with {
@@ -97,4 +75,13 @@
 			message: ('forms.login.error_general' | t)
 		} %}
 	{% endif %}
+
+	<hr class="altar-login-form__rule">
+	<p class="altar-login-form__links">
+		<a href="{{ store.customer_reset_password_url }}"><span class="altar-es">Recuperar contraseña</span><span class="altar-en">Reset password</span></a>
+		{% if 'mandatory' not in store.customer_accounts %}
+			<span aria-hidden="true">·</span>
+			<a href="{{ store.customer_register_url }}"><span class="altar-es">Crear cuenta</span><span class="altar-en">Create account</span></a>
+		{% endif %}
+	</p>
 </form>

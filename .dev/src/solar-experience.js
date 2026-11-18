@@ -27,7 +27,7 @@ function writeStorage(key, value) {
     // Storage can be unavailable (private mode, blocked site data); the GUI still works in memory.
   }
 }
-const LIGHTING_PRESET_VERSION = 6;
+const LIGHTING_PRESET_VERSION = 9;
 
 const TONE_MAPPINGS = {
   ACES: THREE.ACESFilmicToneMapping,
@@ -639,8 +639,8 @@ const DEFAULT_LIGHTING = {
   // film (client mock-up). Size (the sun's diameter) and X are % of the film's width (X from its right edge to
   // the sun's centre), Y is where the sun's bottom edge sits, in % of the film's height from its top.
   filmSun: false,
-  filmSunSize: 18.3,
-  filmSunX: 33.7,
+  filmSunSize: 13.9,
+  filmSunX: 39,
   filmSunY: 50,
   shootingEnabled: true,
   shootingPauseMin: 3,
@@ -686,12 +686,59 @@ const V3_SHARED_LIGHTING = {
   orbitSpeed: 0.1,
   orbitKepler: 1.6,
   orbitTilt: 65,
-  orbitScale: 1.4,
+  // The sun now sits beside the film (same anchor day and night), so the system is tighter: every body stays
+  // around the sun inside the hero, as in Sofi's night reference.
+  orbitScale: 0.75,
   orbitDirection: "Horario",
   moonSpeed: 2.25,
   spinSpeed: 1.5,
   orbitLineOpacity: 0,
+  // Sun look is the same day and night (Sofi): cream halo and light around the #FFF3C6 sun.
+  sunGlowColor: "#fff3c6",
+  sunLightColor: "#fff3c6",
 };
+// Sofi's palette for the v3 sky (day shows only the sun; night shows these bodies). Urano, Neptuno and Plutón are
+// not part of it, so the v3 home hides them.
+const V3_SUN_COLOR = "#fff3c6";
+const V3_PLANET_COLORS = {
+  mercury: "#83a6c9",
+  venus: "#cc95c1",
+  earth: "#0a1f2b",
+  moon: "#cfe8f9",
+  mars: "#e84f31",
+  jupiter: "#e7edbe",
+  saturn: "#34142c",
+  "saturn-ring": "#34142c",
+  uranus: "#b9cbb5",
+  pluto: "#8b7b69",
+};
+// Bodies outside Sofi's composition (Saturn shows without its ring in her reference).
+const V3_HIDDEN_BODIES = ["neptune", "saturn-ring"];
+// Night composition from Sofi's Illustrator file (WEB.ai, analysed 2026-11-17). Values measured on her artboard as
+// % of the red orbit's bounding box (974 × 850): [centre X, centre Y, diameter as % of the box width]. The sun is the
+// anchor; every body is placed and sized relative to it on the screen plane, so the layout holds at any size.
+const V3_COMPOSITION_BOX = 850 / 974;
+const V3_COMPOSITION_SUN = [55.5, 20.7, 11.9];
+const V3_COMPOSITION = {
+  saturn: [27.4, 8.4, 5.5], // morado grande
+  venus: [41.0, 16.4, 3.2], // rosa
+  mercury: [41.0, 24.9, 2.2], // azul
+  moon: [31.2, 31.9, 1.0], // blanco mínimo
+  earth: [35.1, 33.6, 2.5], // tierra oscura
+  jupiter: [80.6, 38.0, 8.1], // amarillo grande
+  mars: [53.8, 44.3, 2.3], // rojo
+  uranus: [46.9, 67.6, 4.0], // menta inferior
+  pluto: [99.8, 11.5, 2.5], // marrón, fuera de la elipse a propósito
+};
+// Slow drift around each composed position (fraction of the sun's diameter) so the sky stays alive.
+const V3_COMPOSITION_DRIFT = 0.05;
+// Self-lit amount so the tinted bodies read on the night sky ("brillo" in Sofi's reference).
+// v3 orbit distances (× orbitScale): evenly spread between the sun's edge and ~220px, so with the sun beside the
+// film every body stays on the sky to its right and none passes behind the film (Sofi's night reference).
+const V3_ORBIT_DISTANCE = { mercury: 1.75, venus: 2.1, earth: 2.45, mars: 2.8, jupiter: 3.1, saturn: 3.4 };
+// Sun scale (relative to its default size) when it sits beside the film on a 1440px screen. The orbits grow and
+// shrink with the sun from there, so the system keeps its proportions next to the film at any desktop width.
+const V3_FILM_SUN_REFERENCE_RATIO = 2.036;
 // V3 draws the sky over a light gradient: white stars with more halo, and more frequent, longer shooting stars
 // so they read on the blue and peach grounds.
 const V3_LIGHTING = {
@@ -706,9 +753,9 @@ const V3_LIGHTING = {
   showStars: false,
   showPlanets: false,
   filmSun: true,
-  // Pale yellow sun, tuned in the lighting panel (Sol → Apariencia) on layout A.
+  // Sun colour from Sofi's palette (#FFF3C6), same in both layouts.
   sunEmissive: 2.45,
-  sunEmissiveColor: "#fff3a3",
+  sunEmissiveColor: V3_SUN_COLOR,
   // Stars tuned in the lighting panel (02 · 3D → Estrellas) on layout A.
   starCount: 3850,
   starSize: 2.4,
@@ -736,7 +783,12 @@ const V3_NIGHT_LIGHTING = {
   ...Object.fromEntries(Object.keys(V3_LIGHTING).map((key) => [key, DEFAULT_LIGHTING[key]])),
   starCount: 1100,
   grainOpacity: 0.09,
-  shootingEnabled: false,
+  // Same sun anchor as day (beside the film); the planets orbit around it. Same sun colour and brightness.
+  filmSun: true,
+  sunEmissive: V3_LIGHTING.sunEmissive,
+  sunEmissiveColor: V3_SUN_COLOR,
+  // Night: sun, planets, stars and shooting stars (Sofi).
+  shootingEnabled: true,
   shootingPauseMin: V3_LIGHTING.shootingPauseMin,
   shootingPauseMax: V3_LIGHTING.shootingPauseMax,
 };
@@ -1355,6 +1407,76 @@ function layoutKey(mesh) {
   }
   if (/^material(\.\d+)?$/.test(materialKey(mesh))) return "sun";
   return null;
+}
+
+// v3: each body keeps the model's texture (surface, bands, craters) but takes the tone of Sofi's palette: the
+// texture is read as light and shade (its luminance) and multiplies the palette colour, plus a soft self-glow.
+// Materials are cloned so a colour never leaks to another body that shares the material.
+function averageTextureColor(texture) {
+  const image = texture?.image;
+  if (!image || typeof document === "undefined") return null;
+  try {
+    const size = 48;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    context.drawImage(image, 0, 0, size, size);
+    const { data } = context.getImageData(0, 0, size, size);
+    const toLinear = (value) => {
+      const c = value / 255;
+      return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    const count = data.length / 4;
+    for (let i = 0; i < data.length; i += 4) {
+      r += toLinear(data[i]);
+      g += toLinear(data[i + 1]);
+      b += toLinear(data[i + 2]);
+    }
+    return new THREE.Color(r / count, g / count, b / count);
+  } catch {
+    return null;
+  }
+}
+
+// Keeps the planet's own texture (every band, crater and colour variation of the model)
+// and only regrades it so its average colour lands on Sofi's palette tone.
+function tintPlanet(mesh, color) {
+  const target = new THREE.Color(color);
+  const tint = (material) => {
+    if (!material) return material;
+    const copy = material.clone();
+    const mean = averageTextureColor(copy.map);
+    if (!copy.map || !mean) {
+      if (copy.color) copy.color.copy(target);
+      return copy;
+    }
+    const gain = new THREE.Vector3(
+      target.r / Math.max(mean.r, 0.002),
+      target.g / Math.max(mean.g, 0.002),
+      target.b / Math.max(mean.b, 0.002)
+    );
+    if (copy.color) copy.color.set(0xffffff);
+    copy.onBeforeCompile = (shader) => {
+      shader.uniforms.altarGain = { value: gain };
+      shader.fragmentShader = shader.fragmentShader
+        .replace("void main() {", "uniform vec3 altarGain;\nvoid main() {")
+        .replace(
+          "#include <map_fragment>",
+          `#ifdef USE_MAP
+            vec4 altarTexel = texture2D( map, vMapUv );
+            diffuseColor.rgb *= min( altarTexel.rgb * altarGain, vec3( 1.0 ) );
+          #endif`
+        );
+    };
+    copy.customProgramCacheKey = () => "altar-v3-planet-grade";
+    copy.needsUpdate = true;
+    return copy;
+  };
+  mesh.material = Array.isArray(mesh.material) ? mesh.material.map(tint) : tint(mesh.material);
 }
 
 function fitMeshToRadius(mesh, targetRadius) {
@@ -2437,13 +2559,19 @@ ${stonePositionsMarkup(1)}
             material.needsUpdate = true;
           });
 
+          if (IS_V3_HOME && V3_PLANET_COLORS[key]) tintPlanet(node, V3_PLANET_COLORS[key]);
+
+          if (key === "saturn-ring" && IS_V3_HOME && V3_HIDDEN_BODIES.includes(key)) {
+            node.visible = false;
+            return;
+          }
           if (key === "saturn-ring") {
             pendingRing.push(node);
             return;
           }
 
           const slot = key ? PLANET_LAYOUT[key] : null;
-          if (!slot) {
+          if (!slot || (IS_V3_HOME && V3_HIDDEN_BODIES.includes(key))) {
             node.visible = false;
             return;
           }
@@ -2503,12 +2631,20 @@ ${stonePositionsMarkup(1)}
       this.sun.parent.add(line);
       this.orbiters.push({
         mesh,
-        distance: PLANET_LAYOUT[key].orbit ?? offset.length(),
+        distance: (IS_V3_HOME && V3_ORBIT_DISTANCE[key]) || PLANET_LAYOUT[key].orbit || offset.length(),
         angle: Math.atan2(offset.y, offset.x),
         line,
         rings: key === "saturn" ? rings : [],
       });
     });
+
+    if (IS_V3_HOME) {
+      this.orbiters = [];
+      this.composedBodies = Object.fromEntries(
+        Object.keys(V3_COMPOSITION).filter((key) => planets[key]).map((key) => [key, planets[key]])
+      );
+      return;
+    }
 
     if (planets.moon && planets.earth) {
       const offset = planets.moon.position.clone().sub(planets.earth.position);
@@ -2591,10 +2727,16 @@ ${stonePositionsMarkup(1)}
     const box = film.getBoundingClientRect();
     const view = canvas.getBoundingClientRect();
     if (!box.width || !view.width || !view.height) return false;
-    const transform = getComputedStyle(film).transform;
-    const drag = new DOMMatrixReadOnly(transform === "none" ? undefined : transform);
-    const left = box.left - drag.e;
-    const top = box.top - drag.f;
+    // Dragging the film moves only the film: its drag offset (--drag-x/--drag-y on it or an ancestor, applied via
+    // CSS `translate`) is removed, so the sun and the planets stay where they are.
+    let dragX = 0;
+    let dragY = 0;
+    for (let node = film; node && node !== document.documentElement; node = node.parentElement) {
+      dragX += parseFloat(node.style.getPropertyValue("--drag-x")) || 0;
+      dragY += parseFloat(node.style.getPropertyValue("--drag-y")) || 0;
+    }
+    const left = box.left - dragX;
+    const top = box.top - dragY;
     const radius = (box.width * Number(settings.filmSunSize)) / 200;
     const x = left + box.width + (box.width * Number(settings.filmSunX)) / 100 - view.left;
     const y = top + (box.height * Number(settings.filmSunY)) / 100 - radius - view.top;
@@ -2813,8 +2955,43 @@ ${stonePositionsMarkup(1)}
     if (!showPlanets) this.orbiters.forEach((orbiter) => { orbiter.line.visible = false; });
   }
 
+  // v3 night: Sofi's fixed composition instead of orbits. Each body sits at its offset from the sun, measured in
+  // sun diameters along the camera's screen axes, and is scaled to its size relative to the sun.
+  updateComposition(delta) {
+    this.camera.updateMatrixWorld();
+    this.sun.updateWorldMatrix(true, false);
+    const parent = this.sun.parent;
+    const sunWorld = this.sun.getWorldPosition(this.compositionSun ??= new THREE.Vector3());
+    this.sun.geometry.computeBoundingSphere();
+    const sunWorldScale = this.sun.getWorldScale(this.compositionScale ??= new THREE.Vector3()).x;
+    const sunDiameter = this.sun.geometry.boundingSphere.radius * 2 * sunWorldScale;
+    const parentScale = parent.getWorldScale(this.compositionParentScale ??= new THREE.Vector3()).x;
+    const right = (this.compositionRight ??= new THREE.Vector3()).setFromMatrixColumn(this.camera.matrixWorld, 0);
+    const up = (this.compositionUp ??= new THREE.Vector3()).setFromMatrixColumn(this.camera.matrixWorld, 1);
+    const target = (this.compositionTarget ??= new THREE.Vector3());
+    this.compositionTime = (this.compositionTime ?? 0) + delta;
+    const [sunX, sunY, sunSize] = V3_COMPOSITION_SUN;
+
+    Object.entries(this.composedBodies).forEach(([key, mesh], index) => {
+      const [x, y, size] = V3_COMPOSITION[key];
+      const phase = index * 1.7;
+      const drift = V3_COMPOSITION_DRIFT * sunDiameter;
+      const dx = ((x - sunX) / sunSize) * sunDiameter + Math.sin(this.compositionTime * 0.21 + phase) * drift;
+      const dy = (-(y - sunY) * V3_COMPOSITION_BOX / sunSize) * sunDiameter + Math.cos(this.compositionTime * 0.17 + phase) * drift;
+      target.copy(sunWorld).addScaledVector(right, dx).addScaledVector(up, dy);
+      mesh.position.copy(parent.worldToLocal(target));
+      mesh.geometry.computeBoundingSphere();
+      const radius = (sunDiameter * size / sunSize) / 2;
+      mesh.scale.setScalar(radius / (mesh.geometry.boundingSphere.radius * parentScale));
+    });
+  }
+
   updateOrbits(delta) {
     if (!this.sun) return;
+    if (this.composedBodies) {
+      this.updateComposition(delta);
+      return;
+    }
     const settings = this.effectSettings ?? DEFAULT_LIGHTING;
     const speed = Number(settings.orbitSpeed);
     const kepler = Number(settings.orbitKepler);
@@ -2828,11 +3005,16 @@ ${stonePositionsMarkup(1)}
     this.orbitQuaternion.setFromUnitVectors(Z_AXIS, this.orbitAxis);
     this.orbitBinormal.crossVectors(this.orbitAxis, X_AXIS);
 
+    // v3 with the sun beside the film: orbits follow the sun's film-relative size (see V3_FILM_SUN_REFERENCE_RATIO).
+    const sunRatio = IS_V3_HOME && this.sunMode === "film" && this.sunBaseScale
+      ? this.sun.scale.x / (this.sunBaseScale * Number(settings.sunSize)) / V3_FILM_SUN_REFERENCE_RATIO
+      : 1;
+
     this.orbiters.forEach((orbiter) => {
       const angularSpeed = ORBIT_BASE_SPEED * speed * (ORBIT_REFERENCE_RADIUS / orbiter.distance) ** kepler;
       orbiter.angle += delta * angularSpeed * direction;
 
-      const radius = orbiter.distance * scale;
+      const radius = orbiter.distance * scale * sunRatio;
       this.placeOnOrbit(orbiter.mesh.position, this.sun.position, radius, orbiter.angle);
       orbiter.rings.forEach((ring) => ring.position.copy(orbiter.mesh.position));
 
@@ -3719,8 +3901,17 @@ ${stonePositionsMarkup(1)}
       ? new FontFace(MESSAGE_FONT_FAMILY, `url("${fontUrl}")`).load().then((font) => document.fonts.add(font)).catch(() => {})
       : Promise.resolve();
     const message = card.querySelector(".altar-solar__fortune-copy p");
-    const map = { canvas, texture, fontReady, frame: null, message, phrase: pickFortunePhrase() };
+    const element = () => FIGURE_ELEMENTS[this.cardVariantIndex ?? 0];
+    const map = { canvas, texture, fontReady, frame: null, message, phrase: pickFortunePhrase(undefined, element()) };
     if (message) message.textContent = map.phrase;
+    // The sheet arrives (or changes) after the first pick: while the card is still face down, swap in a phrase from it.
+    const sheet = this.cardRoot?.querySelector("[data-oracle-sheet]")?.dataset.oracleSheet || document.querySelector("[data-oracle-sheet]")?.dataset.oracleSheet;
+    loadOraclePhrases(sheet, () => {
+      if (map.revealed) return;
+      map.phrase = pickFortunePhrase(undefined, element());
+      this.cardRoot?.querySelectorAll(".altar-solar__fortune-copy p").forEach((node) => { node.textContent = map.phrase; });
+      this.drawMessageMap(); // the phrase lives in the relief map
+    });
     return map;
   }
 
@@ -3758,8 +3949,9 @@ ${stonePositionsMarkup(1)}
   drawNextFortune() {
     const map = this.messageMap;
     if (!map) return;
-    map.phrase = pickFortunePhrase(map.phrase);
-    this.setCardVariant(pickCardVariant(this.cardVariantIndex));
+    const variant = pickCardVariant(this.cardVariantIndex);
+    map.phrase = pickFortunePhrase(map.phrase, FIGURE_ELEMENTS[variant]);
+    this.setCardVariant(variant);
   }
 
   // Warms the image cache for a figure so revealing it never waits on the network.
@@ -4031,6 +4223,8 @@ ${stonePositionsMarkup(1)}
     if (!REDUCED_MOTION.matches) this.updateShootingStars(this.timer.getElapsed(), delta);
     if (!REDUCED_MOTION.matches) {
       this.updateOrbits(delta);
+    } else if (this.composedBodies && this.sun) {
+      this.updateComposition(0);
     }
     this.updatePlanetVisibility();
     this.drawScene();
@@ -4231,7 +4425,7 @@ const MESSAGE_FONT_FAMILY = "Altar Fortune";
 // Figma (Fortune card / Message, 611:2655): every symbol sits in a 150px frame, so the text block starts at
 // the same height on all four cards (the dots frame is 0.248px taller).
 const MESSAGE_TOPS = [199.357, 199.357, 199.481, 199.357];
-const MESSAGE_LAYOUT = { x: 21.752, width: 192.496, fontSize: 14, lineHeight: 1.1, minFontSize: 11, maxLines: 5, color: "#8c8c8c", baselineNudge: -5 / 3 };
+const MESSAGE_LAYOUT = { x: 21.752, width: 192.496, fontSize: 16, lineHeight: 1.15, minFontSize: 11, maxLines: 5, color: "#8c8c8c", baselineNudge: -5 / 3 };
 const FORTUNE_SEEN_KEY = "altar-fortune-seen";
 
 // Share story (Figma "Share"): 1080 × 1920, card 840 wide centered, handle centered 1660.5px from the top.
@@ -4295,17 +4489,91 @@ function readFortuneSeen() {
   }
 }
 
-function pickFortunePhrase(previous) {
+// Oracle phrases live in Sofi's online sheet ("ORACULO", tab "oraculo": id · elemento · frase · raiz · caracteres ·
+// estado). Its "leeme" tab says the site uses only rows with estado = activa, so filling a row and marking it
+// "activa" publishes it, and "reserva" (or empty) keeps it off — no deploy needed. The sheet is read as CSV
+// (data-oracle-sheet on the card), cached in localStorage and refreshed in the background on every visit (stale
+// while revalidate); if it can't be reached, the last copy or the built-in list (FORTUNE_PHRASES) is used.
+// Each figure on the revealed face belongs to an element; its phrase comes from that element when there is one.
+const FIGURE_ELEMENTS = ["fuego", "tierra", "aire", "agua"]; // star, flower, dots, circle
+const ORACLE_CACHE_KEY = "altar-oracle-phrases";
+const ORACLE_CACHE_MAX_AGE = 1000 * 60 * 60 * 24 * 7;
+let oraclePhrases = FORTUNE_PHRASES.map((text) => ({ text, element: null }));
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (quoted) {
+      if (char === '"' && text[index + 1] === '"') { field += '"'; index += 1; }
+      else if (char === '"') quoted = false;
+      else field += char;
+    } else if (char === '"') quoted = true;
+    else if (char === ",") { row.push(field); field = ""; }
+    else if (char === "\n" || char === "\r") {
+      if (char === "\r" && text[index + 1] === "\n") index += 1;
+      row.push(field); rows.push(row); row = []; field = "";
+    } else field += char;
+  }
+  if (field || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function oraclePhrasesFromCsv(text) {
+  const [header = [], ...rows] = parseCsv(text);
+  const column = (name) => header.findIndex((cell) => cell.trim().toLowerCase() === name);
+  const phraseColumn = column("frase");
+  const stateColumn = column("estado");
+  const elementColumn = column("elemento");
+  if (phraseColumn < 0 || stateColumn < 0) return [];
+  return rows
+    .filter((row) => (row[stateColumn] || "").trim().toLowerCase() === "activa" && (row[phraseColumn] || "").trim())
+    .map((row) => ({ text: row[phraseColumn].trim().replace(/\s+/g, " "), element: (row[elementColumn] || "").trim().toLowerCase() || null }));
+}
+
+function readOracleCache() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(ORACLE_CACHE_KEY));
+    if (cached && Array.isArray(cached.phrases) && cached.phrases.length && Date.now() - cached.time < ORACLE_CACHE_MAX_AGE) return cached.phrases;
+  } catch {}
+  return null;
+}
+
+// Uses the cached sheet at once, then fetches the current one; onUpdate runs when the list changes.
+function loadOraclePhrases(url, onUpdate) {
+  const cached = readOracleCache();
+  if (cached) oraclePhrases = cached;
+  if (!url || !window.fetch) return;
+  fetch(url, { cache: "no-store" })
+    .then((response) => (response.ok ? response.text() : Promise.reject(response.status)))
+    .then((text) => {
+      const phrases = oraclePhrasesFromCsv(text);
+      if (!phrases.length) return;
+      const changed = JSON.stringify(phrases) !== JSON.stringify(oraclePhrases);
+      oraclePhrases = phrases;
+      try { localStorage.setItem(ORACLE_CACHE_KEY, JSON.stringify({ time: Date.now(), phrases })); } catch {}
+      if (changed) onUpdate?.();
+    })
+    .catch(() => {});
+}
+
+function pickFortunePhrase(previous, element) {
   const seen = readFortuneSeen();
-  let pool = FORTUNE_PHRASES.filter((phrase) => !seen.includes(phrase) && phrase !== previous);
-  if (!pool.length) pool = FORTUNE_PHRASES.filter((phrase) => phrase !== previous);
-  return pool[Math.floor(Math.random() * pool.length)];
+  const ofElement = oraclePhrases.filter((phrase) => phrase.element === element);
+  const source = ofElement.length ? ofElement : oraclePhrases;
+  let pool = source.filter((phrase) => !seen.includes(phrase.text) && phrase.text !== previous);
+  if (!pool.length) pool = source.filter((phrase) => phrase.text !== previous);
+  if (!pool.length) pool = source;
+  return pool[Math.floor(Math.random() * pool.length)]?.text ?? "";
 }
 
 function markFortuneSeen(phrase) {
   let seen = readFortuneSeen();
   // A full round has been revealed: start a new one.
-  if (FORTUNE_PHRASES.every((item) => seen.includes(item))) seen = [];
+  if (oraclePhrases.every((item) => seen.includes(item.text))) seen = [];
   if (!seen.includes(phrase)) seen.push(phrase);
   try {
     sessionStorage.setItem(FORTUNE_SEEN_KEY, JSON.stringify(seen));
@@ -4330,8 +4598,9 @@ function drawFortuneMap(canvas, frame, phrase, top = MESSAGE_TOPS[0]) {
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.drawImage(frame, 0, 0, canvas.width, canvas.height);
 
-  // Same size as Figma; only a phrase that would need more lines than the block allows gets smaller.
-  const text = phrase.toLocaleUpperCase("es");
+  // Sofi (Figma 828:5533): the phrase stays in the metallic relief, now in Minion (data-fortune-font), in sentence
+  // case and right-aligned — no longer uppercased.
+  const text = phrase;
   let fontSize = layout.fontSize;
   let lines;
   for (;;) {

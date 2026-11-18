@@ -21,6 +21,7 @@
 		<form action="{{ form_action }}" method="post" class="modal-form {{ modal_classes.form }}" {% if form_data_store %}data-store="{{ form_data_store }}"{% endif %}>
 	{% endif %}
 			<div class="modal-header {{ modal_classes.header }}">
+				{% block modal_header %}
 				{% if back_button %}
 					<button class="js-modal-close-private modal-close modal-back {{ modal_classes.back_button }}" data-target="#{{ modal_id }}" data-modal-url="{{ modal_id }}">
 						<svg class="icon-flip-horizontal modal-close-icon {{ modal_classes.close_icon }} {{ modal_classes.back_icon }}"><use xlink:href="#chevron"/></svg>
@@ -38,6 +39,7 @@
 				<button class="js-modal-close-private {{ modal_close_all_classes }} modal-close {{ modal_classes.close_button }}" data-target="#{{ modal_id }}" data-modal-url="{{ modal_id }}">
 					<svg class="modal-close-icon {{ modal_classes.close_icon }}"><use xlink:href="#times"/></svg>
 				</button>
+				{% endblock %}
 			</div>
 			<div class="modal-body {{ modal_classes.body }}">
 				{% block modal_body %}{% endblock %}

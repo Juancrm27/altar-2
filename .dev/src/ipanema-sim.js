@@ -106,15 +106,15 @@ function setQty(slug, variant, qty) {
 
 /* ---------- Modals (snippets/modals/modal.tpl) ---------- */
 
-function modal({ id, title, from = "bottom", dockRight = false, widthDesktop = "medium", classes = "", headerClass = "", titleClass = "", closeClass = "", closeIconClass = "", bodyClass = "", overlayClass = "", body = "", foot = "" }) {
+function modal({ id, title, from = "bottom", dockRight = false, widthDesktop = "medium", classes = "", headerClass = "", titleClass = "", closeClass = "", closeIconClass = "", bodyClass = "", overlayClass = "", body = "", foot = "", header = "", form = false }) {
   const md = dockRight ? "modal-md-docked modal-md-docked-right" : `modal-md-${from}`;
-  return `<div id="${id}" class="js-modal-private modal modal-${from} ${md} modal-width-full modal-md-width-${widthDesktop} ${classes}" style="display:none;" data-url="${id}">
+  return `<div id="${id}" class="js-modal-private modal modal-${from} ${md} modal-width-full modal-md-width-${widthDesktop} ${classes}" style="display:none;" data-url="${id}">${form ? `<form class="modal-form" action="#" method="post" data-sim-cart-form>` : ""}
       <div class="modal-header ${title ? "" : "no-title"} ${headerClass}">
-        ${title ? `<span class="modal-title ${titleClass}">${esc(title)}</span>` : ""}
-        <button type="button" class="js-modal-close-private modal-close ${closeClass}" data-target="#${id}" aria-label="Cerrar">${icon("times", `modal-close-icon icon-inline ${closeIconClass}`)}</button>
+        ${header || `${title ? `<span class="modal-title ${titleClass}">${esc(title)}</span>` : ""}
+        <button type="button" class="js-modal-close-private modal-close ${closeClass}" data-target="#${id}" aria-label="Cerrar">${icon("times", `modal-close-icon icon-inline ${closeIconClass}`)}</button>`}
       </div>
       <div class="modal-body ${bodyClass}">${body}</div>
-      ${foot ? `<div class="modal-footer">${foot}</div>` : ""}
+      ${foot ? `<div class="modal-footer">${foot}</div>` : ""}${form ? "</form>" : ""}
     </div>
     <div class="js-modal-close-private js-modal-overlay-private modal-overlay ${overlayClass}" data-target="#${id}" style="display:none;"></div>`;
 }
@@ -187,7 +187,19 @@ function closeSearch() {
 }
 
 function initSearch() {
+  // Nav v3 (snippets/header/altar-header.tpl): the inline field submits ?q= — here it routes to #/buscar.
+  const inline = $("[data-altar-search-form]");
+  if (inline) {
+    inline.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const q = $("input[name='q']", inline).value.trim();
+      if (q) location.hash = `#/buscar?q=${encodeURIComponent(q)}`;
+    });
+  }
+  // Local preview: the footer newsletter has no backend.
+  $$("[data-newsletter-form]").forEach((form) => form.addEventListener("submit", (event) => { event.preventDefault(); form.reset(); }));
   const slot = $("[data-sim-search-slot]");
+  if (!slot) return;
   slot.innerHTML = searchForm();
   wireSearchForm(slot);
   $(".js-search-trigger").addEventListener("click", () => {
@@ -210,11 +222,19 @@ function initSearch() {
 /* ---------- Header modals: cart, mobile menu, mobile search ---------- */
 
 function renderModals() {
-  const navLinks = [["./preview.html", "Home"], [`${BASE}#/tienda`, "Shop"], [`${BASE}#/the-star`, "The Star"], ...store.categories.map((c) => [`${BASE}#/categoria/${c.slug}`, c.name]), [`${BASE}#/contacto`, "Contacto"]];
+  // Same accesses as the Altar nav (snippets/header/altar-header.tpl): Colección, Collab, Hola (mail)
+  const navLinks = [[`${BASE}#/tienda`, '<span class="altar-es">Colección</span><span class="altar-en">Collection</span>'], [`${BASE}#/the-star`, '<span class="altar-es">Collab</span><span class="altar-en">Collab</span>'], ["mailto:altarmundi@gmail.com", '<span class="altar-es">Hola</span><span class="altar-en">Hello</span>']];
   $("[data-sim-modals]").innerHTML =
-    modal({ id: "modal-cart", title: t("cart.title", "Carrito de compras"), from: "right", dockRight: true, widthDesktop: "small", body: `<div data-sim-cart-panel></div>` }) +
+    modal({ id: "modal-cart", title: t("cart.title", "Carrito de compras"), from: "right", dockRight: true, widthDesktop: "small", classes: "altar-cart", form: true, body: `<div data-sim-cart-panel></div>`,
+      // as snippets/cart/cart-modal.tpl (block modal_header)
+      header: `<span class="modal-title altar-cart__title"><span class="altar-es">Carrito</span><span class="altar-en">Cart</span> (<span class="js-cart-widget-amount altar-cart__count">${cartCount()}</span>)</span>
+        <button type="button" class="js-modal-close-private modal-close altar-cart__close" data-target="#modal-cart"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>` }) +
+    // as snippets/cart/cart-modal.tpl: "Agregaste al carrito" with suggestions (settings.add_to_cart_recommendations)
+    modal({ id: "related-products-notification", from: "bottom", widthDesktop: "medium", classes: "h-auto altar-added", body: `<div data-sim-added></div>`,
+      header: `<span class="modal-title altar-cart__title"><span class="altar-es">Agregaste al carrito</span><span class="altar-en">Added to cart</span></span>
+        <button type="button" class="js-modal-close-private modal-close altar-cart__close" data-target="#related-products-notification"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>` }) +
     modal({ id: "nav-hamburger", from: "left", classes: "modal-nav-hamburger modal-nav-main",
-      body: `<ul class="nav-list list-unstyled">${navLinks.map(([href, label]) => `<li><a class="nav-list-link" href="${href}">${esc(label)}</a></li>`).join("")}</ul>`,
+      body: `<ul class="nav-list list-unstyled">${navLinks.map(([href, label]) => `<li><a class="nav-list-link" href="${href}">${label}</a></li>`).join("")}</ul>`,
       foot: `<div class="nav-secondary"><a class="secondary-menu-link" href="${BASE}#/cuenta/login">${icon("user", "utility-icon icon-inline")} ${esc(t("general.login", "Entrá"))}</a>
              <a class="secondary-menu-link" href="${BASE}#/cuenta/registro">${esc(t("general.create_account", "Crear cuenta"))}</a></div>` }) +
     modal({ id: "modal-search", title: t("search.placeholder", "Buscar"), from: "left", classes: "modal-nav-search", body: `<div class="modal-nav-search-body">${searchForm()}</div>` });
@@ -229,17 +249,19 @@ function cartLinesMarkup(page = false) {
         <div class="cart-item-product-info">
           <div class="cart-item-name-container">
             <a class="cart-item-name" href="${BASE}#/producto/${product.slug}">${esc(product.name)}</a>
-            ${variant ? `<span class="cart-item-variant">(${esc(variant)})</span>` : ""}
+            ${variant ? `<span class="cart-item-variant">${esc(variant)}</span>` : ""}
           </div>
-          <div class="cart-item-delete"><button type="button" class="btn btn-link cart-item-delete-button" data-sim-remove>${esc(t("general.remove", "Borrar"))}</button></div>
+          <div class="cart-item-delete"><button type="button" class="btn btn-link cart-item-delete-button" data-sim-remove><span class="altar-es">Eliminar</span><span class="altar-en">Remove</span></button></div>
         </div>
         <div class="cart-item-totals-container">
           <div class="cart-item-quantity">
-            <div class="js-quantity form-quantity small grid grid-3-auto grid-no-gap align-items-center">
-              <button type="button" class="btn cart-quantity-btn" data-sim-qty="-1" aria-label="Restar">${icon("minus")}</button>
-              <span class="cart-quantity-input sim-qty">${qty}</span>
-              <button type="button" class="btn cart-quantity-btn" data-sim-qty="1" aria-label="Sumar">${icon("plus")}</button>
-            </div>
+            <!-- same output as snippets/forms/form-input.tpl in _cart-item.tpl -->
+            <div class="form-group js-quantity form-quantity small"><div class="grid grid-3-auto grid-no-gap align-items-center">
+              <span class="js-cart-quantity-minus js-cart-quantity-btn btn cart-quantity-btn" data-sim-qty="-1" role="button" aria-label="Restar"><span aria-hidden="true">−</span></span>
+              <div class="form-control-container"><input type="number" class="form-control js-cart-quantity-input cart-quantity-input p-0 form-control-inline" value="${qty}" readonly aria-label="Cantidad"></div>
+              <span class="js-cart-input-spinner cart-item-spinner" style="display: none;"><span class="altar-cart__spinner"></span></span>
+              <span class="js-cart-quantity-plus js-cart-quantity-btn btn cart-quantity-btn" data-sim-qty="1" role="button" aria-label="Sumar"><span aria-hidden="true">+</span></span>
+            </div></div>
           </div>
           <div class="cart-item-subtotal">${money(product.price * qty)}</div>
         </div>
@@ -251,37 +273,84 @@ function freeShippingBar() {
   const total = cartTotal();
   const missing = store.freeShippingFrom - total;
   const pct = Math.min(100, Math.round((total / store.freeShippingFrom) * 100));
-  return `<div class="shipping-progress-bar box sim-free-shipping">
-      <div class="sim-free-shipping-text">${icon("truck")} ${missing > 0
-        ? esc(t("shipping.almost_free_shipping", "¡Estás a {1} de tener {2}!").replace("{1}", money(missing)).replace("{2}", t("product.free_shipping", "Envío gratis").toLowerCase()))
-        : esc(t("shipping.great_free_shipping", "¡Genial! Tenés envío gratis"))}</div>
-      <div class="sim-progress"><span style="width:${pct}%"></span></div>
-    </div>`;
+  // as snippets/shipping/shipping-free-rest.tpl + snippets/progress-bar.tpl
+  return `<div class="js-fulfillment-info"><div class="progress-bar js-ship-free-rest cart-summary-free-shipping-bar shipping-progress-bar box${missing > 0 ? "" : " bar-progress-success"}">
+      <div class="progress-bar-header"><div class="progress-bar-title js-ship-free-rest-message ship-free-rest-message ${missing > 0 ? "amount" : "success"}">
+        <div class="ship-free-rest-text bar-progress-success">${esc(t("shipping.great_free_shipping", "¡Genial! Tenés envío gratis"))}</div>
+        <div class="ship-free-rest-text bar-progress-amount">${esc(t("shipping.almost_free_shipping", "Te faltan {1} para tener {2}").replace("{1}", money(Math.max(0, missing))).replace("{2}", t("product.free_shipping", "Envío gratis").toLowerCase()))}</div>
+      </div>${icon("truck", "progress-bar-icon")}</div>
+      <div class="js-bar-progress bar-progress"><div class="js-bar-progress-active bar-progress-active" style="width:${pct}%"></div></div>
+    </div></div>`;
 }
 
 function shippingCalculator() {
-  return `<form class="sim-shipping" data-sim-shipping>
-      <div class="js-shipping-calculator-form">
-        <label class="form-label" for="sim-zip">${esc(t("shipping.calculate_shipping", "Calcular envío"))}</label>
-        <div class="input-append sim-inline-form"><input id="sim-zip" class="js-shipping-input form-control" inputmode="numeric" placeholder="${esc(t("shipping.your_zipcode", "Tu código postal"))}" required>
-        <button class="js-calculate-shipping btn btn-secondary btn-inline btn-outline" type="submit">${esc(t("shipping.calculate", "Calcular"))}</button></div>
+  // as snippets/shipping/shipping-calculator.tpl (form) + shipping-calculator-item.tpl (options)
+  return `<div class="shipping-calculator" data-sim-shipping>
+      <div class="js-shipping-calculator-head form-swap with-form" data-sim-shipping-head>
+        <div class="js-shipping-calculator-with-zipcode form-swap-value transition-up" data-sim-shipping-zip>
+          <div class="d-grid grid-1-auto align-items-center">
+            <span class="form-swap-value-label"><span>${esc(t("shipping.deliveries_for_zipcode", "Envío a"))}</span> <strong class="js-shipping-calculator-current-zip"></strong></span>
+            <span><a class="js-shipping-calculator-change-zipcode btn btn-link font-small" href="#" data-sim-shipping-change>${esc(t("shipping.change_zipcode", "Cambiar"))}</a></span>
+          </div>
+        </div>
+        <div class="js-shipping-calculator-form form-swap-input transition-up transition-up-active" data-sim-shipping-form>
+          <div class="form-label">${esc(t("shipping.shipping_methods", "Calcular envío"))}</div>
+          <div class="input-append"><input type="tel" class="js-shipping-input form-control" placeholder="${esc(t("shipping.your_zipcode", "Tu código postal"))}" aria-label="${esc(t("shipping.your_zipcode", "Tu código postal"))}" required>
+            <button class="js-calculate-shipping btn btn-inline btn-outline" type="button" data-sim-calc><span class="js-calculate-shipping-wording">${esc(t("shipping.calculate", "Calcular"))}</span></button></div>
+          <a class="btn btn-link font-small" href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank">${esc(t("shipping.dont_know_zipcode", "No sé mi código postal"))}</a>
+        </div>
       </div>
-      <div class="sim-shipping-results" data-sim-shipping-results></div>
-    </form>`;
+      <div class="js-shipping-calculator-response shipping-calculator-response radio-buttons-group" data-sim-shipping-results style="display:none;"></div>
+    </div>`;
+}
+
+function calculateShipping(box) {
+  const input = $("input", box);
+  const zip = input.value.trim();
+  if (!zip) { input.focus(); return; }
+  $(".js-shipping-calculator-current-zip", box).textContent = zip;
+  // as store.js: the head swaps from .with-form to .with-zip
+  $("[data-sim-shipping-head]", box).classList.replace("with-form", "with-zip");
+  $("[data-sim-shipping-zip]", box).classList.add("transition-up-active");
+  $("[data-sim-shipping-form]", box).classList.remove("transition-up-active");
+  const results = $("[data-sim-shipping-results]", box);
+  results.innerHTML = shippingOptions();
+  results.style.display = "";
+}
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && event.target.matches("[data-sim-shipping] .js-shipping-input")) { event.preventDefault(); calculateShipping(event.target.closest("[data-sim-shipping]")); }
+});
+
+function shippingOptions() {
+  const free = cartTotal() >= store.freeShippingFrom;
+  const options = [["Correo Argentino · A domicilio", "3 a 6 días hábiles", free ? 0 : 6500], ["Moto · CABA", "En 24 h", 4200], ["Retiro en el showroom", "1120 Bulnes, CABA", 0]];
+  return `<ul class="list-unstyled radio-button-container">${options.map(([name, time, cost], i) => `
+      <li class="js-shipping-list-item radio-button-item"><label class="js-shipping-radio radio-button list-item box d-block">
+        <input class="js-shipping-method shipping-method" type="radio" name="option" ${i === 0 ? "checked" : ""} style="display:none">
+        <div class="radio-button-content"><div class="radio-button-icons-container"><span class="radio-button-icons"><span class="radio-button-icon unchecked"></span><span class="radio-button-icon checked"></span></span></div>
+          <div class="radio-button-label"><div class="radio-button-text d-grid grid-auto-1"><div class="shipping-option-details"><div>${esc(name)}</div><div class="shipping-option-date">${esc(time)}</div></div>
+            <div class="shipping-option-price${cost ? "" : " shipping-option-price-free"}">${cost ? money(cost) : esc(t("shipping.free", "Gratis"))}</div></div></div></div>
+      </label></li>`).join("")}</ul>`;
 }
 
 function cartSummary(page = false) {
   const filled = cartCount() > 0;
+  const belowMinimum = !page && store.cartMinimum && cartTotal() < store.cartMinimum;
+  // as snippets/cart/cart-totals.tpl + cart-button.tpl (the drawer gets the bars and the calculator in its scroll area)
   return `<div class="js-visible-on-cart-filled" ${filled ? "" : 'style="display:none;"'}>
-      ${page ? "" : freeShippingBar()}
+      ${page ? shippingCalculator() : ""}
       <div class="cart-subtotals-container">
-        <div class="cart-totals-row cart-totals-subtotal"><span>${esc(t("general.subtotal", "Subtotal"))}:</span><span>${money(cartTotal())}</span></div>
+        <div class="cart-totals-row cart-totals-subtotal"><span>${esc(t("general.subtotal", "Subtotal"))}</span><span>${money(cartTotal())}</span></div>
+        <div class="js-fulfillment-info cart-totals-row cart-totals-shipping"><span>${esc(t("cart.shipping_label", "Envío"))}</span><span><span class="cart-totals-hint">${esc(t("cart.calculate_to_see", "Se calcula en checkout"))}</span></span></div>
       </div>
-      ${shippingCalculator()}
-      <div class="cart-totals-row cart-totals-total"><span>${esc(t("general.total", "Total"))}:</span><span>${money(cartTotal())}</span></div>
-      <p class="cart-totals-installments sim-muted">${store.installments} cuotas sin interés de ${money(Math.round(cartTotal() / store.installments))}</p>
-      <button type="button" class="btn btn-primary btn-big btn-block" data-sim-checkout>${esc(t("cart.start_checkout", "Iniciar compra"))}</button>
-      <div class="cart-continue-shopping"><a class="${page ? "" : "js-modal-close-private"} btn btn-link" ${page ? `href="${BASE}#/tienda"` : `href="${BASE}#/tienda" data-target="#modal-cart"`}>${esc(t("cart.view_more_products", "Ver más productos"))}</a></div>
+      <div class="js-cart-total-container"><div class="cart-totals-row cart-totals-total"><span>${esc(t("general.total", "Total"))}</span><span>${money(cartTotal())}</span></div>
+        <div class="cart-totals-installments">${store.installments} cuotas sin interés de ${money(Math.round(cartTotal() / store.installments))}</div></div>
+    </div>
+    <div class="js-visible-on-cart-filled" ${filled ? "" : 'style="display:none;"'}>
+      <div class="js-ajax-cart-submit" ${belowMinimum ? 'style="display:none"' : ""}>
+        <button type="button" class="btn btn-primary btn-big btn-block altar-cart__checkout" data-sim-checkout>${page ? esc(t("cart.start_checkout", "Iniciar compra")) : '<span class="altar-es">Iniciar checkout</span><span class="altar-en">Start checkout</span>'}</button></div>
+      <div class="js-ajax-cart-minimum alert alert-warning" ${belowMinimum ? "" : 'style="display:none"'}>${esc(t("cart.minimum_value_warning", "El monto mínimo de compra es de {1} sin incluir el costo de envío").replace("{1}", money(store.cartMinimum || 0)))}</div>
+      <div class="cart-continue-shopping"><a class="${page ? "" : "js-modal-close-private"} btn btn-link" ${page ? `href="${BASE}#/tienda"` : `href="${BASE}#/tienda" data-target="#modal-cart"`}>${page ? esc(t("cart.view_more_products", "Ver más productos")) : '<span class="altar-es">Seguir comprando</span><span class="altar-en">Continue shopping</span>'}</a></div>
     </div>`;
 }
 
@@ -290,10 +359,24 @@ function renderCart() {
   $$(".js-cart-widget-amount").forEach((el) => { el.textContent = count; });
   const panel = $("[data-sim-cart-panel]");
   if (panel) {
-    panel.innerHTML = `<div class="js-ajax-cart-list">${cartLinesMarkup()}</div>
-      <div class="js-empty-ajax-cart" ${count ? 'style="display:none;"' : ""}><div class="alert alert-info">${esc(t("cart.empty", "Tu carrito está vacío"))}</div>
-        <a class="btn btn-secondary btn-block js-modal-close-private" data-target="#modal-cart" href="${BASE}#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a></div>
-      <div class="cart-row">${cartSummary()}</div>`;
+    // as snippets/cart/cart-panel.tpl: scroll area (free shipping, products, empty state, calculator) + fixed summary
+    panel.innerHTML = `<div class="altar-cart__scroll">
+        <div class="js-visible-on-cart-filled" ${count ? "" : 'style="display:none;"'}>${freeShippingBar()}</div>
+        <div id="error-ajax-stock" style="display: none;"><div class="alert alert-warning altar-cart__notice">
+          <p class="altar-cart__notice-title"><span class="altar-es">Sin stock suficiente</span><span class="altar-en">Not enough stock</span></p>
+          <p class="altar-cart__notice-text">${esc(t("cart.out_of_stock_message", "No hay suficiente stock para agregar este producto al carrito."))}</p>
+          <a href="${BASE}#/tienda" class="cart-stock-link altar-cart__link">${esc(t("cart.see_others", "Podés ver otros acá"))}</a></div></div>
+        <div class="altar-cart__notice altar-cart__loading" role="status" aria-live="polite">
+          <p class="altar-cart__notice-title"><span class="altar-cart__spinner" aria-hidden="true"></span><span class="altar-es">Actualizando carrito…</span><span class="altar-en">Updating cart…</span></p>
+          <p class="altar-cart__notice-text"><span class="altar-es">Estamos confirmando precio, stock y cantidad.</span><span class="altar-en">We're confirming price, stock and quantity.</span></p></div>
+        <div class="js-ajax-cart-list">${cartLinesMarkup()}</div>
+        <div class="js-empty-ajax-cart altar-cart__empty" ${count ? 'style="display:none;"' : ""}>
+          <p class="altar-cart__empty-title"><span class="altar-es">Tu carrito está vacío</span><span class="altar-en">Your cart is empty</span></p>
+          <p class="altar-cart__empty-text"><span class="altar-es">Todavía no agregaste productos.</span><span class="altar-en">You haven't added any products yet.</span></p>
+          <a class="altar-cart__link" href="${BASE}#/tienda"><span class="altar-es">Volver a la tienda</span><span class="altar-en">Back to the shop</span></a></div>
+        <div class="js-fulfillment-info cart-fulfillment-info js-visible-on-cart-filled" ${count ? "" : 'style="display:none;"'}><div class="js-shipping-calculator-container">${shippingCalculator()}</div></div>
+      </div>
+      <div class="cart-row altar-cart__summary">${cartSummary()}</div>`;
   }
   if (HAS_VIEW && currentRoute().name === "cart") renderRoute();
 }
@@ -303,6 +386,7 @@ function renderCart() {
 let notificationTimer;
 function showAddedNotification(product, variant, qty) {
   if (settings.cart_open_type === "open_cart") { openModal("#modal-cart"); return; }
+  if (settings.add_to_cart_recommendations) { showAddedWithSuggestions(product, variant, qty); return; }
   const box = $("[data-sim-notification]");
   box.innerHTML = `<div class="notification">
       <button type="button" class="js-cart-notification-close-private notification-close" aria-label="Cerrar">${icon("times", "notification-close-icon icon-inline")}</button>
@@ -320,6 +404,41 @@ function showAddedNotification(product, variant, qty) {
   clearTimeout(notificationTimer);
   notificationTimer = setTimeout(hideNotification, 6000);
 }
+function showAddedWithSuggestions(product, variant, qty) {
+  const suggestions = products.filter((p) => p.slug !== product.slug && p.displayPrice !== false).slice(0, 4);
+  $("[data-sim-added]").innerHTML = `
+    <div class="js-alert-add-to-cart-private d-md-grid grid-1-auto"><div class="notification-cart-inline notification">
+      <div class="notification-cart-item d-grid grid-auto-1">
+        <div class="notification-cart-image-container mr-3"><img class="notification-cart-image" src="${product.images[0]}" alt=""></div>
+        <div class="notification-info-container notification-info-compact">
+          <div class="notification-info-line"><span>${esc(product.name)}</span>${variant ? ` <span><span class="notification-paren">(</span><span>${esc(variant)}</span><span class="notification-paren">)</span></span>` : ""}</div>
+          <div class="notification-info-line"><span class="notification-quantity"><span>${qty}</span><span> x </span></span><span>${money(product.price)}</span></div>
+        </div>
+      </div></div>
+      <div><div class="notification-cart-total"><span class="pr-3"><span>${esc(t("general.total", "Total"))}</span> (<span>${cartCount()}</span>)</span><span>${money(cartTotal())}</span></div></div>
+    </div>
+    <p class="altar-added__heading"><span class="altar-es">También te puede gustar</span><span class="altar-en">You may also like</span></p>
+    <div class="js-related-products-notification-container">
+      <section class="js-related-products-notification"><div class="related-cart-notification">
+        <div class="text-center"><h3 class="related-cart-notification-title">${esc(t("product.add_to_purchase", "Sumá a tu compra"))}</h3></div>
+        <div class="position-relative"><div class="js-related-products-notification-slider swiper-container"><div class="swiper-wrapper">
+          ${suggestions.map((p) => `<div class="swiper-slide"><div class="js-product-item-private product-item product-item-reduced">
+            <a class="product-item-link" href="${BASE}#/producto/${p.slug}">
+              <div class="product-item-image-container"><img class="product-item-image" src="${p.images[0]}" alt=""></div>
+              <div class="product-item-information"><div class="product-item-name">${esc(p.name)}</div>
+                <div class="product-item-price-container"><span class="product-item-price">${money(p.price)}</span></div>
+                <span class="altar-suggest-btn"><span class="altar-es">Ver producto</span><span class="altar-en">View product</span></span></div>
+            </a></div></div>`).join("")}
+        </div></div></div>
+      </div></section>
+    </div>
+    <div class="altar-added__actions">
+      <button type="button" data-target="#related-products-notification" class="js-modal-close-private js-open-cart-modal altar-cart__checkout" data-sim-open-cart><span class="altar-es">Ver carrito</span><span class="altar-en">View cart</span></button>
+      <a href="#" data-target="#related-products-notification" class="js-modal-close-private altar-cart__link"><span class="altar-es">Seguir comprando</span><span class="altar-en">Continue shopping</span></a>
+    </div>`;
+  openModal("#related-products-notification");
+}
+
 function hideNotification() {
   const box = $("[data-sim-notification]");
   if (box.style.display === "none") return;
@@ -342,7 +461,7 @@ function productLabels(product) {
 
 function editorialClasses(position) {
   if (!position) return "";
-  const desktopCyclePosition = ((position - 1) % 16) + 1;
+  const desktopCyclePosition = ((position - 1) % 14) + 1;
   return [
     desktopCyclePosition === 3 ? "is-altar-featured-desktop-right" : "",
     desktopCyclePosition === 10 ? "is-altar-featured-desktop-left" : "",
@@ -425,16 +544,25 @@ function categoryPage({ slug, query, star = false }) {
   if (sort === "za") list = [...list].sort((a, b) => b.name.localeCompare(a.name));
   if (sort === "nuevos") list = [...list].reverse();
 
+  // Búsqueda (main-products-grid.tpl, Figma "Colección · resultados de búsqueda"): the Colección layout, the query stays in the nav.
+  let resultsLine = "";
   if (query !== undefined) {
-    const heading = list.length
-      ? `<div class="products-grid-header"><h2 class="products-grid-search-heading">${esc(t("search.showing", "Mostrando"))} <strong>${list.length}</strong> ${esc(list.length === 1 ? t("search.result_for_query", "resultado para") : t("search.results_for_query", "resultados para"))} “${esc(query)}”</h2></div>`
-      : `<div class="products-grid-empty-message"><h2>${esc(t("search.no_results_for", "No encontramos nada para"))} “${esc(query)}”</h2><p>${esc(t("search.try_different_search", ""))}</p><p>${esc(t("search.maybe_interested", ""))}</p></div>`;
-    return container(pageHeader(t("search.search_results", "Resultados de búsqueda")) + heading + productGrid(list.length ? list : catalog.slice(0, 4)));
+    if (!list.length) {
+      const picks = catalog.filter((p) => p.displayPrice !== false).slice(0, 4);
+      return container(`<div class="py-4"><div class="altar-page-head altar-search-empty">
+          <h1 class="page-header-title"><span class="altar-es">No encontramos nada para</span><span class="altar-en">We found nothing for</span> “${esc(query)}”</h1>
+          <p class="altar-page-lead"><span class="altar-es">Escribilo de otra forma y volvé a intentar.</span><span class="altar-en">Try writing it another way.</span></p></div></div>
+        <div class="altar-search-suggestions section-related-products"><h2 class="altar-search-suggestions__title"><span class="altar-es">O quizás te interesen estos productos</span><span class="altar-en">Or maybe you'd like these</span></h2>
+          <div class="js-product-table grid grid-2 grid-md-4 altar-suggestions-grid">${picks.map((product, i) => productItem(product, i + 1)).join("")}</div></div>`);
+    }
+    resultsLine = `<p class="altar-shop-results"><span>${list.length} ${list.length === 1 ? '<span class="altar-es">resultado</span><span class="altar-en">result</span>' : '<span class="altar-es">resultados</span><span class="altar-en">results</span>'}</span>
+      <span aria-hidden="true">·</span><a href="${BASE}#/tienda"><span class="altar-es">Ver toda la colección</span><span class="altar-en">View the whole collection</span></a></p>`;
   }
 
   const sortOptions = [["relevancia", "Más relevantes"], ["menor", "Precio: menor a mayor"], ["mayor", "Precio: mayor a menor"], ["az", "A - Z"], ["za", "Z - A"], ["antiguos", "Más antiguos"], ["nuevos", "Más nuevos"], ["vendidos", "Más vendidos"]];
   const selectedSort = sortOptions.find(([value]) => value === sort)?.[1] || sortOptions[0][1];
   const controls = `<div class="filters-controls-content sim-controls altar-shop-controls">
+      ${resultsLine}
       <div class="sim-sort altar-shop-sort">
         <button type="button" class="altar-shop-sort-trigger js-modal-open-private" data-target="#modal-sort-by" aria-haspopup="dialog" aria-controls="modal-sort-by">
           <span>${esc(selectedSort)}</span>${icon("chevron-down", "altar-shop-sort-chevron icon-inline")}
@@ -444,6 +572,9 @@ function categoryPage({ slug, query, star = false }) {
   const sortModal = modal({ id: "modal-sort-by", title: "[ ORDENAR POR ]", from: "bottom", widthDesktop: "large",
     classes: "h-auto altar-sort-modal", headerClass: "altar-sort-modal__header", titleClass: "altar-sort-modal__title",
     closeClass: "altar-sort-modal__close", closeIconClass: "altar-sort-modal__close-icon", bodyClass: "altar-sort-modal__body", overlayClass: "altar-sort-modal__overlay",
+    // as filters-modals.tpl (block modal_header): bilingual title and close
+    header: `<span class="modal-title altar-sort-modal__title"><span class="altar-es">[ Ordenar por ]</span><span class="altar-en">[ Sort by ]</span></span>
+      <button type="button" class="js-modal-close-private modal-close altar-sort-modal__close" data-target="#modal-sort-by"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>`,
     body: `<ul class="radio-button-container sort-by-options list-unstyled">${sortOptions.map(([value, label]) => `<li class="radio-button-item"><a href="#" class="radio-button ${value === sort ? "selected" : ""}" data-sim-sort-value="${value}"><span class="radio-button-content"><span class="radio-button-label">${esc(label)}</span></span></a></li>`).join("")}</ul>` });
   const filters = modal({ id: "modal-filters", title: "Filtrar", from: "left", widthDesktop: "small",
     body: `<p class="form-label">${esc(t("filters.categories_title", "Categorías"))}</p>
@@ -486,7 +617,6 @@ function productPage({ slug }) {
           <div class="product-content altar-product">
             <div class="altar-product-head">
               <div class="altar-product-head-price">
-                ${hasPrice(product) ? `<span class="altar-product-marker" aria-hidden="true"></span>` : ""}
                 ${hasPrice(product) ? `<div class="js-price-container product-price"><div class="product-price-main">
                   ${product.comparePrice ? `<div class="js-compare-price-display product-price-compare">${money(product.comparePrice)}</div>` : ""}
                   <div class="product-price-row"><span class="js-price-display product-price-display">${money(product.price)}</span>${product.comparePrice ? `<span class="product-offer-label">${Math.round((1 - product.price / product.comparePrice) * 100)}% OFF</span>` : ""}</div>
@@ -571,16 +701,44 @@ function formPage(title, fields, submit, success, extra = "") {
       <div class="alert alert-success" data-sim-form-success style="display:none;"></div></form>${extra}</div>`);
 }
 
-const contactPage = () => formPage(t("general.contact", "Contacto"),
-  field("c-name", t("contact.name", "Nombre"), "text", t("contact.name_placeholder", "")) + field("c-email", t("contact.email", "Email"), "email", t("contact.email_placeholder", "")) +
-  field("c-phone", t("contact.phone", "Teléfono"), "tel", t("contact.phone_placeholder", ""), false) + field("c-message", t("contact.message", "Mensaje"), "textarea", t("contact.message_placeholder", "")),
-  t("general.send", "Enviar"), t("contact.thanks", "¡Gracias por contactarnos!"),
-  `<div class="contact-info-container sim-muted"><p>WhatsApp, teléfono, email y dirección de la tienda (vienen de la configuración de Tiendanube).</p></div>`);
+// Same markup as sections/page-header.tpl + sections/main-contact.tpl (Figma "Contacto", 931:12690).
+// #/contacto?arrepentimiento (footer legal link) · #/contacto?producto=<slug> (consultar precio) · add &enviado for the sent state.
+function contactPage() {
+  const params = new URLSearchParams(location.hash.split("?")[1] || "");
+  const cancel = params.has("arrepentimiento"), sent = params.has("enviado");
+  const product = params.get("producto") && productBySlug(params.get("producto"));
+  const title = cancel ? '<span class="altar-es">Botón de arrepentimiento</span><span class="altar-en">Order cancellation</span>' : '<span class="altar-es">Contacto</span><span class="altar-en">Contact</span>';
+  const fieldHtml = (id, label, type = "text") => `<div class="form-group"><label class="form-label" for="${id}">${label}</label>${type === "textarea" ? `<textarea id="${id}" class="form-control" rows="7"></textarea>` : `<input id="${id}" type="${type}" class="form-control">`}</div>`;
+  const body = sent
+    ? `<div class="alert alert-success altar-contact-sent">${cancel
+        ? '<strong class="altar-contact-sent__title"><span class="altar-es">¡Tu pedido de cancelación fue enviado!</span><span class="altar-en">Your cancellation request was sent!</span></strong><p class="contact-success-followup"><span class="altar-es">Vamos a ponernos en contacto con vos apenas veamos tu mensaje.</span><span class="altar-en">We\'ll get in touch as soon as we see your message.</span></p><span class="altar-contact-sent__code"><span class="altar-es">Tu código de trámite es</span><span class="altar-en">Your request code is</span> #1024</span>'
+        : '<strong class="altar-contact-sent__title"><span class="altar-es">¡Gracias por escribirnos!</span><span class="altar-en">Thanks for writing to us!</span></strong><p class="contact-success-followup"><span class="altar-es">Vamos a responderte apenas veamos tu mensaje.</span><span class="altar-en">We\'ll reply as soon as we see your message.</span></p>'}</div>
+       <a class="altar-page-link" href="${BASE}#/tienda"><span class="altar-es">Volver a la colección</span><span class="altar-en">Back to the collection</span></a>`
+    : `${product ? `<div class="contact-product-card"><div><img class="img-fluid" src="${product.images[0]}" alt=""></div><div class="contact-product-info"><p><span class="contact-product-kicker"><span class="altar-es">Estás consultando por</span><span class="altar-en">You're asking about</span></span> <a href="${BASE}#/producto/${product.slug}">${esc(product.name)}</a></p></div></div>` : ""}
+       <form id="contact-form" class="js-form form altar-contact-form" data-sim-form data-success="Simulación: Tiendanube envía el mensaje a la tienda.">
+         ${fieldHtml("name", '<span class="altar-es">Nombre</span><span class="altar-en">Name</span>')}${fieldHtml("email", "Email", "email")}${fieldHtml("phone", '<span class="altar-es">Teléfono</span><span class="altar-en">Phone</span>', "tel")}${fieldHtml("message", '<span class="altar-es">Mensaje</span><span class="altar-en">Message</span>', "textarea")}
+         <button class="btn btn-primary btn-big btn-block" type="submit"><span class="altar-es">Enviar</span><span class="altar-en">Send</span></button>
+         <div class="alert alert-success" data-sim-form-success style="display:none;"></div>
+       </form>`;
+  return `<div class="page-header"><div class="container"><div class="page-header-title-row"><div class="page-header-title-inner"><h1 class="page-header-title">${title}</h1></div></div></div></div>
+  <div class="contact-form-section"><div class="container"><div class="d-grid grid-md-2"><div class="contact-form-container">
+    ${cancel && !sent ? '<p class="contact-disclaimer altar-page-lead"><span class="altar-es">Si te arrepentiste de una compra, podés pedir la cancelación enviando este formulario <strong>con tu número de orden.</strong> Tenés como máximo hasta 10 días corridos desde que recibiste el producto.</span><span class="altar-en">If you changed your mind about a purchase, you can request its cancellation by sending this form <strong>with your order number.</strong> You have up to 10 calendar days from the day you received the product.</span></p>' : ""}
+    ${body}
+  </div></div></div></div>`;
+}
 
-const loginPage = () => formPage(t("general.login_page", "Iniciar sesión"),
-  field("l-email", t("account.email", "Email"), "email") + field("l-pass", "Contraseña", "password"),
-  t("general.login", "Entrá"), "Simulación: en la tienda real te lleva a Mi cuenta.",
-  `<p class="sim-links"><a class="btn-link" href="${BASE}#/cuenta/recuperar">${esc(t("general.recover_password", "Recuperar contraseña"))}</a> · <a class="btn-link" href="${BASE}#/cuenta/registro">${esc(t("general.create_account", "Crear cuenta"))}</a></p>`);
+// Same markup as sections/page-header.tpl + snippets/forms/login.tpl (Figma "Ingresar", 755:3820).
+const loginPage = () => `<div class="page-header"><div class="container"><div class="page-header-title-row"><div class="page-header-title-inner"><h1 class="page-header-title"><span class="altar-es">Iniciar sesión</span><span class="altar-en">Log in</span></h1></div></div></div></div>
+  <div class="login-form-section"><div class="container"><div class="account-form-container">
+    <form id="login-form" class="js-form form altar-login-form" data-sim-form data-success="Simulación: en la tienda real te lleva a Mi cuenta.">
+      <div class="form-group"><label class="form-label" for="email">Email</label><input type="email" id="email" name="email" class="js-account-input form-control" autocomplete="email" required></div>
+      <div class="form-group"><label class="form-label" for="password"><span class="altar-es">Contraseña</span><span class="altar-en">Password</span></label><input type="password" id="password" name="password" class="js-account-input js-password-input form-control" autocomplete="current-password" required></div>
+      <button class="btn btn-primary btn-big btn-block" type="submit"><span class="altar-es">Entrá</span><span class="altar-en">Log in</span></button>
+      <div class="alert alert-success" data-sim-form-success style="display:none;"></div>
+      <hr class="altar-login-form__rule">
+      <p class="altar-login-form__links"><a href="${BASE}#/cuenta/recuperar"><span class="altar-es">Recuperar contraseña</span><span class="altar-en">Reset password</span></a> <span aria-hidden="true">·</span> <a href="${BASE}#/cuenta/registro"><span class="altar-es">Crear cuenta</span><span class="altar-en">Create account</span></a></p>
+    </form>
+  </div></div></div>`;
 
 const registerPage = () => formPage(t("general.create_account", "Crear cuenta"),
   field("r-name", t("account.name", "Nombre")) + field("r-email", t("account.email", "Email"), "email") + field("r-phone", t("account.phone", "Teléfono"), "tel", "", false) + field("r-pass", "Contraseña", "password") + field("r-pass2", "Confirmar contraseña", "password"),
@@ -591,6 +749,7 @@ const resetPage = () => formPage(t("general.recover_password", "Recuperar contra
   t("general.send", "Enviar"), "Simulación: llegaría un email para cambiar la contraseña.");
 
 const staticPages = {
+  cambios: ["Cambios y devoluciones", ""],
   envios: ["Envíos y devoluciones", "Página de contenido (page.tpl). Se edita desde el administrador de Tiendanube → Páginas."],
   faqs: ["Preguntas frecuentes", "Página de contenido. Ipanema también tiene una sección FAQ con acordeón para usar en la home o en páginas."],
   makers: ["Makers", "Página de contenido libre."],
@@ -600,13 +759,46 @@ const staticPages = {
 function contentPage({ slug }) {
   const page = staticPages[slug];
   if (!page) return notFoundPage();
-  return container(pageHeader(page[0]) + `<div class="user-content sim-content"><p>${esc(page[1])}</p><p class="sim-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus.</p></div>`);
+  // Sample body (Figma "Páginas de contenido"): in Tiendanube it is the admin's HTML (page.content).
+  const sample = `<p>Tenés 30 días desde que recibís tu compra para cambiarla o devolverla. Si llegó dañada, escribinos y lo resolvemos.</p>
+    <h2>Cómo pedir un cambio</h2><p>Escribinos a <a href="mailto:altarmundi@gmail.com">altarmundi@gmail.com</a> con tu número de orden y el producto que querés cambiar. Te respondemos con los pasos a seguir.</p>
+    <h2>Condiciones</h2><ul><li>La prenda tiene que estar sin uso y con sus etiquetas.</li><li>Cada pieza es única: si el talle no está, te ofrecemos otra pieza o un crédito.</li><li>Los gastos de envío del cambio se coordinan por mail.</li></ul>
+    <h2>Botón de arrepentimiento</h2><p>Si te arrepentiste de una compra, podés cancelarla dentro de los 10 días corridos desde que la recibiste, desde el <a href="${BASE}#/contacto?arrepentimiento">Botón de arrepentimiento</a> al pie de la página.</p>`;
+  return `<div class="page-header"><div class="container"><div class="page-header-title-row"><div class="page-header-title-inner"><h1 class="page-header-title">${esc(page[0])}</h1></div></div></div></div>
+  <div class="page-content-section"><div class="container"><div class="page-content user-content">${sample}</div></div></div>`;
 }
 
 function notFoundPage() {
-  return container(`<div class="error-page-container sim-404"><p class="error-page-subtitle">404</p><h1 class="error-page-title">${esc(t("general.page_not_found", "La página que estás buscando no existe."))}</h1>
-    <a class="btn btn-primary" href="${BASE}#/tienda">${esc(t("general.view_all_products", "Ver todos los productos"))}</a></div>
-    <h2 class="products-section-title sim-h3">Productos destacados</h2>${productGrid(catalog.slice(0, 4))}`);
+  const list = catalog.filter((p) => p.displayPrice !== false).slice(0, 4);
+  return `<div id="page-error" class="error-page-container"><section class="error-page-header page-header altar-page-head">
+      <h1 class="error-page-title page-header-title"><span class="altar-es">Página no encontrada</span><span class="altar-en">Page not found</span></h1>
+      <p class="error-page-subtitle altar-page-lead"><span class="altar-es">La página que estás buscando no existe.</span><span class="altar-en">The page you're looking for doesn't exist.</span></p>
+      <a class="altar-page-link" href="${BASE}#/tienda"><span class="altar-es">Volver a la colección</span><span class="altar-en">Back to the collection</span></a>
+    </section></div>
+  <section class="section-related-products"><div class="container sim-related">
+    <div class="heading-block h2"><span class="altar-es">También te puede gustar</span><span class="altar-en">You may also like</span></div>
+    <div class="products-list-slider altar-related-grid" style="--altar-related-columns: 4; --altar-related-columns-mobile: 2;">
+      <section class="products-section"><div><div class="products-section-container">${list.map((product) => productItem(product)).join("")}</div></div></section>
+    </div>
+  </div></section>`;
+}
+
+/* Contraseña (sections/password-logo.tpl + main-password.tpl, Figma 924:10108). #/password · #/password?error */
+function passwordPage() {
+  const error = (location.hash.split("?")[1] || "").includes("error");
+  return `<header class="head-main head-main-password altar-password-head">
+      <a class="altar-password-head__logo" href="./preview.html" aria-label="Altar"><img src="../static/images/altar-logo.svg" alt="" width="40" height="39"></a>
+      <button type="button" class="altar-nav__layout-switch" data-altar-layout-toggle role="switch" aria-checked="false" aria-label="English"><span aria-hidden="true"></span></button>
+    </header>
+    <div class="password-section-layout"><div class="container"><div class="password-form-wrapper"><div class="password-form-content altar-password">
+      <div class="altar-page-head"><h2 class="password-page-title page-header-title">Volvemos pronto</h2>
+        <p class="altar-page-lead"><span class="altar-es">Estamos preparando la próxima colección. Si tenés la contraseña, entrá.</span><span class="altar-en">We're preparing the next collection. If you have the password, come in.</span></p></div>
+      <form id="password-form" class="js-form form w-100 altar-login-form" data-sim-form data-success="Simulación: con la contraseña correcta se abre la tienda.">
+        <div class="form-group"><label class="form-label" for="password"><span class="altar-es">Contraseña de acceso</span><span class="altar-en">Access password</span></label><input type="password" id="password" name="password" class="form-control">
+          ${error ? '<div class="account-form-alert alert alert-danger"><span class="altar-es">La contraseña es incorrecta.</span><span class="altar-en">The password is incorrect.</span></div>' : ""}</div>
+        <button class="btn btn-primary btn-big btn-block" type="submit"><span class="altar-es">Entrar</span><span class="altar-en">Enter</span></button>
+        <div class="alert alert-success" data-sim-form-success style="display:none;"></div>
+      </form></div></div></div></div>`;
 }
 
 /* ---------- Router ---------- */
@@ -624,6 +816,7 @@ const routes = [
   ["register", /^\/cuenta\/registro$/, registerPage, "account-register"],
   ["reset", /^\/cuenta\/recuperar$/, resetPage, "account-reset"],
   ["page", /^\/pagina\/([\w-]+)$/, (m) => contentPage({ slug: m[1] }), "page"],
+  ["password", /^\/password$/, passwordPage, "password"],
 ];
 
 function currentRoute() {
@@ -649,6 +842,15 @@ function renderRoute() {
     else link.removeAttribute("aria-current");
   });
   $("[data-sim-view]").innerHTML = route.render();
+  const searchForm = $(".altar-nav [data-altar-search-form]");
+  if (searchForm) {
+    const onSearch = route.name === "search";
+    const q = new URLSearchParams(location.hash.split("?")[1] || "").get("q") || "";
+    header?.classList.toggle("is-search-open", onSearch);
+    searchForm.hidden = !onSearch;
+    if (onSearch) { searchForm.dataset.altarSearchResults = `${BASE}#/tienda`; $("input[name='q']", searchForm).value = q; }
+    else delete searchForm.dataset.altarSearchResults;
+  }
   if (route.name === "product") updateProductState();
   renderMap(route.name);
 }
@@ -679,8 +881,8 @@ function updateProductState() {
 function renderMap(active) {
   const pages = [["shop", "#/tienda", "Categoría / tienda"], ["product", "#/producto/test-producto", "Producto (Figma 548:6520)"], ["product", "#/producto/corset-saturno", "Producto con colores y poco stock"],
     ["product", "#/producto/sombrero-sol", "Producto sin precio"], ["search", "#/buscar?q=saco", "Resultados de búsqueda"], ["search", "#/buscar?q=zzz", "Búsqueda sin resultados"],
-    ["cart", "#/carrito", "Página de carrito"], ["contact", "#/contacto", "Contacto"], ["login", "#/cuenta/login", "Login"], ["register", "#/cuenta/registro", "Registro"],
-    ["page", "#/pagina/terminos", "Página de contenido"], ["404", "#/no-existe", "404"]];
+    ["cart", "#/carrito", "Página de carrito"], ["contact", "#/contacto?arrepentimiento", "Contacto · Botón de arrepentimiento"], ["contact", "#/contacto?producto=sombrero-sol", "Contacto · consulta por producto"], ["contact", "#/contacto?arrepentimiento&enviado", "Contacto · enviado"], ["login", "#/cuenta/login", "Login"], ["register", "#/cuenta/registro", "Registro"],
+    ["page", "#/pagina/cambios", "Página de contenido"], ["404", "#/no-existe", "404"], ["password", "#/password", "Contraseña de tienda"], ["password", "#/password?error", "Contraseña incorrecta"]];
   const map = $("[data-sim-map]");
   if (!map) return;
   const open = map.dataset.open === "true";
@@ -713,7 +915,7 @@ function initEvents() {
     const opener = target.closest(".js-modal-open-private, [data-sim-open]");
     if (opener) { event.preventDefault(); openModal(opener.dataset.target || opener.dataset.simOpen); return; }
     const closer = target.closest(".js-modal-close-private");
-    if (closer) { closeModal(closer.dataset.target); if (closer.tagName !== "A") event.preventDefault(); return; }
+    if (closer) { closeModal(closer.dataset.target); if (closer.matches("[data-sim-open-cart]")) openModal("#modal-cart"); if (closer.tagName !== "A" || closer.getAttribute("href") === "#") event.preventDefault(); return; }
     if (target.closest("a[href^='#/']")) $$(".modal.modal-visible").forEach((m) => closeModal(`#${m.id}`));
     const sameRoute = target.closest("a[href^='#/']");
     if (sameRoute && sameRoute.getAttribute("href") === location.hash) { event.preventDefault(); renderRoute(); scrollTo(0, 0); }
@@ -724,6 +926,18 @@ function initEvents() {
     if (item && step) {
       const line = readCart().find((l) => l.slug === item.dataset.slug && l.variant === item.dataset.variant);
       setQty(item.dataset.slug, item.dataset.variant, line.qty + Number(step.dataset.simQty));
+    }
+    const calc = target.closest("[data-sim-calc]");
+    if (calc) calculateShipping(calc.closest("[data-sim-shipping]"));
+    const changeZip = target.closest("[data-sim-shipping-change]");
+    if (changeZip) {
+      event.preventDefault();
+      const form = changeZip.closest("[data-sim-shipping]");
+      $("[data-sim-shipping-head]", form).classList.replace("with-zip", "with-form");
+      $("[data-sim-shipping-zip]", form).classList.remove("transition-up-active");
+      $("[data-sim-shipping-form]", form).classList.add("transition-up-active");
+      $("[data-sim-shipping-results]", form).style.display = "none";
+      $("input", form).focus();
     }
     if (target.closest("[data-sim-checkout]")) alert("Simulación: acá Tiendanube abre su checkout (datos, envío y pago). No se personaliza desde el tema, salvo colores y logo.");
     if (target.closest("[data-sim-open-cart]")) { hideNotification(); openModal("#modal-cart"); }
@@ -765,16 +979,7 @@ function initEvents() {
       }, 400);
       return;
     }
-    const shipping = event.target.closest("[data-sim-shipping]");
-    if (shipping) {
-      event.preventDefault();
-      const zip = $("input", shipping).value.trim();
-      const free = cartTotal() >= store.freeShippingFrom;
-      $("[data-sim-shipping-results]", shipping).innerHTML = `<p class="sim-muted">${esc(t("shipping.deliveries_for_zipcode", "Entregas para el CP:"))} <strong>${esc(zip)}</strong></p>
-        <ul class="list-unstyled sim-shipping-list"><li><span>Correo Argentino · 3 a 6 días</span><strong>${free ? esc(t("shipping.free", "Gratis")) : money(6500)}</strong></li>
-        <li><span>Moto · CABA en 24 h</span><strong>${money(4200)}</strong></li><li><span>Retiro en 1120 Bulnes</span><strong>${esc(t("shipping.free", "Gratis"))}</strong></li></ul>`;
-      return;
-    }
+    if (event.target.closest("[data-sim-cart-form]")) { event.preventDefault(); return; }
     const form = event.target.closest("[data-sim-form]");
     if (form) {
       event.preventDefault();
@@ -793,6 +998,8 @@ function initEvents() {
 }
 
 await loadThemeFiles();
+// ?min=30000 simulates settings.cart_minimum_value (cart-button.tpl: minimum purchase notice)
+store.cartMinimum = Number(new URLSearchParams(location.search).get("min")) || 0;
 renderModals();
 initSearch();
 initEvents();
@@ -801,6 +1008,6 @@ if (HAS_VIEW) renderRoute();
 
 // ?open=cart | menu | search | filters opens that panel on load (handy for screenshots and sharing a state).
 const openOnLoad = new URLSearchParams(location.search).get("open");
-if (openOnLoad === "search") $(".js-search-trigger").click();
+if (openOnLoad === "search") $(".js-search-trigger, [data-altar-search-open]")?.click();
 else if (openOnLoad === "menu") $("[data-altar-menu-toggle]").click();
 else if (openOnLoad) openModal({ cart: "#modal-cart", menu: "#nav-hamburger", filters: "#modal-filters" }[openOnLoad] || `#${openOnLoad}`);

@@ -158,9 +158,6 @@
 		{% endfor %}
 		<div class="altar-product-head">
 			<div class="altar-product-head-price">
-				{% if product.display_price %}
-					<span class="altar-product-marker" aria-hidden="true"></span>
-				{% endif %}
 				{{ product_price_markup }}
 			</div>
 			{% if altar_category %}
@@ -305,10 +302,11 @@
 		</div>
 		{% if settings.ajax_cart %}
 		<div class="js-added-to-cart-product-message product-added-message" style="display: none;">
+			{# Altar v3 (Figma "Producto / Feedback · Success"): title, message and the link to the cart #}
 			<svg class="product-added-icon icon-inline"><use xlink:href="#check"/></svg>
-			<span class="product-added-message-text">
-				{{ 'product.already_added' | t }}<a href="#" class="js-modal-open-private product-added-message-link btn-link" data-target="#modal-cart">{{ 'product.view_cart' | t }}</a>
-			</span>
+			<strong class="product-added-message-title"><span class="altar-es">Producto agregado</span><span class="altar-en">Product added</span></strong>
+			<span class="product-added-message-text"><span class="altar-es">Ya está en tu carrito.</span><span class="altar-en">It's now in your cart.</span></span>
+			<a href="#" class="js-modal-open-private product-added-message-link btn-link" data-target="#modal-cart"><span class="altar-es">Ver carrito</span><span class="altar-en">View cart</span></a>
 		</div>
 		{% endif %}
 

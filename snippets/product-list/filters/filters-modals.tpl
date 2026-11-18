@@ -86,6 +86,18 @@
 				overlay: altar_toolbar ? 'altar-sort-modal__overlay' : '',
 			}
 		} %}
+			{# Altar v3 (Figma "Ordenar por / Panel"): title and close follow the language switch #}
+			{% block modal_header %}
+				{% if altar_toolbar %}
+					<span class="modal-title altar-sort-modal__title"><span class="altar-es">[ Ordenar por ]</span><span class="altar-en">[ Sort by ]</span></span>
+					<button class="js-modal-close-private modal-close altar-sort-modal__close" data-target="#modal-sort-by" data-modal-url="modal-sort-by"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>
+				{% else %}
+					<span class="modal-title">{{ sort_modal_title }}</span>
+					<button class="js-modal-close-private modal-close" data-target="#modal-sort-by" data-modal-url="modal-sort-by">
+						<svg class="modal-close-icon icon-inline"><use xlink:href="#times"/></svg>
+					</button>
+				{% endif %}
+			{% endblock %}
 			{% block modal_body %}
 				{% include 'snippets/product-list/filters/sort-by.tpl' with {
 					list: true,

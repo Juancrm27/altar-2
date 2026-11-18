@@ -7,7 +7,7 @@
     "featured_products": {
       "type": "product-list",
       "settings": {
-        "alignment": "center",
+        "alignment": "left",
         "section_width": "full",
         "gap": 32,
         "horizontal_padding": 16,
@@ -17,7 +17,7 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "title": "t:defaults.heading",
+            "title": "<span class=\"altar-es\">También te puede gustar</span><span class=\"altar-en\">You may also like</span>",
             "size": "h3"
           }
         },

@@ -4,6 +4,9 @@
    version in English. One continuous sky runs behind the first three screens (film, statement, gallery):
    the 3D stage is that tall and carries the gradient, the stars and the shooting stars; 04–06 continue on
    the last colour of that gradient. */
+/* Minion Plus S (Sofi): serif for the statement (02) and the manifesto copy (04), as in Figma. */
+@font-face { font-family: "Altar Minion"; src: url("../fonts/minion-plus-s-regular.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: "Altar Minion"; src: url("../fonts/minion-plus-s-italic.woff2") format("woff2"); font-style: italic; font-weight: 400; font-display: swap; }
 html.is-altar-home.altar-home-v3 {
   --v3-ink: #091e2b;
   --v3-sage: #c6ca9f;
@@ -61,13 +64,13 @@ html.altar-home-v3 body.template-home .altar-solar__stage {
   background: linear-gradient(180deg, var(--v3-sky-c0) 0, var(--v3-sky-c1) var(--v3-sky-1), var(--v3-sky-c2) var(--v3-sky-2), var(--v3-sky-c3) var(--v3-sky-3), var(--v3-sky-c3) 100%);
 }
 @media (max-width: 749px) {
-  html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: calc(100% - 72px); }
+  html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: 100%; }
 }
-/* Section heights from Figma (1440 frame): 01 832 · 02 512 · 03 707 · 04 624 · 05 832 · 06 106.
-   03: the 543 px gallery sits 82 px from the top and 82 px from the bottom, in A and B. */
+/* Section heights from Figma (1440 frame): 01 832 · 02 353 · 03 543 · 04 830 · 05 700 · 06 560.
+   03: the four photos edge to edge, no margin above or below (Figma 631:1011 / 648:3457), in A and B. */
 html.altar-home-v3 {
-  --v3-gallery-top: 5.694444vw;
-  --v3-gallery-bottom: 5.694444vw;
+  --v3-gallery-top: 0px;
+  --v3-gallery-bottom: 0px;
 }
 .altar-home-v3 .altar-solar__sky { display: none; }
 .altar-home-v3 .altar-solar__stage > .altar-solar__stage-grain { mix-blend-mode: var(--v3-grain-blend); }
@@ -111,7 +114,7 @@ html.altar-home-v3 body.template-home .altar-hero-v3__film.is-dragging { cursor:
 .altar-home-v3 .altar-hero-v3__film video { object-fit: cover; pointer-events: none; }
 html.altar-home-v3 .altar-collection__continuation { display: none; }
 @media (max-width: 749px) {
-  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: calc(100vw - 24px); left: 0; }
+  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: 100vw; left: 0; }
 }
 
 /* 02 + 03 share .altar-collection, which sits over the lower two screens of the stage.
@@ -121,13 +124,14 @@ html.altar-home-v3 .altar-collection__continuation { display: none; }
 /* 02 / Manifesto — Statement: 1440 × 512 band, its 878 × ~153 copy centred in it (x 281). A: 18.895 px text, 22.7 px under
    the DROP line · B: 17.65 px, 5.0 px. Sizes are vw of the 1440 frame, so text and column scale together and
    Figma's line breaks hold on every desktop width; phones get readable fixed sizes instead. */
-html.altar-home-v3 { --v3-statement-height: 35.555556vw; }
+html.altar-home-v3 { --v3-statement-height: 24.513889vw; } /* desktop: 1440 × 353 (Figma 648:3233 / 648:3258) */
 .altar-v3-statement { display: flex; height: var(--v3-statement-height); padding: 0 24px; align-items: center; justify-content: center; }
+/* Desktop: the copy sits 20 from the top of its band, 180 free below it (Figma). */
+@media (min-width: 1200px) { .altar-v3-statement { align-items: flex-start; padding-top: 1.388889vw; } }
 .altar-v3-statement__body {
   display: flex; width: 60.972222vw; flex-direction: column; gap: 1.574583vw;
-  color: var(--v3-fg); font: 300 1.312153vw/1.35 Inter, Arial, sans-serif; /* Inter Light, as in Figma */
+  color: var(--v3-fg); font: 400 1.312153vw/1.35 "Altar Minion", Georgia, serif; /* Minion Plus S, as in Figma */
 }
-html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: .350208vw; font-size: 1.225694vw; }
 .altar-v3-statement__label { display: flex; justify-content: space-between; margin: 0; line-height: 1.800764vw; letter-spacing: -.045021vw; text-transform: uppercase; }
 @media (min-width: 750px) {
   /* The statement keeps Figma's lines on every desktop width (its column scales with the text). */
@@ -135,9 +139,7 @@ html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: 
   .altar-v3-statement .altar-v3-justified p { white-space: nowrap; }
 }
 @media (max-width: 749px) {
-  .altar-v3-statement__body { width: 100%; gap: 18px; font-size: 15px; }
-  html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: 6px; font-size: 14px; }
-  .altar-v3-statement__label { line-height: 20.585px; letter-spacing: -.5146px; }
+  .altar-v3-statement__body { width: 100%; }
 }
 /* Worn print on the copy of sections 2 and 4, A and B (filter #altar-worn-text in the page; tuned in the
    lighting panel, 06 · Texto secciones 2 y 4). In 04 it covers the wordmark, title and paragraphs, not the card. */
@@ -157,53 +159,72 @@ html.altar-home-v3.has-worn-text :is(.altar-v3-statement__body, .altar-manifesto
 @media (max-width: 749px) {
   html.altar-home-v3 { --v3-statement-height: 80svh; }
   .altar-v3-statement { height: auto; min-height: var(--v3-statement-height); padding: 120px 24px; }
-  .altar-home-v3 body.template-home .altar-collection__gallery { margin: 72px 0; }
+  .altar-home-v3 body.template-home .altar-collection__gallery { margin: 0; }
 }
 
-/* 04 / Brand story — Oracle card and wordmark (text column: 596 px in A, 562 px in B) */
+/* 04 / Brand story — Oracle card and wordmark (Figma 631:1022 A · 648:3350 B · 699:267 tablet · 699:348 mobile).
+   Two equal halves centred on the page (601 + 601 on the 1440 frame, 348 + 348 on the 834 one): the card centred in
+   the left half, the copy block centred in the right one. The copy block is "altar", then the Inter title, then the
+   Minion body set left (desktop keeps Sofi's lines, so the block is as wide as its longest line). Same in A and B.
+   Mobile stacks it: copy first, the card under it. Every size is one --m4 unit (1 px of the Figma frame). */
 html.altar-home-v3 body.template-home .altar-manifesto-v2 { --manifesto-bg: var(--v3-bg); --manifesto-text: var(--v3-fg); }
-/* 04 is a 624 px band (1440 frame) with the 470 px card and the copy centred in it. */
-@media (min-width: 750px) {
-  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: 43.333333vw; }
-}
-@media (min-width: 1101px) {
-  html.altar-home-v3 body.template-home .altar-manifesto-v2 { padding-top: 0; padding-bottom: 0; }
-}
 .altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { gap: 0; }
 .altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-weight: 300; }
-.altar-v3-manifesto { width: min(596px, 100%); margin-top: 63px; color: var(--v3-fg); font: 400 15px/1.35 Inter, Arial, sans-serif; }
-/* Figma: 562 px. Browser Inter sets "…tuned in the mundane. I’m rather fond of" 9 px wider, so 572. */
-html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-manifesto { width: min(572px, 100%); }
-.altar-v3-manifesto__title { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 3px; margin: 0 0 20px; font: 400 17.154px/20.585px Inter, Arial, sans-serif; letter-spacing: -.5146px; text-transform: uppercase; white-space: nowrap; }
-.altar-v3-manifesto .altar-v3-justified p + p { margin-top: 20px; }
-@media (max-width: 749px) {
-  .altar-v3-manifesto { margin-top: 32px; }
-  .altar-v3-manifesto__title { justify-content: flex-start; column-gap: .3em; font-size: 15px; line-height: 20px; }
+.altar-v3-manifesto { width: auto; margin-top: 12px; color: var(--v3-fg); font: 400 16px/1.35 "Altar Minion", Georgia, serif; }
+.altar-v3-manifesto__title { margin: 0 0 20px; font: 400 17.154px/20.585px Inter, Arial, sans-serif; letter-spacing: -.5146px; text-transform: uppercase; }
+.altar-v3-manifesto__body { text-align: left; }
+.altar-v3-manifesto__body p { margin: 0; }
+.altar-v3-manifesto__body p + p { margin-top: 1.35em; } /* one empty line, as in Figma */
+.altar-v3-manifesto__body br.altar-v3-desk { display: none; }
+
+@media (min-width: 750px) {
+  html.altar-home-v3 {
+    /* desktop (1440 frame) */
+    --m4: calc(100vw / 1440); --m4-half: 601; --m4-card: 310; --m4-pad: 180; /* 830 tall */
+    --m4-word: 88.324; --m4-word-lh: 85.4; --m4-word-ls: 4.6486; --m4-gap-wt: 12;
+    --m4-title: 17.154; --m4-title-lh: 20.585; --m4-title-ls: -.5146; --m4-gap-tb: 20; --m4-body: 16;
+  }
+  html.altar-home-v3 body.template-home .altar-manifesto-v2 { display: block; min-height: 0; padding: calc(var(--m4-pad) * var(--m4)) var(--chrome-gutter, 32px); }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__content {
+    display: grid; width: auto; margin: 0; grid-template-columns: repeat(2, calc(var(--m4-half) * var(--m4)));
+    justify-content: center; align-items: center; gap: 0;
+  }
+  html.altar-home-v3 .altar-manifesto__oracle { justify-self: center; width: calc(var(--m4-card) * var(--m4)); }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { justify-self: center; width: max-content; max-width: 100%; }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-size: calc(var(--m4-word) * var(--m4)); line-height: calc(var(--m4-word-lh) * var(--m4)); letter-spacing: calc(var(--m4-word-ls) * var(--m4)); }
+  html.altar-home-v3 .altar-v3-manifesto { margin-top: calc(var(--m4-gap-wt) * var(--m4)); font-size: calc(var(--m4-body) * var(--m4)); }
+  html.altar-home-v3 .altar-v3-manifesto__title { margin-bottom: calc(var(--m4-gap-tb) * var(--m4)); font-size: calc(var(--m4-title) * var(--m4)); line-height: calc(var(--m4-title-lh) * var(--m4)); letter-spacing: calc(var(--m4-title-ls) * var(--m4)); }
+}
+@media (min-width: 1200px) {
+  .altar-v3-manifesto__body br.altar-v3-desk { display: inline; }
+  .altar-v3-manifesto__body p { white-space: nowrap; }
+  .altar-v3-manifesto__body p.altar-v3-manifesto__join { margin-top: 0; } /* "Diseño…" follows on the next line */
+}
+@media (min-width: 750px) and (max-width: 1199px) {
+  html.altar-home-v3 {
+    /* tablet (834 frame): the body reflows in a 320 column */
+    --m4: var(--t); --m4-half: 348; --m4-card: 221.7; --m4-pad: 64;
+    --m4-word: 59.01; --m4-word-lh: 57.05; --m4-word-ls: 3.11; --m4-gap-wt: 8;
+    --m4-title: 11.46; --m4-title-lh: 13.75; --m4-title-ls: -.344; --m4-gap-tb: 12; --m4-body: 10.02;
+  }
+  html.altar-home-v3 .altar-v3-manifesto { width: calc(320 * var(--t)); line-height: calc(13.53 * var(--t)); }
 }
 
-/* 05 / Closing — campaign photo (426.96 × 285.11 at x 732, y 50 of the 1440 × 832 frame) over the persistent 3D
-   stones (1440 × 480 at the bottom). B uses the compact hero photo, drawn at 459.4 × 304 inside the frame. */
-.altar-v3-closing { display: grid; min-height: max(100svh, 57.777778vw); place-items: center; }
+/* 05 / Campaign image — Full bleed (Figma 785:3396 A · 804:4069 B · 804:4071 tablet · 804:4073 mobile): the 3:2 photo
+   edge to edge, cropped from the bottom to one band on every device (1440 × 700, 834 × 405, 390 × 190), so the top of
+   the photo always shows. A: Altar1910Grano_477, B: Altar1910Grano_130. */
+.altar-v3-campaign { position: relative; z-index: 6; display: block; width: 100%; aspect-ratio: 1440 / 700; margin: 0; overflow: hidden; background: var(--v3-bg); }
+.altar-v3-campaign a, .altar-v3-campaign img { display: block; width: 100%; height: 100%; }
+.altar-v3-campaign img { object-fit: cover; object-position: center top; }
+
+/* 06 / Closing — Stones scene (Figma 631:1047 A · 648:3375 B · 699:276 tablet · 699:357 mobile): the persistent 3D
+   stones only, at the bottom of the band. Desktop 1440 × 560 with the 480 scene from y 80; tablet 834 × 300 with the
+   278 scene from y 22; mobile 390 × 281, all scene: the composition 2.03× larger, centred, its full height shown (Figma 699:357). */
+.altar-v3-closing { display: block; min-height: 38.888889vw; }
 .altar-v3-closing > .altar-closing-v2__scene { position: absolute; right: 0; bottom: 0; left: 0; z-index: 2; background: transparent; }
-.altar-v3-closing__photo { position: absolute; top: 3.472222vw; left: 50.833333vw; z-index: 3; width: 29.650054vw; aspect-ratio: 426.9608 / 285.1064; margin: 0; overflow: hidden; background: #fff; }
-.altar-v3-closing__photo a, .altar-v3-closing__photo img { display: block; width: 100%; height: 100%; }
-/* Draggable like the hero film (makeDraggable → --drag-x/--drag-y); a plain click still opens the shop. */
-.altar-v3-closing__photo { translate: var(--drag-x, 0px) var(--drag-y, 0px); cursor: grab; user-select: none; -webkit-user-select: none; }
-.altar-v3-closing__photo.is-dragging { cursor: grabbing; }
-.altar-v3-closing__photo img { pointer-events: none; }
-.altar-v3-closing__photo img { object-fit: cover; }
-.altar-v3-closing__photo .altar-v3-closing__compact { scale: 1.066266; }
-/* The photo is centred under the copy column of 04 (Figma grid): that column starts at 44.44vw (x 640) and is
-   596 px wide in A, 572 px in B. Tying the photo to it keeps them aligned on every desktop width. */
-html.altar-home-v3 { --v3-text-col: min(596px, 48.402778vw); }
-html.altar-home-v3[data-altar-home-layout="b"] { --v3-text-col: min(572px, 48.402778vw); }
-@media (min-width: 1101px) {
-  .altar-v3-closing__photo { left: calc(44.444444vw + (var(--v3-text-col) - 29.650054vw) / 2); }
-}
 @media (max-width: 749px) {
-  .altar-v3-closing { min-height: 0; padding: 120px 24px 0; place-items: start center; }
-  .altar-v3-closing > .altar-closing-v2__scene { position: relative; grid-row: 2; width: calc(100% + 48px); margin: -24px -24px 0; }
-  .altar-v3-closing__photo { position: relative; top: auto; left: auto; width: 100%; }
+  .altar-v3-closing { min-height: 0; padding: 0; }
+  .altar-v3-closing > .altar-closing-v2__scene { position: relative; }
 }
 
 /* 06 / Footer — Minimal (667:1603): Claro in A, Oscuro in B. The first link (Cartas / Newsletter)
@@ -234,10 +255,11 @@ html.altar-home-v3[data-altar-home-layout="b"] { --v3-text-col: min(572px, 48.40
 .altar-footer-min__brand img { display: block; width: 155px; height: 17px; opacity: 0; }
 .altar-footer-min__claim { display: flex; flex-wrap: wrap; gap: 8px; }
 .altar-footer-min__claim a:last-child { text-decoration: underline; text-underline-position: from-font; }
-/* Mobile (Device=Mobile): wrapped links, consumer lines stacked above the brand. */
+/* Mobile (Device=Mobile): the five links in one row, consumer lines stacked above the brand.
+   Contact left the footer (Sofi): it lives only in the nav ("Hola"). */
 @media (max-width: 749px) {
   .altar-footer-min { padding-inline: 16px; }
-  .altar-footer-min__links { flex-wrap: wrap; justify-content: flex-start; gap: 12px 42px; }
+  .altar-footer-min__links { flex-wrap: nowrap; justify-content: space-between; gap: 8px; }
   .altar-footer-min__legal { flex-direction: column-reverse; align-items: flex-start; gap: 10px; }
   .altar-footer-min__claim { flex-direction: column; gap: 6px; }
   .altar-footer-min__claim > span { display: none; }
@@ -291,72 +313,73 @@ html.altar-home-v3 .altar-v3-closing > .altar-section-grain { z-index: 2; }
 html.altar-home-v3 .altar-footer-min > .altar-section-grain { z-index: 1; }
 
 /* Tablet (Figma "Home / Layout A — Tablet", 834 frame): desktop scaled down, every size in --t (1 px of the
-   834 frame). 01 is 666 tall with the 667 × 500 film centred; 02 201; 03 the 4-up gallery 17 / 16.5 from the
+   834 frame). 01 is 706 tall with the film full-bleed (834 × 625 from y 81); 02 201; 03 the 4-up gallery (315) flush with 02 and 04, from the
    edges; 04 435 with the 221.7 card and a 319.7 column; 05 472 (photo and stones keep the desktop vw). */
 @media (min-width: 750px) and (max-width: 1199px) {
   html.altar-home-v3 {
     --t: calc(100vw / 834);
     --v3-statement-height: calc(201 * var(--t));
-    --v3-gallery-top: calc(17 * var(--t));
-    --v3-gallery-bottom: calc(16.5 * var(--t));
+    --v3-gallery-top: 0px;
+    --v3-gallery-bottom: 0px;
   }
-  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(666 * var(--t)); }
-  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: calc(667 * var(--t)); left: calc(83.5 * var(--t)); top: calc(103 * var(--t)); }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(706 * var(--t)); }
+  /* Full-bleed film (Figma 699:218): 834 × 625 from y 81, edge to edge, 02 starting right under it. */
+  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: 100vw; left: 0; top: calc(81 * var(--t)); }
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection { min-height: 0; }
 
-  html.altar-home-v3 .altar-v3-statement__body { width: calc(604.74 * var(--t)); gap: calc(15.59 * var(--t)); font-size: calc(13.02 * var(--t)); }
-  html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: calc(3.47 * var(--t)); font-size: calc(12.16 * var(--t)); }
-  html.altar-home-v3 .altar-v3-statement__label { line-height: calc(17.88 * var(--t)); letter-spacing: calc(-.45 * var(--t)); }
-  html.altar-home-v3 .altar-v3-statement .altar-v3-justified br { display: none; }
-  html.altar-home-v3 .altar-v3-statement .altar-v3-justified p { white-space: normal; }
+  /* Tablet keeps the desktop's four lines (Figma 699:236), scaled: 605 column, Minion 13.02, label 17.6 tall. */
+  html.altar-home-v3 .altar-v3-statement__body { width: calc(604.74 * var(--t)); gap: calc(15.62 * var(--t)); font-size: calc(13.02 * var(--t)); }
+  html.altar-home-v3 .altar-v3-statement__label { line-height: 1.35; letter-spacing: calc(-.447 * var(--t)); }
 
-  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: calc(435 * var(--t)); padding: calc(24 * var(--t)) calc(50 * var(--t)); }
-  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__content { width: auto; margin-inline: auto; grid-template-columns: calc(221.7 * var(--t)) calc(319.66 * var(--t)); gap: calc(50 * var(--t)); }
-  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-size: calc(59.01 * var(--t)); line-height: calc(57.05 * var(--t)); letter-spacing: calc(3.11 * var(--t)); }
-  html.altar-home-v3 .altar-v3-manifesto { width: 100%; margin-top: calc(42.09 * var(--t)); font-size: calc(10.02 * var(--t)); line-height: calc(13.53 * var(--t)); }
-  /* Two lines here: the first justified, the last one set left (the ::after soaks up its free space). */
-  html.altar-home-v3 .altar-v3-manifesto__title { column-gap: .3em; margin-bottom: calc(13.36 * var(--t)); font-size: calc(11.46 * var(--t)); line-height: calc(13.75 * var(--t)); letter-spacing: calc(-.34 * var(--t)); }
-  html.altar-home-v3 .altar-v3-manifesto__title::after { content: ""; flex: auto; }
-  html.altar-home-v3 .altar-v3-manifesto .altar-v3-justified p + p { margin-top: calc(13.36 * var(--t)); }
 
-  html.altar-home-v3 .altar-v3-closing { min-height: calc(472 * var(--t)); }
+  html.altar-home-v3 .altar-v3-closing { min-height: calc(300 * var(--t)); }
+  html.altar-home-v3 .altar-v3-closing > .altar-closing-v2__scene { height: calc(278 * var(--t)); min-height: 0; }
 }
 
-/* Mobile (Figma "Home / Layout A — Mobile", 390 frame): 12 px margins. 01 hugs the film (98 px under the top,
-   18.5 px over the bottom); 02 is 291 tall with 14 px label and 12 px copy centred in it; 03 is a swipeable strip of full-width photos; 04 puts the copy
+/* Mobile (Figma "Home / Layout A — Mobile", 390 frame): 12 px margins. 01 hugs the full-bleed film (79 px under the top,
+   flush with 02); 02 is 223 tall, Minion 14 / 21.67 copy (label included) reflowing in 350 px (20 px gutters), centred; 03 is a swipeable strip of full-width photos; 04 puts the copy
    before the card; 05 tucks the stones 32 px under the photo. */
 @media (max-width: 749px) {
-  html.altar-home-v3 { --v3-statement-height: 291px; }
-  html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: calc(100% - 13px); }
-  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(116.5px + (100vw - 24px) * .75); }
-  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: calc(100vw - 24px); left: 12px; top: 98px; }
+  html.altar-home-v3 { --v3-statement-height: 223px; }
+  html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: 100%; }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(79px + 100vw * .75); }
+  /* Full-bleed film (Figma 699:300): 390 × 292 from y 79, edge to edge, 02 starting right under it. */
+  html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: 100vw; left: 0; top: 79px; }
 
-  html.altar-home-v3 .altar-v3-statement { min-height: 291px; padding: 24px 12px; }
-  html.altar-home-v3 .altar-v3-statement__body { gap: 19.26px; font-size: 12px; line-height: 21.67px; }
-  html.altar-home-v3[data-altar-home-layout="b"] .altar-v3-statement__body { gap: 6px; font-size: 15px; }
-  html.altar-home-v3 .altar-v3-statement__label { font-size: 14px; line-height: 22.03px; letter-spacing: -.55px; }
+  html.altar-home-v3 .altar-v3-statement { min-height: 223px; padding: 24px 20px; } /* 20px gutter, as the nav */
+  html.altar-home-v3 .altar-v3-statement__body { gap: 14px; font-size: 14px; line-height: 21.67px; }
+  html.altar-home-v3 .altar-v3-statement__label { line-height: 21.67px; letter-spacing: 0; }
 
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__gallery {
-    display: flex; margin: 13px 0; overflow-x: auto; overscroll-behavior-x: contain;
+    display: flex; margin: 0; overflow-x: auto; overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch;
   }
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__gallery::-webkit-scrollbar { display: none; }
-  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__photo { flex: 0 0 100%; scroll-snap-align: start; }
+  html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__photo { flex: 0 0 100%; aspect-ratio: 390 / 594; scroll-snap-align: start; } /* Figma 699:343: 594 tall */
 
-  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: 0; padding: 24px 12px; }
+  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: 0; padding: 32px 12px 40px; }
   html.altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { order: 1; }
-  html.altar-home-v3 .altar-manifesto__oracle { order: 2; width: min(73.85vw, 310px); }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__content { display: flex; flex-direction: column; align-items: stretch; gap: 42px; }
+  html.altar-home-v3 .altar-manifesto__oracle { order: 2; align-self: center; width: min(73.85vw, 310px); }
   html.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-size: 74px; line-height: 73.46px; letter-spacing: 4px; }
-  html.altar-home-v3 .altar-v3-manifesto { margin-top: 34.25px; font-size: 12px; line-height: 18px; }
-  html.altar-home-v3 .altar-v3-manifesto__title { margin-bottom: 21.4px; font-size: 14px; line-height: 18px; letter-spacing: -.55px; }
-  html.altar-home-v3 .altar-v3-manifesto .altar-v3-justified p + p { margin-top: 21.4px; }
+  /* Figma 699:348: "altar" 74, 12 to the 14/18 title, 21.4 to the Minion 14/18 body, 42 to the 288 card. */
+  html.altar-home-v3 .altar-v3-manifesto { margin-top: 12px; font-size: 14px; line-height: 18px; }
+  html.altar-home-v3 .altar-v3-manifesto__title { margin-bottom: 21.4px; font-size: 14px; line-height: 18px; letter-spacing: -.551px; }
 
-  html.altar-home-v3 .altar-v3-closing { padding: 16px 12px 0; }
-  /* Stones 40% larger, same composition: the scene is 1.4× taller and solar-experience.js scales the view to match.
-     The bottom quarter of that view is empty ground, so it is cropped (--closing-stones-crop) to keep the footer close. */
-  html.altar-home-v3 .altar-v3-closing > .altar-closing-v2__scene { --closing-stones-scale: 1.4; --closing-stones-crop: .25; width: calc(100% + 24px); height: calc(72vw * 1.4 * .75); min-height: 294px; margin: -32px -12px 0; }
+  /* Figma 699:357: the desktop composition 2.03× larger and centred, so about five stones show (solar-experience.js
+     lays the view out that much wider and keeps its centre); 390 × 281, nothing cropped. */
+  html.altar-home-v3 .altar-v3-closing > .altar-closing-v2__scene { --closing-stones-scale: 2.03; --closing-stones-crop: 0; width: 100%; height: calc(100vw * 281 / 390); min-height: 0; margin: 0; }
 }
-/* Tablet and mobile reflow the copy (Figma Tablet / Mobile): justified, with each paragraph's last line set left. */
-@media (max-width: 1199px) {
+/* Mobile reflows the copy (Figma Mobile): justified, with each paragraph's last line set left. Tablet keeps
+   the desktop lines, last one included. */
+@media (max-width: 749px) {
   html.altar-home-v3 .altar-v3-justified p { text-align-last: left; }
 }
+
+/* 04 · Oracle card (Figma 828:5533, Sofi's note): no outer border (removed from the relief maps), the message in the
+   metallic relief in Minion, sentence case, right-aligned (drawn by solar-experience.js drawFortuneMap). No "revelar carta" link (removed 2026-11-18): the card flips on tap.
+   Every size follows the card width (--card-w; Figma card 236 px). */
+html.altar-home-v3 .altar-manifesto__oracle { --card-w: calc(var(--m4-card, 310) * var(--m4, 1px)); }
+@media (max-width: 749px) { html.altar-home-v3 .altar-manifesto__oracle { --card-w: min(73.85vw, 310px); } }
+html.altar-home-v3 .altar-manifesto__oracle { overflow: visible; }
+

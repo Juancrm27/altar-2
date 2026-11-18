@@ -40,7 +40,12 @@
                     {{ 'search.no_results_for' | t }} "{{ query }}"
                   {% endif %}
                 {% elseif template == 'contact' %}
-                  {{ 'general.contact' | t }}
+                  {# Altar v3 (Figma "Contacto"): the footer's legal link lands here as "Botón de arrepentimiento" #}
+                  {% if params.order_cancellation == 'true' or params.order_cancellation_without_id == 'true' %}
+                    <span class="altar-es">Botón de arrepentimiento</span><span class="altar-en">Order cancellation</span>
+                  {% else %}
+                    <span class="altar-es">Contacto</span><span class="altar-en">Contact</span>
+                  {% endif %}
                 {% elseif template == 'blog' %}
                   {{ 'general.blog' | t }}
                 {% elseif template == 'page' %}
@@ -50,7 +55,7 @@
                 {% elseif template == 'blog-post' %}
                   {{ post.title }}
                 {% elseif template == 'account/login' %}
-                  {{ 'general.login_page' | t }}
+                  <span class="altar-es">Iniciar sesión</span><span class="altar-en">Log in</span>
                 {% elseif template == 'account/register' %}
                   {{ 'general.create_account' | t }}
                 {% elseif template == 'account/reset' %}

@@ -1,0 +1,170 @@
+/* Altar v3 chrome: navigation and footer on every page.
+   Figma page "v3": Navigation / Site / Desktop (768:1698), Navigation / Site / Mobile (773:3948),
+   Footer / Illustrator (819:4095). Loaded after altar-header-v2.css and overrides it where the classes meet.
+
+   Language = colours. The nav switch sets html[data-altar-home-layout="b"] (kept for the visit by
+   altar-header.js): off = ES on #C6CA9F with #091E2B text, on = EN on #091E2B with #C6CA9F text.
+   Gutters follow the nav: 32px on desktop, 20px on tablet and mobile (Figma spacing/32, spacing/page/gutter-compact). */
+
+:root {
+  --altar-ink: #091e2b;
+  --altar-sage: #c6ca9f;
+  --chrome-fg: var(--altar-ink);
+  --chrome-bg: var(--altar-sage);
+  --chrome-gutter: 32px;
+}
+:root[data-altar-home-layout="b"] { --chrome-fg: var(--altar-sage); --chrome-bg: var(--altar-ink); }
+@media (max-width: 1023px) { :root { --chrome-gutter: 20px; } }
+
+/* Language: every label exists in both languages. */
+:root:not([data-altar-home-layout="b"]) .altar-en,
+:root[data-altar-home-layout="b"] .altar-es { display: none !important; }
+
+/* Inner pages take the language colours too (Figma: Producto, Colección, Collab, Contacto, Ingresar). */
+html.is-altar-commerce { --altar-commerce-background: var(--chrome-bg); --altar-commerce-foreground: var(--chrome-fg); }
+html.is-altar-commerce .head-main--altar.altar-nav--v3 { --altar-commerce-background: var(--chrome-bg) !important; --altar-commerce-foreground: var(--chrome-fg) !important; }
+
+/* ---------- Navigation ---------- */
+:root .altar-nav.altar-nav--v3 {
+  --altar-nav-color: var(--chrome-fg);
+  position: relative; display: block; width: 100%; padding: 0; gap: 0;
+  color: var(--chrome-fg); background: transparent;
+  font: 300 12.75px/24px Inter, Arial, sans-serif; letter-spacing: 0; text-transform: uppercase;
+  border-radius: 0; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+/* The theme's v2 home (not yet v3) keeps its grey bar. */
+html.is-altar-home:not(.altar-home-v3) .altar-nav.altar-nav--v3 { --chrome-fg: #91938f; }
+:root .altar-nav--v3 :is(a, button) { padding: 0; border: 0; color: inherit; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; text-decoration: none; cursor: pointer; }
+:root .altar-nav--v3 :is(a, button):hover { color: inherit; opacity: .6; text-decoration: none; }
+:root .altar-nav--v3 a.is-active { text-decoration: underline; text-underline-position: from-font; }
+:root .altar-nav--v3 :is(a, button):focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
+:root .altar-nav--v3 .altar-nav__pending { cursor: default; }
+
+.altar-nav--v3 .altar-nav__bar { display: flex; height: 99px; padding: 30px var(--chrome-gutter); align-items: center; justify-content: space-between; gap: 24px; }
+:root .altar-nav--v3 .altar-nav__logo { display: block; width: 40px; height: 39px; flex: 0 0 40px; background: currentColor; -webkit-mask: url("../images/altar-logo.svg") center / contain no-repeat; mask: url("../images/altar-logo.svg") center / contain no-repeat; }
+:root .altar-nav--v3 .altar-nav__logo:hover { opacity: 1; }
+:root .altar-nav--v3 .altar-nav__logo img { width: 100%; height: 100%; opacity: 0; filter: none; }
+
+/* Right group (Figma "Navigation / Controls"): gap 40 between switch·PLAY, the rule, the links and commerce. */
+.altar-nav--v3 .altar-nav__controls { display: flex; min-width: 0; align-items: center; gap: 40px; }
+:root .altar-nav--v3 .altar-nav__experience { display: flex; height: 24px; align-items: center; gap: 24px; flex: none; }
+:root .altar-nav--v3 .altar-nav__layout-switch { position: relative; width: 22px; height: 12px; flex: 0 0 22px; border-radius: 20px; background: currentColor; }
+:root .altar-nav--v3 .altar-nav__layout-switch:hover { opacity: 1; }
+:root .altar-nav--v3 .altar-nav__layout-switch span { position: absolute; top: 1.5px; left: 1.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--chrome-bg); transition: transform .2s; }
+html.is-altar-home:not(.altar-home-v3) .altar-nav--v3 .altar-nav__layout-switch span { background: #0f0f0f; }
+:root .altar-nav--v3 .altar-nav__layout-switch[aria-checked="true"] span { transform: translateX(10px); }
+:root .altar-nav--v3 .altar-nav__layout-switch::after { content: ""; position: absolute; inset: -10px -6px; }
+/* A 14px horizontal dash between PLAY and the links (Figma "Divider / Horizontal (14)"). */
+:root .altar-nav--v3 .altar-nav__experience-divider { display: block; width: 14px; height: 1px; flex: 0 0 14px; background: currentColor; opacity: 1; }
+:root .altar-nav--v3 .altar-nav__menu { display: flex; align-items: center; gap: 16px; font: inherit; text-transform: inherit; }
+:root .altar-nav--v3 .altar-nav__commerce { display: flex; align-items: center; gap: 16px; }
+:root .altar-nav--v3 .altar-nav__account { display: block; margin-right: -6px; } /* Ingresar ↔ (0): 10px in Figma */
+:root .altar-nav--v3 .altar-nav__cart-wrap { display: block; }
+:root .altar-nav--v3 .altar-nav__cart { display: block; white-space: nowrap; }
+:root .altar-nav--v3 .altar-nav__count { display: inline !important; }
+:root .altar-nav--v3 .altar-nav__count::before { content: "("; }
+:root .altar-nav--v3 .altar-nav__count::after { content: ")"; }
+:root .altar-nav--v3 .altar-nav__menu-toggle { display: none; }
+:root .altar-nav--v3 .altar-nav__menu-close { display: none; }
+:root .altar-nav--v3:is(.is-menu-open, .is-search-open) .altar-nav__menu-open { display: none; }
+:root .altar-nav--v3:is(.is-menu-open, .is-search-open) .altar-nav__menu-close { display: inline; }
+
+/* Search, inline (Figma Estado=Buscar abierto): the word turns into a 240px underline field with its magnifier. */
+.altar-nav--v3 .altar-nav__search-slot { display: flex; align-items: center; }
+.altar-nav--v3 .altar-nav__search-form { display: flex; width: 240px; height: 33px; padding: 4px 0; align-items: center; gap: 6px; border-bottom: 1px solid currentColor; }
+.altar-nav--v3 .altar-nav__search-form[hidden] { display: none; }
+.altar-nav--v3.is-search-open .altar-nav__search { display: none; }
+.altar-nav--v3 .altar-nav__search-input { min-width: 0; flex: 1; height: 24px; margin: 0; padding: 0; border: 0; border-radius: 0; outline: 0; color: inherit; background: none; font: inherit; letter-spacing: inherit; text-transform: uppercase; caret-color: currentColor; box-shadow: none; -webkit-appearance: none; appearance: none; }
+.altar-nav--v3 .altar-nav__search-input::placeholder { color: currentColor; opacity: .45; }
+.altar-nav--v3 .altar-nav__search-input::-webkit-search-cancel-button { display: none; }
+/* The underline is the field: no box around it, ever (focus, autofill, theme form styles). */
+:root .altar-nav.altar-nav--v3 .altar-nav__search-input:is(:focus, :focus-visible, :hover) { border: 0; outline: 0; box-shadow: none; background: none; }
+:root .altar-nav--v3 .altar-nav__search-submit { display: grid; width: 24px; height: 24px; flex: 0 0 24px; place-items: center; }
+.altar-nav--v3 .altar-nav__search-icon { display: block; width: 12px; height: 12px; }
+
+:root .altar-nav--v3 .altar-nav__panel { display: none; }
+:root .altar-nav--v3 .altar-nav__panel[hidden] { display: none !important; }
+
+/* ---------- Tablet and mobile (Navigation / Site / Mobile) ---------- */
+@media (max-width: 1023px) {
+  .altar-nav--v3 .altar-nav__bar { height: 72px; padding: 20px var(--chrome-gutter); }
+  :root .altar-nav--v3 .altar-nav__logo { width: 32px; height: 31px; flex-basis: 32px; }
+  /* switch · PLAY · MENU · (0), from the left; 24 between switch and PLAY, 20 after. */
+  .altar-nav--v3 .altar-nav__controls { gap: 20px; }
+  :root .altar-nav--v3 :is(.altar-nav__menu, .altar-nav__account) { display: none; }
+  /* switch · PLAY · — · MENU · (0): the dash stays (Figma Mobile, Cerrado and Menú abierto). */
+  .altar-nav--v3 .altar-nav__experience-divider { order: 2; }
+  :root .altar-nav--v3 .altar-nav__menu-toggle { display: block; order: 3; }
+  .altar-nav--v3 .altar-nav__experience { order: 1; }
+  .altar-nav--v3 .altar-nav__commerce { order: 4; }
+  .altar-nav--v3 .altar-nav__search-slot { display: none; }
+
+  /* Menú abierto: a full-width rule, then one 48px row — Colección · Collab · Hola · Ingresar · magnifier. */
+  /* The open menu gets the page colour behind it, so the row reads over the hero. */
+  :root .altar-nav.altar-nav--v3.is-menu-open { background: var(--chrome-bg); }
+  :root .altar-nav--v3.is-menu-open .altar-nav__panel { display: block; padding: 0; border-top: 1px solid currentColor; background: none; }
+  .altar-nav--v3 .altar-nav__panel-row { display: flex; height: 48px; padding: 0 var(--chrome-gutter); align-items: center; justify-content: space-between; gap: 12px; }
+  :root .altar-nav--v3 .altar-nav__panel-search { display: grid; width: 24px; height: 24px; margin-right: -6px; place-items: center; }
+
+  /* Buscar abierto: logo · field (fills) · CERRAR. Everything else steps aside. */
+  .altar-nav--v3.is-search-open .altar-nav__bar { justify-content: flex-start; gap: 32px; }
+  .altar-nav--v3.is-search-open .altar-nav__controls { flex: 1; gap: 16px; }
+  :root .altar-nav--v3.is-search-open :is(.altar-nav__experience, .altar-nav__experience-divider, .altar-nav__cart-wrap) { display: none; }
+  .altar-nav--v3.is-search-open .altar-nav__commerce { flex: 1; order: 1; }
+  .altar-nav--v3.is-search-open .altar-nav__search-slot { display: flex; flex: 1; }
+  .altar-nav--v3.is-search-open .altar-nav__search-form { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { :root .altar-nav--v3 .altar-nav__layout-switch span { transition: none; } }
+
+/* ---------- Footer (Footer / Illustrator) ---------- */
+.site-footer .altar-footer.altar-footer--v3 {
+  display: flex; padding: 32px var(--chrome-gutter) 12px; flex-direction: column; gap: 32px; /* 12 at the bottom (Figma footer, 2026-11-18) */
+  color: var(--chrome-fg); background: var(--chrome-bg); font: 300 12px/20px Inter, Arial, sans-serif; text-transform: uppercase; /* Inter Light, like the nav (Figma footer, 2026-11-18) */
+}
+.site-footer .altar-footer--v3 :is(a, button) { padding: 0; border: 0; color: inherit; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; text-decoration: none; cursor: pointer; }
+.site-footer .altar-footer--v3 :is(a, button):is(:hover, :focus-visible) { opacity: .6; text-decoration: none; }
+.site-footer .altar-footer--v3 :is(a, button, input):focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
+.site-footer .altar-footer--v3 p { margin: 0; }
+
+/* Newsletter, always open: EMAIL ………… ENVIAR over a 1px rule, 8px below the words.
+   (Selectors carry .site-footer and the field to win over altar-footer.css, which styles the old footer.) */
+.site-footer .altar-footer--v3 .altar-footer__newsletter { display: flex; width: 100%; margin: 0; flex-direction: column; align-items: stretch; gap: 8px; }
+.site-footer .altar-footer--v3 .altar-footer__field { display: flex; width: 100%; height: auto; min-height: 0; padding: 0 0 8px; align-items: center; justify-content: space-between; gap: 16px; border: 0; border-bottom: 1px solid currentColor; font-size: 14px; line-height: 20px; }
+.site-footer .altar-footer--v3 .altar-footer__field:focus-within { border-bottom-width: 1px; }
+.site-footer .altar-footer--v3 .altar-footer__field .altar-footer__input { min-width: 0; flex: 1; height: 20px; margin: 0; padding: 0; border: 0; border-radius: 0; color: inherit; background: none; font: 300 14px/20px Inter, Arial, sans-serif; text-transform: uppercase; box-shadow: none; outline: 0; }
+.site-footer .altar-footer--v3 .altar-footer__field .altar-footer__input::placeholder { color: currentColor; opacity: 1; }
+.site-footer .altar-footer--v3 .altar-footer__field .altar-footer__input:focus::placeholder { opacity: .45; }
+.site-footer .altar-footer--v3 .altar-footer__submit { display: block; font: 300 14px/20px Inter, Arial, sans-serif; letter-spacing: 0; text-transform: uppercase; }
+.site-footer .altar-footer--v3 .altar-footer__status { font-size: 10px; line-height: 16px; text-transform: none; }
+
+.altar-footer--v3 .altar-footer__links { display: flex; align-items: center; justify-content: space-between; gap: 8px; letter-spacing: .15px; }
+.altar-footer--v3 .altar-footer__short { display: none; }
+
+.altar-footer--v3 .altar-footer__legal-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 10px; line-height: 16px; letter-spacing: .2px; text-transform: none; }
+.altar-footer--v3 .altar-footer__brand { display: flex; align-items: center; gap: 24px; }
+.altar-footer--v3 .altar-footer__powered :is(a, img, svg) { display: inline-block; vertical-align: middle; color: inherit; }
+.altar-footer--v3 .altar-footer__consumer { display: flex; flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 749px) {
+  .site-footer .altar-footer.altar-footer--v3 { padding: 24px var(--chrome-gutter) 12px; gap: 24px; }
+  .altar-footer--v3 .altar-footer__long { display: none; }
+  .altar-footer--v3 .altar-footer__short { display: inline; }
+  /* Legal stacks: the two consumer links, then © and Tiendanube. */
+  .altar-footer--v3 .altar-footer__legal-row { flex-direction: column-reverse; align-items: flex-start; gap: 8px; }
+  .altar-footer--v3 .altar-footer__consumer { flex-direction: column; gap: 8px; }
+  .altar-footer--v3 .altar-footer__separator { display: none; }
+}
+
+/* ---------- Film grain: always, on every section and page ----------
+   The footer carries its own grain layer (over its background, under nothing clickable). Inner pages already have
+   one fixed grain for the whole page (.altar-page-grain, layouts/layout.tpl) that shows through the transparent
+   footer, so there the footer's own layer steps aside to avoid doubling it. Multiply marks the light ES ground,
+   screen lifts the dark EN one. */
+.site-footer .altar-footer.altar-footer--v3 { position: relative; isolation: isolate; }
+.altar-footer--v3 > .altar-footer__grain { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; opacity: var(--grain-opacity, var(--altar-grain)); mix-blend-mode: multiply; pointer-events: none; }
+:root[data-altar-home-layout="b"] .altar-footer--v3 > .altar-footer__grain { mix-blend-mode: screen; }
+html.is-altar-commerce .altar-footer--v3 > .altar-footer__grain { display: none; }
+:root { --altar-grain: .21; } /* the home v3 grain: .21 on A, .09 on B (solar-experience.js presets) */
+:root[data-altar-home-layout="b"] { --altar-grain: .09; }
+html.is-altar-commerce .altar-page-grain .altar-section-grain { opacity: var(--altar-grain); }
+:root[data-altar-home-layout="b"] .altar-page-grain .altar-section-grain { mix-blend-mode: screen; }

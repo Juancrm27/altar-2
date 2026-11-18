@@ -16,12 +16,13 @@
   {% if page_width %}
     <div class="container">
   {% endif %}
-  <section class="error-page-header page-header" data-store="page-title">
-    {% include 'snippets/breadcrumbs.tpl' %}
-    <h1 class="error-page-title">{{ 'general.error' | t }} - 404</h1>
+  {# Altar v3 (Figma "404", 926:10284): title, the store's message and a way back to the collection; the suggestions
+     below come from the product-list section (templates/pages/404.json). #}
+  <section class="error-page-header page-header altar-page-head" data-store="page-title">
+    <h1 class="error-page-title page-header-title"><span class="altar-es">Página no encontrada</span><span class="altar-en">Page not found</span></h1>
+    <p class="error-page-subtitle altar-page-lead"><span class="altar-es">La página que estás buscando no existe.</span><span class="altar-en">The page you're looking for doesn't exist.</span></p>
+    <a class="altar-page-link" href="{{ store.products_url }}"><span class="altar-es">Volver a la colección</span><span class="altar-en">Back to the collection</span></a>
   </section>
-  
-  <h2 class="error-page-subtitle">{{ 'general.page_not_found' | t }}</h2>
   {% if page_width %}
     </div>
   {% endif %}

@@ -13,55 +13,38 @@
       "blocks": {
         "channel_1": {
           "type": "altar-channel",
-          "settings": { "internal_name": "CHANNEL 01" }
+          "settings": {
+            "internal_name": "CHANNEL 01"
+          }
         },
         "channel_2": {
           "type": "altar-channel",
-          "settings": { "internal_name": "CHANNEL 02" }
+          "settings": {
+            "internal_name": "CHANNEL 02"
+          }
         },
         "channel_3": {
           "type": "altar-channel",
-          "settings": { "internal_name": "CHANNEL 03" }
+          "settings": {
+            "internal_name": "CHANNEL 03"
+          }
         },
         "channel_4": {
           "type": "altar-channel",
-          "settings": { "internal_name": "CHANNEL 04" }
+          "settings": {
+            "internal_name": "CHANNEL 04"
+          }
         }
       },
-      "block_order": ["channel_1", "channel_2", "channel_3", "channel_4"]
-    },
-    "altar_campaign": {
-      "type": "altar-campaign",
-      "settings": {
-        "title": "ELEMENTAL",
-        "background_color": "#0f0f0f"
-      },
-      "blocks": {
-        "photo_1": {
-          "type": "altar-campaign-image",
-          "settings": { "alt_text": "Retrato con vestido negro y detalle floral" }
-        },
-        "photo_2": {
-          "type": "altar-campaign-image",
-          "settings": { "alt_text": "Composición de flores de la campaña Altar" }
-        },
-        "photo_3": {
-          "type": "altar-campaign-image",
-          "settings": { "alt_text": "Vestido azul y verde de la colección Altar" }
-        },
-        "photo_4": {
-          "type": "altar-campaign-image",
-          "settings": { "alt_text": "Retrato con flores y tejido verde" }
-        }
-      },
-      "block_order": ["photo_1", "photo_2", "photo_3", "photo_4"]
-    },
-    "altar_manifesto": {
-      "type": "altar-manifesto",
-      "settings": {
-        "background_color": "#c6ca9f"
-      }
+      "block_order": [
+        "channel_1",
+        "channel_2",
+        "channel_3",
+        "channel_4"
+      ]
     }
   },
-  "order": ["altar_solar", "altar_campaign", "altar_manifesto"]
+  "order": [
+    "altar_solar"
+  ]
 }

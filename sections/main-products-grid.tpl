@@ -64,7 +64,7 @@
   {% endif %}
 
     {# Search-specific header with results count - only shown when there ARE products #}
-    {% if template == 'search' and has_real_products %}
+    {% if template == 'search' and has_real_products and not altar_editorial_grid %}
       {% set display_query = query ? query %}
       <div class="products-grid-header">
         <h2 class="products-grid-search-heading">
@@ -122,6 +122,15 @@
                     <span>{{ 'general.filter' | t }}</span>
                   </button>
                 {% endif %}
+                {# Search results live in the Colección layout (Figma "Colección · resultados de búsqueda"): the query stays
+                   in the nav; here only the count and a way back to the whole collection. #}
+                {% if template == 'search' %}
+                  <p class="altar-shop-results">
+                    <span>{{ products_count }} {% if products_count == 1 %}<span class="altar-es">resultado</span><span class="altar-en">result</span>{% else %}<span class="altar-es">resultados</span><span class="altar-en">results</span>{% endif %}</span>
+                    <span aria-hidden="true">·</span>
+                    <a href="{{ store.products_url }}"><span class="altar-es">Ver toda la colección</span><span class="altar-en">View the whole collection</span></a>
+                  </p>
+                {% endif %}
                 <div class="altar-shop-sort">
                   <button
                     type="button"
@@ -168,6 +177,11 @@
           <div class="py-4" data-component="filter.message">
             {% if has_applied_filters %}
               <p class="products-grid-empty-message">{{ 'category.no_results' | t }}</p>
+            {% elseif template == 'search' and altar_editorial_grid %}
+              <div class="altar-page-head altar-search-empty">
+                <h1 class="page-header-title"><span class="altar-es">No encontramos nada para</span><span class="altar-en">We found nothing for</span> “{{ query }}”</h1>
+                <p class="altar-page-lead"><span class="altar-es">Escribilo de otra forma y volvé a intentar.</span><span class="altar-en">Try writing it another way.</span></p>
+              </div>
             {% elseif template == 'search' %}
               {# Search empty state with suggestions #}
               <p class="products-grid-search-suggestion">{{ 'search.try_different_search' | t }}</p>
@@ -183,7 +197,16 @@
     {# Featured products when search has no results #}
     {% if template == 'search' and not display_products and not has_applied_filters %}
       {% set featured_products = sections.primary.products | slice(0, 12) %}
-      {% if featured_products %}
+      {% if featured_products and altar_editorial_grid %}
+        <div class="altar-search-suggestions section-related-products">
+          <h2 class="altar-search-suggestions__title"><span class="altar-es">O quizás te interesen estos productos</span><span class="altar-en">Or maybe you'd like these</span></h2>
+          <div class="js-product-table grid grid-2 grid-md-4 altar-suggestions-grid">
+            {% for product in featured_products | slice(0, 4) %}
+              {% include 'snippets/product-list/product-item/item.tpl' %}
+            {% endfor %}
+          </div>
+        </div>
+      {% elseif featured_products %}
         <div class="js-products-list-slider js-products-list-slider-container search-featured-products">
           <div class="js-products-list-swiper swiper-container">
             <div class="js-swiper-products-slider swiper-wrapper swiper-products-slider flex-nowrap" 

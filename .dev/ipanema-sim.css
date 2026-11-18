@@ -1,7 +1,7 @@
 /* Simulation only (.dev/ipanema.html). Everything else comes from Ipanema's CSS + altar.css.
    These rules fill the gaps where the simulation uses simplified markup, plus the "simulation map" panel. */
 body[data-sim] { margin: 0; color: var(--main-foreground); background: var(--main-background); font-family: var(--body-font); font-size: var(--font-base); }
-body[data-sim]:is(.template-product, .template-contact) { background: transparent; } /* as altar.css: grain layer shows through */
+body[data-sim].is-altar-commerce { background: transparent; } /* as altar.css: the page grain shows through on every inner page */
 .sim-section { padding-top: 32px; padding-bottom: 64px; }
 .sim-page-header { margin-bottom: 24px; }
 .sim-page-header h1 { margin: 0; font-family: var(--heading-font); font-size: var(--h3); }
@@ -118,3 +118,7 @@ body[data-sim]:not(.template-home) .site-header { position: sticky; }
 .sim-map__body a:hover, .sim-map__body button:hover, .sim-map__body .is-active { text-decoration: underline; }
 .sim-map__label { margin: 10px 0 2px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
 .sim-map__note { margin: 10px 0 0; font-size: 11px; opacity: .8; }
+#related-products-notification [data-sim-added] { display: contents; } /* the theme puts these blocks straight in .modal-body */
+/* Contraseña: Tiendanube doesn't render the site header on this template (layout.tpl) */
+body[data-sim].template-password .site-header { display: none; }
+body[data-sim].template-password { background: var(--chrome-bg); }

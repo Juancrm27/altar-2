@@ -20,7 +20,7 @@
 
 		<div class="cart-totals-row cart-totals-subtotal" data-store="cart-subtotal">
 			<span>
-				{{ 'general.subtotal' | t }}{% if show_shipping %} {{ 'cart.without_shipping' | t }}{% endif %}:
+				{{ 'general.subtotal' | t }}{% if show_shipping %} {{ 'cart.without_shipping' | t }}{% endif %}
 			</span>
 			<span class="js-ajax-cart-total js-cart-subtotal" data-priceraw="{{ cart.subtotal }}" data-component="cart.subtotal" data-component-value='{{ cart.subtotal }}'>{{ cart.subtotal | money }}</span>
 		</div>
@@ -130,7 +130,7 @@
 	<div class="js-cart-total-container" data-store="cart-total">
 
 		<div class="cart-totals-row cart-totals-total">
-			<span>{{ 'general.total' | t }}:</span>
+			<span>{{ 'general.total' | t }}</span>
 			<span class="js-cart-total{% if cart.free_shipping.cart_has_free_shipping %} js-free-shipping-achieved{% endif %}{% if cart.shipping_data.selected %} js-cart-saved-shipping{% endif %}" data-component="cart.total" data-component-value='{{ cart.total }}'>{{ cart.total | money }}</span>
 		</div>
 

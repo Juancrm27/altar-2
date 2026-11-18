@@ -76,7 +76,7 @@
             {% if not is_gift %}
                 <div class="cart-item-delete {% if cart_page %}d-md-none{% endif %}">
                     <button type="button" class="js-cart-item-remove btn btn-link cart-item-delete-button" data-component="line-item.remove">
-                        {{ 'general.remove' | t }}
+                        <span class="altar-es">Eliminar</span><span class="altar-en">Remove</span>
                     </button>
                 </div>
             {% endif %}
@@ -103,7 +103,7 @@
                     {% block input_prepend_content %}
                         <div class="grid grid-3-auto grid-no-gap align-items-center">
                             <span class="js-cart-quantity-minus js-cart-quantity-btn btn cart-quantity-btn" data-component="quantity.minus">
-                                <svg class="icon-inline"><use xlink:href="#minus"/></svg>
+                                <span aria-hidden="true">−</span>
                             </span>
                     {% endblock input_prepend_content %}
                     {% block input_append_content %}
@@ -111,7 +111,7 @@
                                 <svg class="icon-loading icon-inline"><use xlink:href="#spinner-third"/></svg>
                             </span>
                             <span class="js-cart-quantity-plus js-cart-quantity-btn btn cart-quantity-btn" data-component="quantity.plus">
-                                <svg class="icon-inline"><use xlink:href="#plus"/></svg>
+                                <span aria-hidden="true">+</span>
                             </span>
                         </div>
                     {% endblock input_append_content %}

@@ -1,5 +1,7 @@
 {# Shared interactive oracle, mounted in the manifesto in V2. #}
-<div class="altar-solar__fortune-cards is-open" id="altar-fortune-card" role="group" aria-label="Mensaje de Altar" aria-hidden="false">
+{# Phrases come live from Sofi's sheet ("ORACULO", rows with estado = activa); the fallback phrase is used only if it can't be read. #}
+{% set oracle_sheet = (fortune_settings.oracle_sheet_url ?? '') | default("https://docs.google.com/spreadsheets/d/1kv9DKruOYKfMOiVNaXE_DlolOcp2AfFKWiSRmkIFf48/gviz/tq?tqx=out:csv&gid=334686543") %}
+<div class="altar-solar__fortune-cards is-open" id="altar-fortune-card" role="group" aria-label="Mensaje de Altar" aria-hidden="false" data-oracle-sheet="{{ oracle_sheet }}">
         <span class="altar-solar__fortune-cta-frame" aria-hidden="true"></span>
         <p class="altar-solar__fortune-cta-text">
           <img class="altar-solar__fortune-cta-icon" src="{{ 'images/altar-arrow-up-right.svg' | static_url }}" alt="" width="12" height="12">
@@ -23,7 +25,7 @@
               data-foil-card
               data-foil-base="{{ 'images/altar-card-base.png' | static_url }}"
               data-foil-frame="{{ 'images/altar-card-message-frame.png' | static_url }}"
-              data-fortune-font="{{ 'fonts/gestura-text-regular.otf' | static_url }}"
+              data-fortune-font="{{ 'fonts/minion-plus-s-regular.woff2' | static_url }}"
               data-channel-frame-2="{{ 'images/altar-card-message-frame-2.png' | static_url }}"
               data-channel-frame-3="{{ 'images/altar-card-message-frame-3.png' | static_url }}"
               data-channel-frame-4="{{ 'images/altar-card-message-frame-4.png' | static_url }}"

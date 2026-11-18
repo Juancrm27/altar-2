@@ -17,7 +17,7 @@
         <a href="#" class="{{ cancel_custom_class }} btn btn-default">{{ cancel_text }}</a>
     {% endif %}
     <button class="btn btn-primary btn-big {{ submit_custom_class }}" type="submit" value="{{ submit_text }}" name="{{ submit_name }}" {{ submit_prop }}>
-        {{ submit_text }}
+        {% if submit_html %}{{ submit_html }}{% else %}{{ submit_text }}{% endif %}{# submit_html: bilingual label (Altar) #}
         <span class="js-form-spinner" style="display:none;">
             <svg class="icon-loading icon-inline"><use xlink:href="#spinner-third"/></svg>
         </span>

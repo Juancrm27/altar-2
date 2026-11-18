@@ -1,4 +1,5 @@
-{% if not cart_page %}
+{# In the AJAX cart (cart_panel_split) the bars, shipping calculator and coupon live in cart-panel.tpl, above the summary. #}
+{% if not cart_page and not cart_panel_split %}
 
 	{# Gift progress bar #}
 	{% include "snippets/promotions/gift-promotion-progress.tpl" with {container_class: 'cart-summary-gift-promotion-bar'} %}
@@ -20,7 +21,7 @@
 
 {# Coupon input #}
 
-{% if settings.cart_coupon %}
+{% if settings.cart_coupon and not cart_panel_split %}
 	<div class="js-visible-on-cart-filled" {% if cart.items_count == 0 %}style="display:none;"{% endif %}>
 		{% include "snippets/promotions/coupon-input.tpl" %}
 	</div>
