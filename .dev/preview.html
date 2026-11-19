@@ -317,6 +317,7 @@
             <label class="visually-hidden" for="altar-newsletter-email">Email</label>
             <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input" placeholder="EMAIL" autocomplete="email" required>
             <button type="submit" class="altar-footer__submit"><span class="altar-es">Enviar</span><span class="altar-en">Send</span></button>
+            <p class="altar-footer__sent" role="status"><span><span class="altar-es">Gracias, ya estás en la lista</span><span class="altar-en">Thank you, you’re on the list</span></span><span><span class="altar-es">Enviado</span><span class="altar-en">Sent</span></span></p>
           </div>
         </form>
         <nav class="altar-footer__links" aria-label="Altar">
@@ -350,7 +351,7 @@
     <script>
       // Local preview only: the newsletter form has no backend here.
       document.querySelectorAll("[data-newsletter-form]").forEach(function (form) {
-        form.addEventListener("submit", function (event) { event.preventDefault(); form.reset(); });
+        form.addEventListener("submit", function (event) { event.preventDefault(); form.reset(); form.classList.add("is-sent"); });
       });
     </script>
     <div data-sim-modals></div>

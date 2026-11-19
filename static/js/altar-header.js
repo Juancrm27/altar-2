@@ -158,6 +158,11 @@
   syncLanguage();
   document.addEventListener("section:load", syncLanguage);
 
+  // Newsletter: Tiendanube answers the subscription with a fresh page at the top; bring the footer's reply
+  // (Gracias… · Enviado, or the error line) into view so the visitor sees it.
+  var newsletterReply = document.querySelector(".altar-footer__newsletter.is-sent, .altar-footer__newsletter .altar-footer__status");
+  if (newsletterReply) window.addEventListener("load", function () { newsletterReply.scrollIntoView({ block: "center" }); });
+
   // Share the hero's actual media with its continuation, including editor updates.
   function syncHeroMedia() {
     var image = document.querySelector(".altar-hero-v2__media--expanded");

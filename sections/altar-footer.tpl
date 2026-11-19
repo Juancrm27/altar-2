@@ -35,7 +35,8 @@
   {% include 'snippets/altar-grain.tpl' with { grain_id: 'footer', grain_class: 'altar-footer__grain' } %}
   {% if not password_page %}
     {% if show_newsletter %}
-      <form class="altar-footer__newsletter newsletter-form" method="post" action="/winnie-pooh" onsubmit="this.setAttribute('action', '');" data-store="newsletter-form">
+      {% set newsletter_sent = contact and contact.type == 'newsletter' and contact.success %}
+      <form class="altar-footer__newsletter newsletter-form{% if newsletter_sent %} is-sent{% endif %}" method="post" action="/winnie-pooh" onsubmit="this.setAttribute('action', '');" data-store="newsletter-form">
         <div class="altar-footer__field">
           <label class="visually-hidden" for="altar-newsletter-email">Email</label>
           <input id="altar-newsletter-email" type="email" name="email" class="altar-footer__input newsletter-form-input" placeholder="EMAIL" autocomplete="email" required>
@@ -47,13 +48,11 @@
           <input type="hidden" name="message" value="{{ 'newsletter.subscription_request' | t }}">
           <input type="hidden" name="type" value="newsletter">
           <button type="submit" name="contact" class="altar-footer__submit newsletter-form-button"><span class="altar-es">Enviar</span><span class="altar-en">Send</span></button>
+          {# Footer / Illustrator · Newsletter=Enviado (Figma 819:4095): the same line thanks the visitor. #}
+          <p class="altar-footer__sent" role="status"><span><span class="altar-es">Gracias, ya estás en la lista</span><span class="altar-en">Thank you, you’re on the list</span></span><span><span class="altar-es">Enviado</span><span class="altar-en">Sent</span></span></p>
         </div>
-        {% if contact and contact.type == 'newsletter' %}
-          {% if contact.success %}
-            <p class="altar-footer__status" role="status">{{ 'footer.thanks_subscribe' | t }}</p>
-          {% else %}
-            <p class="altar-footer__status" role="alert">{{ 'newsletter.email_required' | t }}</p>
-          {% endif %}
+        {% if contact and contact.type == 'newsletter' and not contact.success %}
+          <p class="altar-footer__status" role="alert"><span class="altar-es">Revisá el email e intentá de nuevo.</span><span class="altar-en">Please check the email and try again.</span></p>
         {% endif %}
       </form>
     {% endif %}

@@ -196,8 +196,8 @@ function initSearch() {
       if (q) location.hash = `#/buscar?q=${encodeURIComponent(q)}`;
     });
   }
-  // Local preview: the footer newsletter has no backend.
-  $$("[data-newsletter-form]").forEach((form) => form.addEventListener("submit", (event) => { event.preventDefault(); form.reset(); }));
+  // Local preview: the footer newsletter has no backend; it shows the sent state (Figma Newsletter=Enviado) right away.
+  $$("[data-newsletter-form]").forEach((form) => form.addEventListener("submit", (event) => { event.preventDefault(); form.reset(); form.classList.add("is-sent"); }));
   const slot = $("[data-sim-search-slot]");
   if (!slot) return;
   slot.innerHTML = searchForm();
