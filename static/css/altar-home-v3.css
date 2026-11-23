@@ -133,11 +133,10 @@ html.altar-home-v3 { --v3-statement-height: 24.513889vw; } /* desktop: 1440 × 3
   color: var(--v3-fg); font: 400 1.312153vw/1.35 "Altar Minion", Georgia, serif; /* Minion Plus S, as in Figma */
 }
 .altar-v3-statement__label { display: flex; justify-content: space-between; margin: 0; line-height: 1.800764vw; letter-spacing: -.045021vw; text-transform: uppercase; }
-@media (min-width: 750px) {
-  /* The statement keeps Figma's lines on every desktop width (its column scales with the text). */
-  .altar-v3-statement .altar-v3-justified br { display: inline; }
-  .altar-v3-statement .altar-v3-justified p { white-space: nowrap; }
-}
+/* The statement keeps Figma's four lines on every width, phones included (Sofi: the same shape as the other
+   versions, no orphans): the column scales with the text, so the lines never rewrap. */
+.altar-v3-statement .altar-v3-justified br { display: inline; }
+html.altar-home-v3 .altar-v3-statement .altar-v3-justified p { white-space: nowrap; text-align-last: justify; }
 @media (max-width: 749px) {
   .altar-v3-statement__body { width: 100%; }
 }
@@ -145,6 +144,12 @@ html.altar-home-v3 { --v3-statement-height: 24.513889vw; } /* desktop: 1440 × 3
    lighting panel, 06 · Texto secciones 2 y 4). In 04 it covers the wordmark, title and paragraphs, not the card. */
 .altar-v3-filters { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
 html.altar-home-v3.has-worn-text :is(.altar-v3-statement__body, .altar-manifesto-v2 .altar-closing__identity) { filter: url("#altar-worn-text"); }
+/* Small screens (Sofi: the DROP copy read blurred next to the nav): the worn filter roughens a fixed ~1 px, which
+   eats 14 px letters, so phones drop it and lift the statement over the stage grain — sharp like the nav. */
+@media (max-width: 749px) {
+  html.altar-home-v3.has-worn-text .altar-v3-statement .altar-v3-statement__body { filter: none; } /* beats the :is() rule above (0,4,1) */
+  html.altar-home-v3 .altar-v3-statement { position: relative; z-index: 8; }
+}
 /* Justified, last line included (Figma "justificado"): every line runs edge to edge. On desktop the <br>
    reproduce Figma's lines; below 1240px the column narrows and the text reflows on its own. */
 .altar-v3-justified p { margin: 0; text-align: justify; text-align-last: justify; hyphens: none; }
@@ -294,6 +299,11 @@ html.altar-home-v3 :is(.altar-solar__stage-grain, .altar-section-grain) {
   opacity: var(--grain-opacity, .05);
   mix-blend-mode: var(--v3-grain-blend);
 }
+/* Phones: the same grain 60 % lighter (×0.4) — on a small screen it sits over 14 px copy and made it hard to read. */
+@media (max-width: 749px) {
+  html.altar-home-v3 :is(.altar-solar__stage-grain, .altar-section-grain) { opacity: calc(var(--grain-opacity, .05) * .4); }
+  html.altar-home-v3 .altar-footer--v3 > .altar-footer__grain { opacity: calc(var(--grain-opacity, var(--altar-grain)) * .4); }
+}
 /* 01–03: the stage grain covers the full sky (01, 02 and 03) above the 3D and the statement copy. The stage
    and the collection make no stacking context here, so the film and the gallery can sit over it. */
 html.altar-home-v3 .altar-solar__stage > .altar-solar__stage-grain { z-index: 7; }
@@ -340,15 +350,16 @@ html.altar-home-v3 .altar-footer-min > .altar-section-grain { z-index: 1; }
    flush with 02); 02 is 223 tall, Minion 14 / 21.67 copy (label included) reflowing in 350 px (20 px gutters), centred; 03 is a swipeable strip of full-width photos; 04 puts the copy
    before the card; 05 tucks the stones 32 px under the photo. */
 @media (max-width: 749px) {
-  html.altar-home-v3 { --v3-statement-height: 223px; }
+  html.altar-home-v3 { --v3-statement-height: calc(100vw * 60 / 390 + 128px); } /* the scaled copy (60 tall at 390) + 64 above and below */
   html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: 100%; }
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(79px + 100vw * .75); }
   /* Full-bleed film (Figma 699:300): 390 × 292 from y 79, edge to edge, 02 starting right under it. */
   html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: 100vw; left: 0; top: 79px; }
 
-  html.altar-home-v3 .altar-v3-statement { min-height: 223px; padding: 24px 20px; } /* 20px gutter, as the nav */
-  html.altar-home-v3 .altar-v3-statement__body { gap: 14px; font-size: 14px; line-height: 21.67px; }
-  html.altar-home-v3 .altar-v3-statement__label { line-height: 21.67px; letter-spacing: 0; }
+  html.altar-home-v3 .altar-v3-statement { height: var(--v3-statement-height); min-height: 0; padding: 64px 20px; } /* 64 air above and below, 20px gutter as the nav */
+  /* Phones: the desktop statement scaled to the 20px-gutter column (--sw), same proportions as the 878 desktop column. */
+  html.altar-home-v3 .altar-v3-statement__body { --sw: calc(100vw - 40px); gap: calc(var(--sw) * .025825); font-size: calc(var(--sw) * .021521); line-height: 1.35; }
+  html.altar-home-v3 .altar-v3-statement__label { line-height: calc(var(--sw) * .029534); letter-spacing: calc(var(--sw) * -.000738); }
 
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__gallery {
     display: flex; margin: 0; overflow-x: auto; overscroll-behavior-x: contain;
