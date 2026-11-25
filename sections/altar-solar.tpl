@@ -23,7 +23,7 @@
     {% set film_url = solar_settings.hero_video_url | default('videos/altar-film.mp4' | static_url) %}
     {% set poster_media = solar_settings.hero_poster and solar_settings.hero_poster starts with '@media-lib:' ? (solar_settings.hero_poster | resolve_media) : null %}
     <a class="altar-hero-v2__campaign altar-hero-v3__film" id="altar-hero-campaign" href="{{ solar_settings.hero_link | default(store.products_url) }}" aria-label="{{ solar_settings.hero_media_alt | default('Film de campaña Altar') }} · Ver colección" data-cursor-label="{{ 'Arrastrar' | translate }}" data-cursor-icon="move">
-      <video class="altar-hero-v2__media" src="{{ film_url }}" poster="{{ poster_media ? poster_media.sourceUrl : ('images/altar-film-poster.jpg' | static_url) }}" width="1344" height="1008" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      <video class="altar-hero-v2__media"{% if not solar_settings.hero_video_url %} data-src-mobile="{{ 'videos/altar-film-mobile.mp4' | static_url }}"{% endif %} src="{{ film_url }}" poster="{{ poster_media ? poster_media.sourceUrl : ('images/altar-film-poster.jpg' | static_url) }}" width="1344" height="1008" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video><script>(function (v) { if (v && v.dataset.srcMobile && matchMedia("(max-width: 749px)").matches) { v.src = v.dataset.srcMobile; } })(document.currentScript.previousElementSibling);</script>
     </a>
     <div class="altar-solar__sky" aria-hidden="true">
       <i class="altar-solar__glow altar-solar__glow--rose"></i>
@@ -199,7 +199,7 @@
         {% set pick_b = attribute(solar_settings, 'gallery_b_' ~ photo) %}
         {% set media_a = pick_a and pick_a starts with '@media-lib:' ? (pick_a | resolve_media) : null %}
         {% set media_b = pick_b and pick_b starts with '@media-lib:' ? (pick_b | resolve_media) : null %}
-        <a class="altar-collection__photo" href="{{ attribute(solar_settings, 'gallery_link_' ~ photo) | default(store.products_url) }}" data-cursor-label="{{ 'Ver colección' | translate }}"><img class="v3-a" src="{{ media_a ? media_a.sourceUrl : (('images/altar-v3-gallery-a-' ~ photo ~ '.jpg') | static_url) }}" alt="{{ gallery_alts_a[loop.index0] }}" width="1000" height="1500" loading="lazy"><img class="v3-b" src="{{ media_b ? media_b.sourceUrl : (('images/altar-v3-gallery-b-' ~ photo ~ '.jpg') | static_url) }}" alt="{{ gallery_alts_b[loop.index0] }}" width="1000" height="1500" loading="lazy"></a>
+        <a class="altar-collection__photo" href="{{ attribute(solar_settings, 'gallery_link_' ~ photo) | default(store.products_url) }}" data-cursor-label="{{ 'Ver colección' | translate }}"><picture>{% if not media_a %}<source media="(max-width: 749px)" srcset="{{ ('images/altar-v3-gallery-a-' ~ photo ~ '-m.jpg') | static_url }}">{% endif %}<img class="v3-a" src="{{ media_a ? media_a.sourceUrl : (('images/altar-v3-gallery-a-' ~ photo ~ '.jpg') | static_url) }}" alt="{{ gallery_alts_a[loop.index0] }}" width="1000" height="1500" loading="lazy"></picture><picture>{% if not media_b %}<source media="(max-width: 749px)" srcset="{{ ('images/altar-v3-gallery-b-' ~ photo ~ '-m.jpg') | static_url }}">{% endif %}<img class="v3-b" src="{{ media_b ? media_b.sourceUrl : (('images/altar-v3-gallery-b-' ~ photo ~ '.jpg') | static_url) }}" alt="{{ gallery_alts_b[loop.index0] }}" width="1000" height="1500" loading="lazy"></picture></a>
       {% endfor %}
     </div>
   </section>
@@ -209,7 +209,7 @@
     <div class="altar-closing__content">
       <div class="altar-manifesto__oracle">{% include 'snippets/altar-fortune-card.tpl' with { fortune_settings: solar_settings } %}</div>
       <div class="altar-closing__identity">
-        <p class="altar-closing__wordmark"><span>altar</span></p>
+        <p class="altar-closing__wordmark"><span class="altar-v3-logo" role="img" aria-label="altar"></span></p>
         <div class="altar-v3-manifesto">
           <h2 class="altar-v3-manifesto__title v3-a" lang="es">{{ solar_settings.manifesto_title_es | default('Atlas latino de textiles, amuletos & rituales') }}</h2>
           <h2 class="altar-v3-manifesto__title v3-b" lang="en">{{ solar_settings.manifesto_title_en | default('Atlas of Latin textiles, amulets & rituals') }}</h2>
@@ -224,8 +224,8 @@
   {% set campaign_b = solar_settings.campaign_image_b and solar_settings.campaign_image_b starts with '@media-lib:' ? (solar_settings.campaign_image_b | resolve_media) : null %}
   <section class="altar-v3-campaign" aria-label="Campaña Altar">
     <a href="{{ solar_settings.campaign_link | default(store.products_url) }}" data-cursor-label="{{ 'Ver colección' | translate }}">
-      <img class="v3-a" src="{{ campaign_a ? campaign_a.sourceUrl : ('images/altar-v3-campaign-a.jpg' | static_url) }}" alt="Campaña Altar" width="2400" height="1599" loading="lazy">
-      <img class="v3-b" src="{{ campaign_b ? campaign_b.sourceUrl : ('images/altar-v3-campaign-b.jpg' | static_url) }}" alt="Altar campaign" width="2400" height="1599" loading="lazy">
+      <picture>{% if not campaign_a %}<source media="(max-width: 749px)" srcset="{{ 'images/altar-v3-campaign-a-m.jpg' | static_url }}">{% endif %}<img class="v3-a" src="{{ campaign_a ? campaign_a.sourceUrl : ('images/altar-v3-campaign-a.jpg' | static_url) }}" alt="Campaña Altar" width="2400" height="1599" loading="lazy"></picture>
+      <picture>{% if not campaign_b %}<source media="(max-width: 749px)" srcset="{{ 'images/altar-v3-campaign-b-m.jpg' | static_url }}">{% endif %}<img class="v3-b" src="{{ campaign_b ? campaign_b.sourceUrl : ('images/altar-v3-campaign-b.jpg' | static_url) }}" alt="Altar campaign" width="2400" height="1599" loading="lazy"></picture>
     </a>
   </section>
   <div class="altar-solar__effect" data-solar-effect aria-hidden="true">

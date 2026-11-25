@@ -223,10 +223,10 @@ html[data-altar-home-layout="b"] #modal-cart.altar-cart + .modal-overlay { backg
 :is(#modal-cart.altar-cart, #related-products-notification.altar-added) .altar-cart__link { width: fit-content; color: inherit; font-size: 14px; line-height: 18px; text-decoration: underline; text-underline-position: from-font; text-transform: uppercase; }
 :is(#modal-cart.altar-cart, #related-products-notification.altar-added) .altar-cart__link:hover { opacity: .6; }
 
-/* Free shipping bar: outlined box (12 / 16 / 14), message 12, then a 2 px track at 20 % with the progress in full colour */
+/* Free shipping bar: no box (Sofi 24-nov «sacar recuadro») — message 12, then a 2 px track at 20 % with the progress in full colour */
 #modal-cart.altar-cart .progress-bar {
-  display: flex; margin: 0; padding: 12px 16px 14px; flex-direction: column; gap: 10px;
-  color: inherit; background: none; border: 1px solid var(--cart-fg); border-radius: 0; box-shadow: none;
+  display: flex; margin: 0; padding: 0; flex-direction: column; gap: 10px;
+  color: inherit; background: none; border: 0; border-radius: 0; box-shadow: none;
 }
 #modal-cart.altar-cart .progress-bar-header { display: block; margin: 0; }
 #modal-cart.altar-cart :is(.progress-bar-icon, .progress-bar-subtitle:empty) { display: none; }
@@ -612,3 +612,198 @@ body.template-page .user-content img { max-width: 100%; height: auto; }
   /* The last row's 36 already sits under the grid: 100 to the footer in all. */
   :is(.section-main-products-grid.is-altar-editorial, body.template-category[data-sim] .sim-section) { padding-bottom: calc(100px - 2.5vw) !important; }
 }
+
+/* ===== Producto · ficha simple (feedback Sofi 24-nov, ref. Sadaels; Figma 755:3775 «Producto / Ficha») =====
+   Everything in Minion (numbers and button too), name first and big, price small, no rules: only air.
+   Order: name → price (+ compare, transfer) → color → talle → cantidad → button → description (no heading)
+   → cambios / pago seguro → «ver medios de pago». Mobile: the whole ficha sits under the gallery. */
+@font-face { font-family: "Altar Minion"; src: url("../fonts/minion-plus-s-regular.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+.section-main-product { --ficha-rule: 0 solid transparent; --ficha-serif: "Altar Minion", Georgia, serif; }
+.section-main-product .altar-product-info,
+.section-main-product .altar-product-info :is(button, input, select, textarea, .btn, .form-control, a, span, p, div, label, strong, h1, h3) { font-family: var(--ficha-serif); letter-spacing: 0; }
+.section-main-product .altar-product-info { padding-top: 32px !important; padding-bottom: 32px !important; font-size: 16px; line-height: 1.3; }
+
+/* order inside the info column */
+.section-main-product .altar-product .product-name { order: -3; }
+.section-main-product .altar-product-head { order: -2; }
+.section-main-product .altar-product-info > .product-info-description { order: 1; }
+.section-main-product .altar-product-info > .product-purchase-info { order: 2; }
+.section-main-product .altar-product-info .altar-product-specs { order: 3; }
+
+/* name + price */
+.section-main-product .altar-product .product-name { min-height: 0; margin: 0; padding: 0; font-size: 32px; font-weight: 400; line-height: 1.15; letter-spacing: 0; text-transform: none; }
+.section-main-product .altar-product-head { display: block; min-height: 0; margin-top: 10px; }
+.section-main-product .altar-product-head-price { display: block; }
+.section-main-product .altar-product-category,
+.section-main-product .altar-product .product-offer-label { display: none !important; }
+.section-main-product .altar-product .product-price { min-height: 0; gap: 2px; }
+.section-main-product .altar-product .product-price-main { column-gap: 8px; }
+.section-main-product .altar-product :is(.product-price-display, .product-price-compare) { font-size: 16px; font-weight: 400 !important; line-height: 1.3; letter-spacing: 0; }
+.section-main-product .altar-product .product-price-compare { opacity: .5; }
+.section-main-product .altar-product .product-payment-discount-price { display: block; height: auto; padding: 0; color: inherit; font-size: 16px; line-height: 1.3; white-space: normal; opacity: .7; }
+.section-main-product .altar-product .product-payment-discount-price :is(.payment-discount-price-product, span) { margin: 0; font-family: var(--ficha-serif); font-size: 16px; font-weight: 400; line-height: 1.3; }
+
+/* variants: plain words, chosen underlined, sold out struck */
+.section-main-product .altar-product .product-form { padding-top: 36px; }
+.section-main-product .altar-product .product-detail-variants { padding: 0; }
+.section-main-product .altar-product .product-detail-variants-group,
+.section-main-product .altar-product .product-detail-variants-group.js-color-variants-container { width: 100%; gap: 0 18px; }
+.section-main-product .altar-product .product-detail-variants-group + .product-detail-variants-group { margin-top: 20px; }
+.section-main-product .altar-product .product-detail-variants-group .form-label,
+.section-main-product .altar-product .product-detail-variants-group.js-color-variants-container .form-label { margin: 0 0 4px; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: lowercase; opacity: 1; }
+.section-main-product .altar-product :is(.altar-variant-colon, .product-detail-variants-group .form-label strong) { display: none !important; }
+.section-main-product .altar-product .btn-variant { height: auto; min-height: 0; padding: 3px 0; background: transparent; border: 0; border-radius: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: none; box-shadow: none; }
+.section-main-product .altar-product .btn-variant .btn-variant-content { font-size: 16px; line-height: 1.3; text-transform: none; }
+.section-main-product .altar-product .btn-variant.selected { background: transparent; }
+.section-main-product .altar-product .btn-variant.selected .btn-variant-content { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.section-main-product .altar-product .btn-variant.btn-variant-no-stock .btn-variant-content { text-decoration: line-through; }
+.section-main-product .altar-product .btn-variant:hover .btn-variant-content { text-decoration-line: underline; }
+.section-main-product .altar-product .product-stock-alert { margin: 16px 0 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: none; opacity: .7; }
+
+/* cantidad «-  1  +» without a box, then the button */
+.section-main-product .altar-product .product-actions { display: flex; min-height: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 20px 0 0; }
+.section-main-product .altar-product .altar-qty-label { display: block; margin: 0 0 4px; }
+.section-main-product .altar-product .form-quantity-container { flex: none; align-self: flex-start; }
+.section-main-product .altar-product .form-quantity { display: inline-flex; height: auto; gap: 14px; border: 0; border-radius: 0; }
+.section-main-product .altar-product .form-quantity-icon { width: auto; height: auto; padding: 3px 6px; margin: 0 -6px; font-size: 16px; line-height: 1.3; cursor: pointer; }
+.section-main-product .altar-product .form-quantity-icon svg { display: none; }
+.section-main-product .altar-product .js-quantity-down::before { content: "-"; }
+.section-main-product .altar-product .js-quantity-up::before { content: "+"; }
+.section-main-product .altar-product .form-quantity .form-control { width: 3ch; height: auto; padding: 3px 0; background: transparent; font-size: 16px; font-weight: 400; line-height: 1.3; }
+.section-main-product .altar-product .buy-button-container { width: 100%; margin-top: 28px; }
+.section-main-product .altar-product .js-addtocart { height: 44px; font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; }
+.section-main-product .altar-product :is(.product-added-message, .alert) { margin-top: 12px; padding: 0; border: 0; background: transparent; color: inherit; font-size: 16px; line-height: 1.3; }
+.section-main-product .altar-product .product-added-icon { display: none; }
+
+/* description without its heading, then cambios / pago seguro, then the payment-methods link */
+.section-main-product .altar-product-info > .product-info-description { margin: 0; padding: 40px 0 0; border: 0 !important; }
+.section-main-product .altar-product-info .product-description-heading { display: none; }
+.section-main-product .altar-product-info .product-description-content { padding: 0; font-size: 16px; line-height: 1.4; opacity: 1; }
+.section-main-product .altar-product-info .product-description-content :is(p, li, span) { margin: 0 0 .7em; }
+/* cambios / pago seguro / medios de pago: Paloma Wool rows — lowercase label + chevron, the text opens below (Figma «Producto / Desplegable») */
+.section-main-product .altar-product-info > .product-purchase-info { gap: 8px !important; padding-top: 36px; }
+.section-main-product .altar-product-info > .product-purchase-info .icon-text-item { display: flex !important; flex-direction: column; gap: 6px; }
+.section-main-product .altar-product-info > .product-purchase-info .icon-text-item-title { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; padding: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: lowercase; opacity: 1; cursor: pointer; }
+.section-main-product .altar-product-info > .product-purchase-info .icon-text-item-title::after,
+.section-main-product .js-product-payments-container .product-payments-link::after { content: ""; width: 5px; height: 5px; flex: none; border: solid currentColor; border-width: 1px 1px 0 0; transform: rotate(45deg); }
+.section-main-product .altar-product-info > .product-purchase-info .is-open .icon-text-item-title::after { margin-top: -4px; transform: rotate(135deg); }
+.section-main-product .altar-product-info > .product-purchase-info .icon-text-item-title:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
+.section-main-product .altar-product-info > .product-purchase-info .icon-text-item-description { display: none; padding: 0 0 8px; font-size: 16px !important; line-height: 1.4; opacity: .8; }
+.section-main-product .altar-product-info > .product-purchase-info .is-open .icon-text-item-description { display: block; }
+.section-main-product .altar-product-info .altar-product-specs { margin: 0; padding: 8px 0 0; border: 0; }
+.section-main-product .altar-product-specs .js-product-payments-container:not([style*="display: none"]) { padding: 0; }
+.section-main-product .js-product-payments-container > .altar-spec:last-child { display: block; }
+.section-main-product .js-product-payments-container > .altar-spec:last-child > :is(.altar-spec-label, .product-payment-discount) { display: none !important; }
+.section-main-product .js-product-payments-container .product-payments-link { display: inline-flex; align-items: center; gap: 6px; padding: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: lowercase; text-decoration: none !important; opacity: 1; }
+.section-main-product .js-product-payments-container .product-payments-link span { text-decoration: none !important; }
+
+@media (min-width: 1200px) {
+  .section-main-product .altar-product .buy-button-container { max-width: 420px; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .section-main-product .altar-product .product-name { font-size: 30px; }
+}
+@media (max-width: 767px) {
+  .section-main-product .product-columns { gap: 0 !important; }
+  .section-main-product .product-images { order: -4; }
+  .section-main-product .altar-product .product-name { order: -3; padding-top: 24px; font-size: 28px; line-height: 1.15; }
+  .section-main-product .altar-product-head { order: -2; }
+  .section-main-product .altar-product-info > .product-info-description,
+  .section-main-product .altar-product-info .altar-product-specs,
+  .section-main-product .altar-product-info > .product-purchase-info { margin-top: 0 !important; }
+  .section-main-product .altar-product-info > .product-info-description { order: 1; }
+  .section-main-product .altar-product-info > .product-purchase-info { order: 2; }
+  .section-main-product .altar-product-info .altar-product-specs { order: 3; padding-bottom: 8px; }
+  .section-main-product .altar-product .btn-variant { padding: 6px 0; }
+}
+
+/* Related products → «También te puede gustar» / «You may also like», everything in Minion, no rule (Sofi 24-nov).
+   ES text comes from the editable heading (templates/pages/product.json); the EN layout swaps it here. */
+.section-related-products,
+.section-related-products :is(a, span, p, div, h2, h3, button) { font-family: "Altar Minion", Georgia, serif; letter-spacing: 0; }
+.section-related-products .heading-block { padding-top: 0; border-top: 0; font-family: "Altar Minion", Georgia, serif; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: none; opacity: 1; }
+:root[data-altar-home-layout="b"] .section-related-products .heading-block { font-size: 0; }
+:root[data-altar-home-layout="b"] .section-related-products .heading-block::before { content: "You may also like"; font-size: 16px; }
+.section-related-products :is(.product-item-name, .product-item-price, .product-item-payment-discount, .product-item-stock-notice, .product-item-colors-bullet-text) { font-weight: 400 !important; letter-spacing: 0; }
+/* Related cards: only the name (Sofi 24-nov «SOLO NOMBRE») */
+.section-related-products :is(.product-item-price-container, .product-item-price, .product-item-payment-discount, .product-item-stock-notice, .product-item-colors-container, .product-item-installments, .product-item-discount, .item-colors, .product-item-colors) { display: none !important; }
+.section-related-products .product-item-information { min-height: 0 !important; }
+.section-related-products .product-item-information > :not(.product-item-link),
+.section-related-products .product-item-information .product-item-link > :not(.product-item-name) { display: none !important; }
+
+/* Related products on tablet / mobile: Paloma Wool carousel — big cards, the next one peeking past the gutter,
+   native swipe with snap (Figma 1031:28973 → product pages). Desktop keeps the 4-up row. */
+@media (max-width: 1199px) {
+  .section-related-products .products-section-container { display: flex !important; gap: 23px !important; margin-right: -24px; padding: 0 24px 35px 0; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-left: 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .section-related-products .products-section-container::-webkit-scrollbar { display: none; }
+  .section-related-products .products-section-container > * { flex: 0 0 320px; scroll-snap-align: start; }
+  .section-related-products :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 320 / 420; }
+}
+@media (max-width: 767px) {
+  .section-related-products .products-section-container > * { flex-basis: min(274px, 70.3vw); }
+  .section-related-products :is(.product-item-image-container, .sim-product-image) { aspect-ratio: 274 / 360; }
+}
+
+/* Out of stock: «avisarme cuando vuelva ›» under the disabled button (Figma «Producto / Aviso de stock») */
+.section-main-product .altar-stock-notify { display: none; order: 0; margin-top: 14px; }
+.section-main-product .altar-product-info:has(.js-addtocart.nostock) .altar-stock-notify { display: block; }
+.section-main-product .altar-stock-notify__toggle { display: inline-flex; align-items: center; gap: 6px; padding: 3px 0; color: inherit; background: none; border: 0; font: 400 16px/1.3 "Altar Minion", Georgia, serif; text-transform: lowercase; cursor: pointer; }
+.section-main-product .altar-stock-notify__toggle::after { content: ""; width: 5px; height: 5px; border: solid currentColor; border-width: 1px 1px 0 0; transform: rotate(45deg); }
+.section-main-product .altar-stock-notify__toggle[aria-expanded="true"]::after { margin-top: -4px; transform: rotate(135deg); }
+.section-main-product .altar-stock-notify__form { display: flex; align-items: baseline; gap: 12px; margin-top: 10px; padding-bottom: 6px; border-bottom: 1px solid currentColor; }
+.section-main-product .altar-stock-notify__form[hidden], .section-main-product .altar-stock-notify [hidden] { display: none !important; }
+.section-main-product .altar-stock-notify__email { flex: 1 1 auto; min-width: 0; height: auto; padding: 3px 0; color: inherit; background: transparent; border: 0; border-radius: 0; box-shadow: none; font: 400 16px/1.3 "Altar Minion", Georgia, serif; }
+.section-main-product .altar-stock-notify__email::placeholder { color: inherit; opacity: .5; }
+.section-main-product .altar-stock-notify__email:focus { outline: none; }
+.section-main-product .altar-stock-notify__form:focus-within { border-bottom-width: 2px; padding-bottom: 5px; }
+.section-main-product .altar-stock-notify__send { flex: none; padding: 3px 0; color: inherit; background: none; border: 0; font: 400 16px/1.3 "Altar Minion", Georgia, serif; cursor: pointer; }
+.section-main-product .altar-stock-notify__send:disabled { opacity: .5; }
+.section-main-product :is(.altar-stock-notify__toggle, .altar-stock-notify__send):focus-visible { outline: 1px solid currentColor; outline-offset: 3px; }
+.section-main-product .altar-stock-notify__done { margin: 10px 0 0; font-size: 16px; line-height: 1.3; opacity: .8; }
+@media (max-width: 767px) { .section-main-product .altar-stock-notify { order: 0; } }
+
+/* Card / Producto (Colección, Collab, búsqueda, sugerencias, relacionados) — Paloma Wool card in Minion (Figma 438:657):
+   name 16 → 10px air → price 16 → small 12px lines (transfer and «N colores» at 72 %, stock at 100 %), all centred, no swatch. */
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-information { min-height: 0; padding-top: 16px; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-link { gap: 0; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) :is(.product-item-name, .product-item-price, .product-item-payment-discount, .product-item-payment-discount *, .product-item-stock-notice, .product-item-colors-bullet-text) { font-family: "Altar Minion", Georgia, serif; font-weight: 400 !important; letter-spacing: 0; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-name { margin: 0 0 10px; font-size: 16px; line-height: 1.3; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-price-container { padding-top: 0; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-price { font-size: 16px; line-height: 1.5; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) :is(.product-item-payment-discount, .product-item-stock-notice, .product-item-colors-bullet-text) { margin: 0; font-size: 12px; line-height: 1.4; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) :is(.product-item-payment-discount, .product-item-colors-bullet-text) { color: color-mix(in srgb, currentColor 72%, transparent); }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-stock-notice { color: inherit; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-colors-container { padding-bottom: 0; }
+:is(.altar-shop-grid, .section-related-products, .altar-search-suggestions, body.template-404 .section-product-list) .product-item-colors-bullet { display: none; }
+
+/* Ingresar: everything in Inter Light like the sticky bar / nav (Sofi 24-nov) — 12.75px, uppercase, no tracking */
+body.template-account-login :is(.page-header-title, .altar-login-form .form-label, .altar-login-form .btn-primary, .altar-login-form__links, .altar-login-form .alert) { font: 300 12.75px/24px Inter, Arial, sans-serif; letter-spacing: 0; text-transform: uppercase; }
+body.template-account-login .altar-login-form .form-control { font: 300 12.75px/24px Inter, Arial, sans-serif; letter-spacing: 0; }
+
+/* Cuenta, carrito, contacto, contenido, contraseña, 404, cookies y descuento exclusivo: todo en Inter Light 12.75 like the
+   sticky bar (Sofi 24-nov). Text case stays as each element had it (labels/buttons uppercase, paragraphs as written).
+   Product cards keep their Minion (Card / Producto). */
+body:is([class*="template-account"], .template-cart, .template-contact, .template-page, .template-404, .template-password) .main-content :is(h1, h2, h3, h4, h5, h6, p, span, a, label, button, input, select, textarea, td, th, li, dt, dd, div, strong, small, b, em):not(.product-item, .product-item *, .altar-shop-grid *),
+:is(.js-notification-cookie-private, .js-cross-selling-container) :is(p, span, a, button, div, strong, small, label) {
+  font-family: Inter, Arial, sans-serif !important; font-size: 12.75px !important; font-weight: 300 !important; letter-spacing: 0 !important;
+}
+body.template-account-login .altar-login-form__links { justify-content: space-between; gap: 12px; }
+
+/* Cart: close and remove are an X (Sofi 24-nov «X en ambos casos»), 14px Lucide X like the sort panel; text stays for screen readers */
+.altar-x { display: block; width: 14px; height: 14px; flex: none; }
+:is(#modal-cart.altar-cart, #related-products-notification.altar-added) .altar-cart__close { display: inline-flex; width: 24px; height: 24px; margin-right: -5px; align-items: center; justify-content: center; }
+:is(#modal-cart.altar-cart, .template-cart) .cart-item-delete-button { display: inline-flex; width: 24px; height: 24px; min-height: 0; margin: 0 -5px 0 0; padding: 0; align-items: center; justify-content: center; border: 0; color: inherit; background: none; text-decoration: none; }
+:is(#modal-cart.altar-cart, .template-cart) .cart-item-delete-button:hover { opacity: .6; }
+
+/* Carrito lateral y «Agregaste al carrito»: Inter Light 12.75 like the sticky bar (Sofi 24-nov). Case stays as designed. */
+:is(#modal-cart.altar-cart, #related-products-notification.altar-added) :is(a, button, .btn, input, select, span, p, div, label, strong, small, b, h2, h3, h4, li) {
+  font-family: Inter, Arial, sans-serif !important; font-size: 12.75px !important; font-weight: 300 !important; letter-spacing: 0 !important;
+}
+
+/* Página de carrito: free-shipping notice without box or truck icon, like the drawer (Sofi «sacar recuadro») */
+body.template-cart .progress-bar { display: flex; margin: 0 0 24px; padding: 0; flex-direction: column; gap: 10px; color: inherit; background: none !important; border: 0; border-radius: 0; box-shadow: none; }
+body.template-cart .progress-bar-header { display: block; margin: 0; }
+body.template-cart :is(.progress-bar-icon, .progress-bar-subtitle:empty) { display: none !important; }
+body.template-cart .bar-progress { height: 2px; margin: 0; overflow: hidden; border-radius: 0; background: color-mix(in srgb, currentColor 20%, transparent); }
+body.template-cart .bar-progress-active { height: 100%; border-radius: 0; background: currentColor; }
+body.template-cart .bar-progress-active::after, body.template-cart .bar-progress-active::before { display: none; }

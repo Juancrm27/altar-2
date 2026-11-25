@@ -512,6 +512,10 @@ body:has(#modal-sort-by.modal-visible) .altar-shop-sort-trigger { visibility: hi
 .altar-sort-modal__title { width: auto; margin: 0; font: 400 10px/16px "Inter", sans-serif; letter-spacing: 0; text-transform: uppercase; }
 .altar-sort-modal__close { display: inline-flex; align-items: center; justify-content: center; margin: 0; padding: 0; color: inherit; font: 400 10px/16px "Inter", sans-serif; text-transform: uppercase; }
 .altar-sort-modal__close-icon { display: none; }
+.altar-sort-modal__close { width: 24px; height: 24px; margin-right: -5px; }
+.altar-sort-modal__x { display: block; width: 14px; height: 14px; }
+.altar-sort-modal__header { justify-content: flex-end; border-bottom: 0; }
+.altar-sort-modal__title { display: none; }
 .altar-sort-modal__body { height: auto; padding: 8px 0; overflow: hidden; }
 .altar-sort-modal .sort-by-options { width: 100%; margin: 0; gap: 0; }
 .altar-sort-modal .radio-button-item { width: 100%; margin: 0; }

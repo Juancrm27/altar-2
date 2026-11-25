@@ -86,11 +86,10 @@
 				overlay: altar_toolbar ? 'altar-sort-modal__overlay' : '',
 			}
 		} %}
-			{# Altar v3 (Figma "Ordenar por / Panel"): title and close follow the language switch #}
+			{# Altar v3 (Figma "Ordenar por / Panel"): no title, only the X to close (Sofi feedback) #}
 			{% block modal_header %}
 				{% if altar_toolbar %}
-					<span class="modal-title altar-sort-modal__title"><span class="altar-es">[ Ordenar por ]</span><span class="altar-en">[ Sort by ]</span></span>
-					<button class="js-modal-close-private modal-close altar-sort-modal__close" data-target="#modal-sort-by" data-modal-url="modal-sort-by"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>
+										<button class="js-modal-close-private modal-close altar-sort-modal__close" data-target="#modal-sort-by" data-modal-url="modal-sort-by" aria-label="{{ 'Cerrar' | translate }}"><svg class="altar-sort-modal__x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg></button>
 				{% else %}
 					<span class="modal-title">{{ sort_modal_title }}</span>
 					<button class="js-modal-close-private modal-close" data-target="#modal-sort-by" data-modal-url="modal-sort-by">

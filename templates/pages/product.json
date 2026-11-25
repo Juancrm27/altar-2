@@ -96,7 +96,7 @@
         "complementary_heading": {
           "type": "heading",
           "settings": {
-            "title": "Productos relacionados",
+            "title": "También te puede gustar",
             "size": "h2"
           }
         },
@@ -126,7 +126,7 @@
         "alternative_heading": {
           "type": "heading",
           "settings": {
-            "title": "Productos relacionados",
+            "title": "También te puede gustar",
             "size": "h2"
           }
         },

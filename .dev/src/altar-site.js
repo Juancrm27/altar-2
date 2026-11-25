@@ -70,7 +70,77 @@
     nodes.forEach((node) => node.setAttribute("seed", grainSeed));
   }
 
+  // Product page (Sofi, ref. Paloma Wool): «cambios» / «pago seguro» are rows that open on click.
+  const DISCLOSURE_TITLE = ".section-main-product .product-purchase-info div.icon-text-item .icon-text-item-title";
+
+  function initProductDisclosures() {
+    document.querySelectorAll(DISCLOSURE_TITLE).forEach((title) => {
+      if (title.hasAttribute("role")) return;
+      title.setAttribute("role", "button");
+      title.setAttribute("tabindex", "0");
+      title.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  function toggleProductDisclosure(event) {
+    const title = event.target.closest?.(DISCLOSURE_TITLE);
+    if (!title) return;
+    if (event.type === "keydown" && event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    const item = title.closest(".icon-text-item");
+    const open = !item.classList.contains("is-open");
+    item.classList.toggle("is-open", open);
+    title.setAttribute("aria-expanded", String(open));
+  }
+
+  // Out of stock → «avisarme cuando vuelva»: open the email field, send it as a contact message (product + variant).
+  const isEnglish = () => document.documentElement.getAttribute("data-altar-home-layout") === "b";
+
+  function selectedVariantText(root) {
+    return Array.from(root.querySelectorAll(".product-detail-variants-group")).map((group) => {
+      const axis = (group.querySelector(".form-label")?.firstChild?.textContent || "").replace(":", "").trim();
+      const value = (group.querySelector(".js-insta-variation-label")?.textContent || group.querySelector(".btn-variant.selected")?.textContent || "").trim();
+      return axis && value ? `${axis}: ${value}` : value;
+    }).filter(Boolean).join(", ");
+  }
+
+  function toggleStockNotify(event) {
+    const toggle = event.target.closest?.(".altar-stock-notify__toggle");
+    if (!toggle) return;
+    const box = toggle.closest("[data-altar-stock-notify]");
+    const form = box.querySelector(".altar-stock-notify__form");
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    toggle.setAttribute("aria-expanded", String(open));
+    form.hidden = !open;
+    const email = form.querySelector(".altar-stock-notify__email");
+    email.placeholder = isEnglish() ? "your email" : "tu mail";
+    if (open) email.focus();
+  }
+
+  function submitStockNotify(event) {
+    const form = event.target.closest?.(".altar-stock-notify__form");
+    if (!form) return;
+    event.preventDefault();
+    const box = form.closest("[data-altar-stock-notify]");
+    const product = document.querySelector(".js-product-name")?.textContent.trim() || "";
+    const variant = selectedVariantText(document.querySelector(".js-product-form") || document);
+    form.querySelector("[data-altar-stock-message]").value =
+      `Avisarme cuando vuelva: ${product}${variant ? ` (${variant})` : ""} — ${location.href}`;
+    const done = () => {
+      form.hidden = true;
+      box.querySelector(".altar-stock-notify__toggle").hidden = true;
+      box.querySelector(".altar-stock-notify__done").hidden = false;
+    };
+    if (box.hasAttribute("data-preview")) { done(); return; } // dev preview: no store behind it
+    const send = form.querySelector(".altar-stock-notify__send");
+    send.disabled = true;
+    fetch(form.action, { method: "POST", body: new FormData(form), credentials: "same-origin" })
+      .then((response) => { if (!response.ok) throw new Error(response.status); done(); })
+      .catch(() => { send.disabled = false; form.submit(); }); // fall back to the normal contact-form post
+  }
+
   function initSite() {
+    initProductDisclosures();
     updateLiveDates();
     initNewsletterPreview();
     scheduleHeaderTheme();
@@ -79,6 +149,11 @@
   window.addEventListener("scroll", scheduleHeaderTheme, { passive: true });
   window.addEventListener("resize", scheduleHeaderTheme);
   document.addEventListener("section:load", initSite);
+  document.addEventListener("click", toggleProductDisclosure);
+  document.addEventListener("click", toggleStockNotify);
+  document.addEventListener("submit", submitStockNotify);
+  document.addEventListener("keydown", toggleProductDisclosure);
+  window.addEventListener("load", initProductDisclosures);
   setInterval(animateStandaloneGrain, 1000 / GRAIN_FPS);
 
   if (document.readyState === "loading") {

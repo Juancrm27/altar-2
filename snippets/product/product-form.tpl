@@ -277,6 +277,7 @@
 		<div class="product-actions{% if show_product_quantity and not product.isSubscribable() %} grid grid-auto-1{% endif %}">
 			{% set product_quantity_home_product_value = home_main_product ? true : false %}
 			{% if show_product_quantity %}
+				{% if not home_main_product %}<span class="altar-qty-label"><span class="altar-es">cantidad</span><span class="altar-en">quantity</span></span>{% endif %}
 				{% include "snippets/product/product-quantity.tpl" with {home_main_product: product_quantity_home_product_value, product_stock: show_stock} %}
 			{% endif %}
 
@@ -311,6 +312,29 @@
 		{% endif %}
 
 	</form>
+
+	{% if not home_main_product and not store.is_catalog %}
+		{# Altar · out of stock (Sofi, ref. Sadaels «Email me when back in stock"): the shopper leaves an email; it reaches
+		   the store as a contact-form message with product + variant (altar-site.js sends it without leaving the page).
+		   Only visible while the add-to-cart button is in its "nostock" state. #}
+		<div class="altar-stock-notify" data-altar-stock-notify>
+			<button type="button" class="altar-stock-notify__toggle" aria-expanded="false" aria-controls="altar-stock-notify-{{ product.id }}"><span class="altar-es">avisarme cuando vuelva</span><span class="altar-en">email me when it's back</span></button>
+			<form id="altar-stock-notify-{{ product.id }}" class="altar-stock-notify__form" action="{{ store.contact_url }}" method="post" hidden>
+				<div class="winnie-pooh" style="display: none;">
+					<label for="altar-stock-winnie-{{ product.id }}">{{ 'contact.do_not_fill' | t }}</label>
+					<input type="text" id="altar-stock-winnie-{{ product.id }}" name="winnie-pooh" tabindex="-1" autocomplete="off">
+				</div>
+				<input type="hidden" name="type" value="contact">
+				<input type="hidden" name="product" value="{{ product.id }}">
+				<input type="hidden" name="name" value="Aviso de stock">
+				<input type="hidden" name="message" value="" data-altar-stock-message>
+				<label class="visually-hidden" for="altar-stock-email-{{ product.id }}">Email</label>
+				<input type="email" id="altar-stock-email-{{ product.id }}" class="altar-stock-notify__email" name="email" required autocomplete="email" placeholder="tu mail">
+				<button type="submit" class="altar-stock-notify__send" name="contact"><span class="altar-es">avisarme</span><span class="altar-en">notify me</span></button>
+			</form>
+			<p class="altar-stock-notify__done" role="status" hidden><span class="altar-es">listo, te avisamos por mail cuando vuelva.</span><span class="altar-en">done, we'll email you when it's back.</span></p>
+		</div>
+	{% endif %}
 
 	{{ component('nubesdk-slot', { type: "after_product_detail_add_to_cart" }) }}
 
@@ -348,7 +372,7 @@
 							</div>
 						</div>
 						<a id="btn-installments" class="product-payments-link btn-link" href="#" {% if not (product.get_max_installments and product.get_max_installments(false)) %}style="display: none;"{% endif %}>
-							{{ not hasDiscount and not show_installments ? 'product.see_payment_methods' | t : 'product.see_more_details' | t }}
+							<span class="altar-es">medios de pago</span><span class="altar-en">payment methods</span>
 						</a>
 					</div>
 				</div>

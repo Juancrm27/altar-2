@@ -77,10 +77,10 @@
 	{% endif %}
 
 	<hr class="altar-login-form__rule">
+	{# Sofi: the two links reach both edges (justified), no middle dot #}
 	<p class="altar-login-form__links">
 		<a href="{{ store.customer_reset_password_url }}"><span class="altar-es">Recuperar contraseña</span><span class="altar-en">Reset password</span></a>
 		{% if 'mandatory' not in store.customer_accounts %}
-			<span aria-hidden="true">·</span>
 			<a href="{{ store.customer_register_url }}"><span class="altar-es">Crear cuenta</span><span class="altar-en">Create account</span></a>
 		{% endif %}
 	</p>

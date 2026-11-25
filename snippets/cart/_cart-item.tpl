@@ -76,7 +76,7 @@
             {% if not is_gift %}
                 <div class="cart-item-delete {% if cart_page %}d-md-none{% endif %}">
                     <button type="button" class="js-cart-item-remove btn btn-link cart-item-delete-button" data-component="line-item.remove">
-                        <span class="altar-es">Eliminar</span><span class="altar-en">Remove</span>
+                        <span class="visually-hidden"><span class="altar-es">Eliminar</span><span class="altar-en">Remove</span></span><svg class="altar-x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg>
                     </button>
                 </div>
             {% endif %}
@@ -161,8 +161,8 @@
             {# Cart page item delete #}
 
             <div class="cart-item-delete d-none d-md-block">
-                <button type="button" class="js-cart-item-remove btn btn-link" data-component="line-item.remove">
-                    {{ 'general.remove' | t }}
+                <button type="button" class="js-cart-item-remove btn btn-link cart-item-delete-button" data-component="line-item.remove">
+                    <span class="visually-hidden"><span class="altar-es">Eliminar</span><span class="altar-en">Remove</span></span><svg class="altar-x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg>
                 </button>
             </div>
         {% endif %}

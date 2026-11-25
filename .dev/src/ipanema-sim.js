@@ -228,11 +228,11 @@ function renderModals() {
     modal({ id: "modal-cart", title: t("cart.title", "Carrito de compras"), from: "right", dockRight: true, widthDesktop: "small", classes: "altar-cart", form: true, body: `<div data-sim-cart-panel></div>`,
       // as snippets/cart/cart-modal.tpl (block modal_header)
       header: `<span class="modal-title altar-cart__title"><span class="altar-es">Carrito</span><span class="altar-en">Cart</span> (<span class="js-cart-widget-amount altar-cart__count">${cartCount()}</span>)</span>
-        <button type="button" class="js-modal-close-private modal-close altar-cart__close" data-target="#modal-cart"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>` }) +
+        <button type="button" class="js-modal-close-private modal-close altar-cart__close" data-target="#modal-cart"><span class="visually-hidden"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></span><svg class="altar-x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg></button>` }) +
     // as snippets/cart/cart-modal.tpl: "Agregaste al carrito" with suggestions (settings.add_to_cart_recommendations)
     modal({ id: "related-products-notification", from: "bottom", widthDesktop: "medium", classes: "h-auto altar-added", body: `<div data-sim-added></div>`,
       header: `<span class="modal-title altar-cart__title"><span class="altar-es">Agregaste al carrito</span><span class="altar-en">Added to cart</span></span>
-        <button type="button" class="js-modal-close-private modal-close altar-cart__close" data-target="#related-products-notification"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>` }) +
+        <button type="button" class="js-modal-close-private modal-close altar-cart__close" data-target="#related-products-notification"><span class="visually-hidden"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></span><svg class="altar-x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg></button>` }) +
     modal({ id: "nav-hamburger", from: "left", classes: "modal-nav-hamburger modal-nav-main",
       body: `<ul class="nav-list list-unstyled">${navLinks.map(([href, label]) => `<li><a class="nav-list-link" href="${href}">${label}</a></li>`).join("")}</ul>`,
       foot: `<div class="nav-secondary"><a class="secondary-menu-link" href="${BASE}#/cuenta/login">${icon("user", "utility-icon icon-inline")} ${esc(t("general.login", "Entrá"))}</a>
@@ -251,7 +251,7 @@ function cartLinesMarkup(page = false) {
             <a class="cart-item-name" href="${BASE}#/producto/${product.slug}">${esc(product.name)}</a>
             ${variant ? `<span class="cart-item-variant">${esc(variant)}</span>` : ""}
           </div>
-          <div class="cart-item-delete"><button type="button" class="btn btn-link cart-item-delete-button" data-sim-remove><span class="altar-es">Eliminar</span><span class="altar-en">Remove</span></button></div>
+          <div class="cart-item-delete"><button type="button" class="btn btn-link cart-item-delete-button" data-sim-remove><span class="visually-hidden"><span class="altar-es">Eliminar</span><span class="altar-en">Remove</span></span><svg class="altar-x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg></button></div>
         </div>
         <div class="cart-item-totals-container">
           <div class="cart-item-quantity">
@@ -485,14 +485,11 @@ function stockNotice(product) {
   return "";
 }
 
-// Mirrors item-colors.tpl: first color as a swatch plus "+N".
+// Mirrors item-colors.tpl: «N colores» as plain text (Paloma Wool card).
 function itemColors(product) {
   const colors = product.options.Color;
   if (!settings.product_color_variants || !colors || colors.length < 2) return "";
-  const swatch = product.swatches?.[colors[0]];
-  return `<div class="product-item-colors-container order-first"><div class="product-item-colors-variation"><div class="product-item-colors" title="${esc(t("product_item.more_colors", "Ver más colores"))}">${swatch
-    ? `<span class="product-item-colors-bullet" title="${esc(colors[0])}" style="background: ${swatch}"></span><span class="product-item-colors-bullet-text">+${colors.length - 1}</span>`
-    : `<span class="product-item-colors-bullet-text">${colors.length} ${esc(t("product_item.colors", "colores"))}</span>`}</div></div></div>`;
+  return `<div class="product-item-colors-container order-first"><div class="product-item-colors-variation"><div class="product-item-colors" title="${esc(t("product_item.more_colors", "Ver más colores"))}"><span class="product-item-colors-bullet-text">${colors.length} <span class="altar-es">colores</span><span class="altar-en">colors</span></span></div></div></div>`;
 }
 
 // Mirrors snippets/product-list/product-item/item.tpl with altar_editorial_card.
@@ -572,9 +569,8 @@ function categoryPage({ slug, query, star = false }) {
   const sortModal = modal({ id: "modal-sort-by", title: "[ ORDENAR POR ]", from: "bottom", widthDesktop: "large",
     classes: "h-auto altar-sort-modal", headerClass: "altar-sort-modal__header", titleClass: "altar-sort-modal__title",
     closeClass: "altar-sort-modal__close", closeIconClass: "altar-sort-modal__close-icon", bodyClass: "altar-sort-modal__body", overlayClass: "altar-sort-modal__overlay",
-    // as filters-modals.tpl (block modal_header): bilingual title and close
-    header: `<span class="modal-title altar-sort-modal__title"><span class="altar-es">[ Ordenar por ]</span><span class="altar-en">[ Sort by ]</span></span>
-      <button type="button" class="js-modal-close-private modal-close altar-sort-modal__close" data-target="#modal-sort-by"><span class="altar-es">Cerrar</span><span class="altar-en">Close</span></button>`,
+    // as filters-modals.tpl (block modal_header): only the X to close
+    header: `<button type="button" class="js-modal-close-private modal-close altar-sort-modal__close" data-target="#modal-sort-by" aria-label="Cerrar"><svg class="altar-sort-modal__x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg></button>`,
     body: `<ul class="radio-button-container sort-by-options list-unstyled">${sortOptions.map(([value, label]) => `<li class="radio-button-item"><a href="#" class="radio-button ${value === sort ? "selected" : ""}" data-sim-sort-value="${value}"><span class="radio-button-content"><span class="radio-button-label">${esc(label)}</span></span></a></li>`).join("")}</ul>` });
   const filters = modal({ id: "modal-filters", title: "Filtrar", from: "left", widthDesktop: "small",
     body: `<p class="form-label">${esc(t("filters.categories_title", "Categorías"))}</p>
@@ -598,7 +594,7 @@ function productPage({ slug }) {
   // Mirrors snippets/product/product-variants.tpl (label + strong value, js-variant-button chips).
   const variants = optionAxes(product).map(([axis, values], index) => `
     <div class="js-product-variants-group product-detail-variants-group${["Color", "Cor"].includes(axis) ? " js-color-variants-container" : ""}">
-      <label class="form-label">${esc(axis)}: <strong class="js-insta-variation-label" data-sim-axis-label="${index}">${esc(values[0])}</strong></label>
+      <label class="form-label">${esc(axis)}<span class="altar-variant-colon">:</span> <strong class="js-insta-variation-label" data-sim-axis-label="${index}">${esc(values[0])}</strong></label>
       ${values.map((value, i) => `<a class="js-variant-button btn btn-variant ${i === 0 ? "selected" : ""}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content">${esc(value)}</span></a>`).join("")}
     </div>`).join("");
   const freeShipping = product.freeShipping
@@ -630,7 +626,7 @@ function productPage({ slug }) {
               <div class="js-product-variants product-detail-variants">${variants}</div>
               <div class="product-stock-alert" data-sim-stock></div>
               <div class="product-actions">
-                ${hasPrice(product) ? `<div class="form-quantity-container"><div class="form-quantity">
+                ${hasPrice(product) ? `<span class="altar-qty-label"><span class="altar-es">cantidad</span><span class="altar-en">quantity</span></span><div class="form-quantity-container"><div class="form-quantity">
                   <span class="js-quantity-down form-quantity-icon btn" data-sim-step="-1" aria-label="Restar">${icon("minus")}</span>
                   <input class="form-control js-quantity-input" type="number" min="1" value="1" data-sim-qty-input aria-label="Cantidad">
                   <span class="js-quantity-up form-quantity-icon btn" data-sim-step="1" aria-label="Sumar">${icon("plus")}</span>
@@ -641,6 +637,16 @@ function productPage({ slug }) {
               </div>
               <p class="alert alert-warning" data-sim-add-error style="display:none;"></p>
             </form>
+            <div class="altar-stock-notify" data-altar-stock-notify data-preview>
+              <button type="button" class="altar-stock-notify__toggle" aria-expanded="false" aria-controls="altar-stock-notify-sim"><span class="altar-es">avisarme cuando vuelva</span><span class="altar-en">email me when it's back</span></button>
+              <form id="altar-stock-notify-sim" class="altar-stock-notify__form" action="#" method="post" hidden>
+                <input type="hidden" name="message" value="" data-altar-stock-message>
+                <label class="visually-hidden" for="altar-stock-email-sim">Email</label>
+                <input type="email" id="altar-stock-email-sim" class="altar-stock-notify__email" name="email" required autocomplete="email" placeholder="tu mail">
+                <button type="submit" class="altar-stock-notify__send"><span class="altar-es">avisarme</span><span class="altar-en">notify me</span></button>
+              </form>
+              <p class="altar-stock-notify__done" role="status" hidden><span class="altar-es">listo, te avisamos por mail cuando vuelva.</span><span class="altar-en">done, we'll email you when it's back.</span></p>
+            </div>
             <div class="altar-product-specs">
               <div class="altar-spec-row">
                 <div class="altar-spec"><span class="altar-spec-label">Maker:</span><span class="altar-spec-value">Altar</span></div>
@@ -648,7 +654,7 @@ function productPage({ slug }) {
               </div>
               <div class="js-product-payments-container product-payments-info altar-spec-row"${hasPrice(product) ? "" : ' style="display: none;"'}>
                 <div class="altar-spec"><span class="altar-spec-label">Cuotas:</span><div class="product-installment">${store.installments} cuotas sin interés de ${cuota}</div></div>
-                <div class="altar-spec"><span class="altar-spec-label">Medios de pago:</span><div class="product-payment-discount">${Math.round(store.transferDiscount * 100)}% de descuento pagando con ${esc(store.transferName)}</div><a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments">Ver más detalles</a></div>
+                <div class="altar-spec"><span class="altar-spec-label">Medios de pago:</span><div class="product-payment-discount">${Math.round(store.transferDiscount * 100)}% de descuento pagando con ${esc(store.transferName)}</div><a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments"><span class="altar-es">medios de pago</span><span class="altar-en">payment methods</span></a></div>
               </div>
               <div class="altar-spec-row">
                 <div class="altar-spec altar-spec-stock"><span class="altar-spec-label">Stock:</span><span class="altar-spec-value altar-stock-available">Disponible</span><span class="altar-spec-value altar-stock-none">${esc(t("product.out_of_stock", "Sin stock"))}</span></div>
@@ -673,7 +679,7 @@ function productPage({ slug }) {
     </div>
   </section>
   <section class="section-related-products"><div class="container sim-related">
-    <div class="heading-block h2">Productos relacionados</div>
+    <div class="heading-block h2">También te puede gustar</div>
     <div class="products-list-slider altar-related-grid" style="--altar-related-columns: 4; --altar-related-columns-mobile: 2;">
       <section class="products-section"><div><div class="products-section-container">${related.map((product) => productItem(product)).join("")}</div></div></section>
     </div>
@@ -736,7 +742,7 @@ const loginPage = () => `<div class="page-header"><div class="container"><div cl
       <button class="btn btn-primary btn-big btn-block" type="submit"><span class="altar-es">Entrá</span><span class="altar-en">Log in</span></button>
       <div class="alert alert-success" data-sim-form-success style="display:none;"></div>
       <hr class="altar-login-form__rule">
-      <p class="altar-login-form__links"><a href="${BASE}#/cuenta/recuperar"><span class="altar-es">Recuperar contraseña</span><span class="altar-en">Reset password</span></a> <span aria-hidden="true">·</span> <a href="${BASE}#/cuenta/registro"><span class="altar-es">Crear cuenta</span><span class="altar-en">Create account</span></a></p>
+      <p class="altar-login-form__links"><a href="${BASE}#/cuenta/recuperar"><span class="altar-es">Recuperar contraseña</span><span class="altar-en">Reset password</span></a> <a href="${BASE}#/cuenta/registro"><span class="altar-es">Crear cuenta</span><span class="altar-en">Create account</span></a></p>
     </form>
   </div></div></div>`;
 
@@ -842,6 +848,7 @@ function renderRoute() {
     else link.removeAttribute("aria-current");
   });
   $("[data-sim-view]").innerHTML = route.render();
+  document.dispatchEvent(new Event("section:load")); // like Tiendanube: site helpers re-init on new markup
   const searchForm = $(".altar-nav [data-altar-search-form]");
   if (searchForm) {
     const onSearch = route.name === "search";

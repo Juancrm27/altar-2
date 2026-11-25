@@ -18,6 +18,8 @@ html.is-altar-home.altar-home-v3 {
   --v3-switch-track: var(--v3-ink);
   --v3-switch-knob: var(--v3-sage);
   --v3-grain-blend: multiply;
+  --v3-m4-top: #e4a980; --v3-m4-bottom: #b7c29f;
+  --v3-texture: url("../images/altar-v3-texture-a.jpg");
   color-scheme: light;
   background: var(--v3-bg);
 }
@@ -29,6 +31,8 @@ html.is-altar-home.altar-home-v3[data-altar-home-layout="b"] {
   --v3-switch-track: var(--v3-sage);
   --v3-switch-knob: #0f0f0f;
   --v3-grain-blend: screen;
+  --v3-m4-top: #7e9079; --v3-m4-bottom: #091e2b;
+  --v3-texture: url("../images/altar-v3-texture-b.jpg");
   color-scheme: dark;
 }
 /* Copy per layout: .v3-a (Spanish) and .v3-b (English). Blocks swap with display. */
@@ -133,10 +137,11 @@ html.altar-home-v3 { --v3-statement-height: 24.513889vw; } /* desktop: 1440 × 3
   color: var(--v3-fg); font: 400 1.312153vw/1.35 "Altar Minion", Georgia, serif; /* Minion Plus S, as in Figma */
 }
 .altar-v3-statement__label { display: flex; justify-content: space-between; margin: 0; line-height: 1.800764vw; letter-spacing: -.045021vw; text-transform: uppercase; }
-/* The statement keeps Figma's four lines on every width, phones included (Sofi: the same shape as the other
-   versions, no orphans): the column scales with the text, so the lines never rewrap. */
-.altar-v3-statement .altar-v3-justified br { display: inline; }
-html.altar-home-v3 .altar-v3-statement .altar-v3-justified p { white-space: nowrap; text-align-last: justify; }
+@media (min-width: 750px) {
+  /* Desktop and tablet keep Figma's four lines (its column scales with the text). */
+  .altar-v3-statement .altar-v3-justified br { display: inline; }
+  html.altar-home-v3 .altar-v3-statement .altar-v3-justified p { white-space: nowrap; text-align-last: justify; }
+}
 @media (max-width: 749px) {
   .altar-v3-statement__body { width: 100%; }
 }
@@ -172,7 +177,18 @@ html.altar-home-v3.has-worn-text :is(.altar-v3-statement__body, .altar-manifesto
    the left half, the copy block centred in the right one. The copy block is "altar", then the Inter title, then the
    Minion body set left (desktop keeps Sofi's lines, so the block is as wide as its longest line). Same in A and B.
    Mobile stacks it: copy first, the card under it. Every size is one --m4 unit (1 px of the Figma frame). */
-html.altar-home-v3 body.template-home .altar-manifesto-v2 { --manifesto-bg: var(--v3-bg); --manifesto-text: var(--v3-fg); }
+html.altar-home-v3 body.template-home .altar-manifesto-v2 {
+  /* Figma 04 (all devices): A #E4A980 → #B7C29F at 30 %, B #7E9079 → #091E2B at 30 %, then flat. */
+  --manifesto-bg: linear-gradient(180deg, var(--v3-m4-top) 0%, var(--v3-m4-bottom) 30%, var(--v3-m4-bottom) 100%);
+  --manifesto-text: var(--v3-fg);
+}
+/* "altar" is Sofi's logo (Figma 1015:19773), drawn in the copy colour through a mask. Desktop 86 tall, tablet 58,
+   mobile 165 wide. */
+.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { display: block; font-size: 0; line-height: 0; letter-spacing: 0; }
+.altar-v3-logo {
+  display: block; height: calc(var(--m4-logo, 86) * var(--m4, 1px)); aspect-ratio: 165.23 / 80.34;
+  background: currentColor; -webkit-mask: url("../images/altar-logo-wordmark.svg") left top / contain no-repeat; mask: url("../images/altar-logo-wordmark.svg") left top / contain no-repeat;
+}
 .altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { gap: 0; }
 .altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-weight: 300; }
 .altar-v3-manifesto { width: auto; margin-top: 12px; color: var(--v3-fg); font: 400 16px/1.35 "Altar Minion", Georgia, serif; }
@@ -210,7 +226,7 @@ html.altar-home-v3 body.template-home .altar-manifesto-v2 { --manifesto-bg: var(
     /* tablet (834 frame): the body reflows in a 320 column */
     --m4: var(--t); --m4-half: 348; --m4-card: 221.7; --m4-pad: 64;
     --m4-word: 59.01; --m4-word-lh: 57.05; --m4-word-ls: 3.11; --m4-gap-wt: 8;
-    --m4-title: 11.46; --m4-title-lh: 13.75; --m4-title-ls: -.344; --m4-gap-tb: 12; --m4-body: 10.02;
+    --m4-title: 11.46; --m4-title-lh: 13.75; --m4-title-ls: -.344; --m4-gap-tb: 12; --m4-body: 10.02; --m4-logo: 58;
   }
   html.altar-home-v3 .altar-v3-manifesto { width: calc(320 * var(--t)); line-height: calc(13.53 * var(--t)); }
 }
@@ -234,7 +250,13 @@ html.altar-home-v3 body.template-home .altar-manifesto-v2 { --manifesto-bg: var(
 
 /* 06 / Footer — Minimal (667:1603): Claro in A, Oscuro in B. The first link (Cartas / Newsletter)
    opens the CORREO — ENVIAR row above the links and stays underlined while it is open. */
-.altar-home-v3 .site-footer { background: var(--v3-bg); }
+.altar-home-v3 .site-footer { background: var(--v3-texture) center / cover no-repeat var(--v3-bg); }
+/* 06 + footer share one texture (Figma "06 + 07 / Closing y footer — textura continua"): it is only the background,
+   one piece from the top of 06 to the end of the footer; the stones stay the 3D scene (no shadows) and the
+   footer has no fill of its own. */
+html.altar-home-v3 body.template-home .altar-v3-closing,
+html.altar-home-v3 body.template-home .site-footer .altar-footer.altar-footer--v3,
+html.altar-home-v3 body.template-home .altar-footer-min { background: transparent; }
 .altar-footer-min { position: relative; isolation: isolate; display: flex; padding: 32px 24px 16px; flex-direction: column; gap: 24px; color: var(--v3-fg); background: var(--v3-bg); font-family: Inter, Arial, sans-serif; }
 /* Same film grain as the closing above it (multiply in A, screen in B), so 05 and 06 read as one surface. */
 .altar-footer-min > .altar-section-grain { position: absolute; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: var(--v3-grain-blend); }
@@ -350,16 +372,17 @@ html.altar-home-v3 .altar-footer-min > .altar-section-grain { z-index: 1; }
    flush with 02); 02 is 223 tall, Minion 14 / 21.67 copy (label included) reflowing in 350 px (20 px gutters), centred; 03 is a swipeable strip of full-width photos; 04 puts the copy
    before the card; 05 tucks the stones 32 px under the photo. */
 @media (max-width: 749px) {
-  html.altar-home-v3 { --v3-statement-height: calc(100vw * 60 / 390 + 128px); } /* the scaled copy (60 tall at 390) + 64 above and below */
+  html.altar-home-v3 { --v3-statement-height: 566px; } /* Figma mobile 02 (1015:19752): 390 × 566, the copy centred */
   html.altar-home-v3 body.template-home .altar-solar__stage { --v3-sky-3: 100%; }
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-solar__stage { --hero-height: calc(79px + 100vw * .75); }
   /* Full-bleed film (Figma 699:300): 390 × 292 from y 79, edge to edge, 02 starting right under it. */
   html.altar-home-v3 body.template-home .altar-hero-v3__film { --film-width: 100vw; left: 0; top: 79px; }
 
-  html.altar-home-v3 .altar-v3-statement { height: var(--v3-statement-height); min-height: 0; padding: 64px 20px; } /* 64 air above and below, 20px gutter as the nav */
-  /* Phones: the desktop statement scaled to the 20px-gutter column (--sw), same proportions as the 878 desktop column. */
-  html.altar-home-v3 .altar-v3-statement__body { --sw: calc(100vw - 40px); gap: calc(var(--sw) * .025825); font-size: calc(var(--sw) * .021521); line-height: 1.35; }
-  html.altar-home-v3 .altar-v3-statement__label { line-height: calc(var(--sw) * .029534); letter-spacing: calc(var(--sw) * -.000738); }
+  /* 02 (Figma 1015:19752): one Minion 19 / 152 % block in a 278 column (56 px margins), justified with each
+     paragraph's last line set left; the DROP label spread across it, one empty line above the copy. */
+  html.altar-home-v3 .altar-v3-statement { height: var(--v3-statement-height); min-height: 0; padding: 0 56px; align-items: center; }
+  html.altar-home-v3 .altar-v3-statement__body { gap: 1.52em; font-size: 19px; line-height: 1.52; }
+  html.altar-home-v3 .altar-v3-statement__label { line-height: 1.52; letter-spacing: 0; }
 
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__gallery {
     display: flex; margin: 0; overflow-x: auto; overscroll-behavior-x: contain;
@@ -368,18 +391,31 @@ html.altar-home-v3 .altar-footer-min > .altar-section-grain { z-index: 1; }
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__gallery::-webkit-scrollbar { display: none; }
   html.altar-home-v3 body.template-home:has(.altar-nav--v2) .altar-collection__photo { flex: 0 0 100%; aspect-ratio: 390 / 594; scroll-snap-align: start; } /* Figma 699:343: 594 tall */
 
-  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: 0; padding: 32px 12px 40px; }
-  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { order: 1; }
-  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__content { display: flex; flex-direction: column; align-items: stretch; gap: 42px; }
-  html.altar-home-v3 .altar-manifesto__oracle { order: 2; align-self: center; width: min(73.85vw, 310px); }
-  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-size: 74px; line-height: 73.46px; letter-spacing: 4px; }
-  /* Figma 699:348: "altar" 74, 12 to the 14/18 title, 21.4 to the Minion 14/18 body, 42 to the 288 card. */
-  html.altar-home-v3 .altar-v3-manifesto { margin-top: 12px; font-size: 14px; line-height: 18px; }
-  html.altar-home-v3 .altar-v3-manifesto__title { margin-bottom: 21.4px; font-size: 14px; line-height: 18px; letter-spacing: -.551px; }
+  /* 04 (Figma 1015:19770): the 288 card 95 from the top, 112 to the logo (165 wide), 32 to the Inter 19 / 152 % title,
+     21.4 to the Minion 19 / 152 % body; 56 px side margins (278 column), 60 at the bottom. The last paragraph runs on. */
+  html.altar-home-v3 body.template-home .altar-manifesto-v2 { min-height: 0; padding: 95px 56px 60px; }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__content { display: flex; flex-direction: column; align-items: stretch; gap: 112px; }
+  html.altar-home-v3 .altar-manifesto__oracle { order: 1; align-self: center; width: min(73.85vw, 288px); }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { order: 2; }
+  html.altar-home-v3 .altar-v3-logo { width: 165.23px; height: auto; }
+  html.altar-home-v3 .altar-v3-manifesto { margin-top: 32px; font-size: 19px; line-height: 1.52; }
+  html.altar-home-v3 .altar-v3-manifesto__title { margin-bottom: 21.4px; font-size: 19px; line-height: 1.52; letter-spacing: -.551px; }
+  html.altar-home-v3 .altar-v3-manifesto__body p + p { margin-top: 1.52em; }
+  /* Same treatment as 02 on phones: justified with each paragraph's last line set left, no worn filter, over the grain. */
+  html.altar-home-v3 :is(.altar-v3-manifesto__title, .altar-v3-manifesto__body) { text-align: justify; text-align-last: left; hyphens: none; }
+  html.altar-home-v3.has-worn-text .altar-manifesto-v2 .altar-closing__content .altar-closing__identity { filter: none; }
+  html.altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { position: relative; z-index: 4; }
+  /* "Diseño…" runs on after "…cuatro actos." (Figma mobile): both paragraphs go inline; the empty line before the
+     first of them is drawn by a block-level ::before. */
+  html.altar-home-v3 .altar-v3-manifesto__body p:has(+ .altar-v3-manifesto__join), html.altar-home-v3 .altar-v3-manifesto__body .altar-v3-manifesto__join { display: inline; margin: 0; }
+  html.altar-home-v3 .altar-v3-manifesto__body p:has(+ .altar-v3-manifesto__join)::before { content: ""; display: block; height: 1.52em; }
+  html.altar-home-v3 .altar-v3-manifesto__body .altar-v3-manifesto__join::before { content: " "; }
 
   /* Figma 699:357: the desktop composition 2.03× larger and centred, so about five stones show (solar-experience.js
      lays the view out that much wider and keeps its centre); 390 × 281, nothing cropped. */
-  html.altar-home-v3 .altar-v3-closing > .altar-closing-v2__scene { --closing-stones-scale: 2.03; --closing-stones-crop: 0; width: 100%; height: calc(100vw * 281 / 390); min-height: 0; margin: 0; }
+  /* Mobile only: the stones as one block, tuned in the panel (03 · Piedras → Piedras · mobile) on 2026-11-24:
+     scale 1.73, 0.13 left, 0.04 up. The --m-stones-* values come from solar-experience.js. */
+  html.altar-home-v3 .altar-v3-closing > .altar-closing-v2__scene { --closing-stones-scale: var(--m-stones-scale, 1.73); --closing-stones-shift-x: var(--m-stones-x, -.13); --closing-stones-shift: var(--m-stones-y, -.04); --closing-stones-crop: 0; width: 100%; height: calc(100vw * 281 / 390); min-height: 0; margin: 0; }
 }
 /* Mobile reflows the copy (Figma Mobile): justified, with each paragraph's last line set left. Tablet keeps
    the desktop lines, last one included. */
@@ -391,6 +427,26 @@ html.altar-home-v3 .altar-footer-min > .altar-section-grain { z-index: 1; }
    metallic relief in Minion, sentence case, right-aligned (drawn by solar-experience.js drawFortuneMap). No "revelar carta" link (removed 2026-11-18): the card flips on tap.
    Every size follows the card width (--card-w; Figma card 236 px). */
 html.altar-home-v3 .altar-manifesto__oracle { --card-w: calc(var(--m4-card, 310) * var(--m4, 1px)); }
-@media (max-width: 749px) { html.altar-home-v3 .altar-manifesto__oracle { --card-w: min(73.85vw, 310px); } }
+@media (max-width: 749px) { html.altar-home-v3 .altar-manifesto__oracle { --card-w: min(73.85vw, 288px); } }
 html.altar-home-v3 .altar-manifesto__oracle { overflow: visible; }
 
+
+/* Phones, lighter page (2026-11-24, "se siente pesado"): the film grain is a 256 px noise tile that steps 10 times a
+   second (CSS) instead of SVG noise recomputed over every section (solar-experience.js leaves the SVG alone below
+   750 px); same layers, same opacity and blend, so it still sits over every background. The 06 + footer texture and
+   the photos load their 1000 / 800 px copies (*-m.jpg). */
+@media (max-width: 749px) {
+  html.is-altar-home.altar-home-v3 { --v3-texture: url("../images/altar-v3-texture-a-m.jpg"); }
+  html.is-altar-home.altar-home-v3[data-altar-home-layout="b"] { --v3-texture: url("../images/altar-v3-texture-b-m.jpg"); }
+  html.altar-home-v3 :is(.altar-solar__grain, .altar-section-grain) > rect { display: none; }
+  html.altar-home-v3 :is(.altar-solar__grain, .altar-section-grain) {
+    background: url("../images/altar-grain-tile.png") 0 0 / 128px 128px repeat;
+    animation: altar-grain-step 1s steps(10) infinite;
+  }
+}
+@keyframes altar-grain-step { to { background-position: 870px 530px; } }
+@media (max-width: 749px) and (prefers-reduced-motion: reduce) {
+  html.altar-home-v3 :is(.altar-solar__grain, .altar-section-grain) { animation: none; }
+}
+/* <picture> wrappers (mobile photo copies) stay out of the layout: the img keeps sizing against its link. */
+.altar-collection__photo picture, .altar-v3-campaign picture { display: contents; }

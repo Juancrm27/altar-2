@@ -4,7 +4,10 @@ import { gsap } from "gsap";
 
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 const COMPACT_LAYOUT = window.matchMedia("(max-width: 749px)");
-const clampDpr = () => Math.min(window.devicePixelRatio || 1, 1.75);
+// Phones (below 750 px) run a lighter 3D: 1.25× pixel density, no antialias, no shadow maps, 30 fps, and the film
+// grain drawn by CSS from a tile instead of animated SVG noise (see altar-home-v3.css).
+const COMPACT = window.matchMedia("(max-width: 749px)");
+const clampDpr = () => Math.min(window.devicePixelRatio || 1, COMPACT.matches ? 1.25 : 1.75);
 // Home v3 (Figma "Home / Layout A"): light gradient sky over three screens (film, statement, gallery).
 const IS_V3_HOME = document.documentElement.classList.contains("altar-home-v3");
 const LIGHTING_STORAGE_KEY = IS_V3_HOME ? "altar-lighting-v3-ab" : "altar-lighting-v1";
@@ -667,6 +670,11 @@ const DEFAULT_LIGHTING = {
   wornErosion: 0.14,
   wornNoiseScale: 2.3,
   wornRoughness: 1.2,
+  // Home v3, phones only: the closing stones as one block (Piedras · mobile in the panel). Escala enlarges the
+  // whole composition, Mover X / Mover Y slide it (share of the band), so every stone moves and scales together.
+  mobileStonesScale: 1.73,
+  mobileStonesX: -0.13,
+  mobileStonesY: -0.04,
   lightingPresetVersion: LIGHTING_PRESET_VERSION,
 };
 
@@ -1546,7 +1554,7 @@ class SolarExperience {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       alpha: true,
-      antialias: true,
+      antialias: !COMPACT.matches,
       powerPreference: "high-performance",
     });
     this.renderer.setPixelRatio(clampDpr());
@@ -1621,7 +1629,8 @@ class SolarExperience {
   setupStones() {
     if (!this.stonesUrl) return;
 
-    this.renderer.shadowMap.enabled = true;
+    // Phones: the stones show no shadows (closing scene), so the shadow maps are skipped altogether.
+    this.renderer.shadowMap.enabled = !COMPACT.matches;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.stonesGroup = new THREE.Group();
     this.stonesGroup.position.set(DEFAULT_LIGHTING.stonesX, DEFAULT_LIGHTING.stonesY, DEFAULT_LIGHTING.stonesZ);
@@ -2063,6 +2072,12 @@ class SolarExperience {
       this.updateTramoHud();
     }
     this.applyWornText(settings);
+    // Phones: the closing stones block (CSS reads these only below 750 px).
+    const rootStyle = document.documentElement.style;
+    rootStyle.setProperty("--m-stones-scale", Number(settings.mobileStonesScale ?? DEFAULT_LIGHTING.mobileStonesScale));
+    rootStyle.setProperty("--m-stones-x", Number(settings.mobileStonesX ?? DEFAULT_LIGHTING.mobileStonesX));
+    rootStyle.setProperty("--m-stones-y", Number(settings.mobileStonesY ?? DEFAULT_LIGHTING.mobileStonesY));
+    if (this.closingActive) this.resizeClosingScene();
     this.effectSettings = settings;
   }
 
@@ -2175,6 +2190,11 @@ ${stonePositionsMarkup(1)}
           <label>Luz piso Z <span><input type="range" min="-30" max="30" step="0.5" data-lighting="groundLightZ"><output></output></span></label>
           <label>Luz apunta X <span><input type="range" min="-20" max="20" step="0.5" data-lighting="groundLightTargetX"><output></output></span></label>
           <label>Luz apunta Z <span><input type="range" min="-20" max="20" step="0.5" data-lighting="groundLightTargetZ"><output></output></span></label>
+        </details>
+        <details><summary>Piedras · mobile</summary>
+          <label>Escala <span><input type="range" min="0.5" max="3" step="0.01" data-lighting="mobileStonesScale"><output></output></span></label>
+          <label>Mover X <span><input type="range" min="-1" max="1" step="0.01" data-lighting="mobileStonesX"><output></output></span></label>
+          <label>Mover Y <span><input type="range" min="-1" max="1" step="0.01" data-lighting="mobileStonesY"><output></output></span></label>
         </details>
         <details><summary>Piedras</summary>
           <label>Posición X <span><input type="range" min="-30" max="30" step="0.05" data-lighting="stonesX"><output></output></span></label>
@@ -2358,7 +2378,7 @@ ${stonePositionsMarkup(1)}
       // The stones only show in the closing scene (footer); their ground is a shadow catcher there.
       {
         label: "03 · Piedras (cierre)",
-        groups: ["Piedras", "Piedras · luces", "Iluminación suelo", "Piso sombras"],
+        groups: ["Piedras · mobile", "Piedras", "Piedras · luces", "Iluminación suelo", "Piso sombras"],
       },
       { label: "04 · Grainy blur", groups: ["Grainy blur"] },
       { label: "05 · Carta", groups: ["Carta", "Carta foil", "Carta extras"] },
@@ -3084,7 +3104,7 @@ ${stonePositionsMarkup(1)}
             antialias: true,
             powerPreference: "low-power",
           });
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, COMPACT.matches ? 2 : 3));
           renderer.setSize(236, 358, false);
           renderer.setClearColor(0x000000, 0);
 
@@ -4150,14 +4170,18 @@ ${stonePositionsMarkup(1)}
     // --closing-stones-crop (0–1) trims that share of the view's empty bottom: the stage is that much shorter and only
     // the top of the view is drawn, so the stones keep their size and place.
     const stageStyle = getComputedStyle(this.closingStage);
-    const scale = Math.max(1, parseFloat(stageStyle.getPropertyValue("--closing-stones-scale")) || 1);
+    const scale = Math.max(0.5, parseFloat(stageStyle.getPropertyValue("--closing-stones-scale")) || 1);
     const crop = THREE.MathUtils.clamp(parseFloat(stageStyle.getPropertyValue("--closing-stones-crop")) || 0, 0, 0.9);
+    // --closing-stones-shift (share of the stage height) moves the stones down (+) or up (−) to centre them.
+    const shift = parseFloat(stageStyle.getPropertyValue("--closing-stones-shift")) || 0;
+    // --closing-stones-shift-x (share of the stage width) moves them right (+) or left (−).
+    const shiftX = parseFloat(stageStyle.getPropertyValue("--closing-stones-shift-x")) || 0;
     const fullWidth = width * scale;
     const fullHeight = height / (1 - crop);
     this.closingCamera.aspect = fullWidth / fullHeight;
     const zoom = 1.8 * Math.min(1, (fullWidth / fullHeight) / 3);
     this.closingCamera.zoom = zoom;
-    this.closingCamera.setViewOffset(fullWidth, fullHeight, (fullWidth - width) / 2, fullHeight * (0.05 + 1.17 * zoom), width, height);
+    this.closingCamera.setViewOffset(fullWidth, fullHeight, (fullWidth - width) / 2 - shiftX * width, fullHeight * (0.05 + 1.17 * zoom) - shift * height, width, height);
     this.closingCamera.updateProjectionMatrix();
   }
 
@@ -4171,11 +4195,18 @@ ${stonePositionsMarkup(1)}
     this.renderer.autoClear = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = Number(this.effectSettings?.ground3dExposure ?? DEFAULT_LIGHTING.ground3dExposure);
-    const groundMaterial = this.ground?.material;
-    if (this.ground) this.ground.material = this.closingShadowMaterial;
+    // No shadows under the stones (Sofi, Figma note "06 + footer"): the shadow-catching ground and the contact
+    // shadows are left out of this view, so only the stones sit on the section's texture.
+    const groundVisible = this.ground?.visible;
+    if (this.ground) this.ground.visible = false;
+    this.closingContactShadows ??= [];
+    if (!this.closingContactShadows.length) this.scene.traverse((node) => { if (node.userData.isContactShadow) this.closingContactShadows.push(node); });
+    const contactVisible = this.closingContactShadows.map((node) => node.visible);
+    this.closingContactShadows.forEach((node) => { node.visible = false; });
     this.closingCamera.layers.set(STONE_LAYER);
     this.renderer.render(this.scene, this.closingCamera);
-    if (this.ground) this.ground.material = groundMaterial;
+    if (this.ground) this.ground.visible = groundVisible;
+    this.closingContactShadows.forEach((node, index) => { node.visible = contactVisible[index]; });
     this.renderer.setClearColor(oldClear, oldAlpha);
     this.renderer.toneMapping = oldMapping;
     this.renderer.toneMappingExposure = oldExposure;
@@ -4185,10 +4216,11 @@ ${stonePositionsMarkup(1)}
   }
 
   resize() {
+    // V2: the stage reaches down behind the whole gallery, whatever its height (measured even while the closing
+    // scene holds the canvas, or the sky stops short when 02/03 change height with the stones in view).
+    if (this.gallery) this.root.style.setProperty("--altar-gallery-height", `${this.gallery.offsetHeight}px`);
     if (this.closingActive) return this.resizeClosingScene();
     this.updateSectionGuide();
-    // V2: the stage reaches down behind the whole gallery, whatever its height.
-    if (this.gallery) this.root.style.setProperty("--altar-gallery-height", `${this.gallery.offsetHeight}px`);
     const { width, height } = this.stage.getBoundingClientRect();
     if (!width || !height || !this.renderer) return;
     this.renderer.setPixelRatio(clampDpr());
@@ -4203,11 +4235,18 @@ ${stonePositionsMarkup(1)}
 
   render = (time = 0) => {
     this.animationFrame = requestAnimationFrame(this.render);
+    // Phones: 30 fps is plenty for the slow sky, stones and card, and halves the GPU work. Skipped frames don't
+    // touch the timer, so the next delta covers the whole gap and the motion keeps its speed.
+    if (COMPACT.matches) {
+      if (time - (this.lastCompactFrame ?? -Infinity) < 1000 / 30 - 2) return;
+      this.lastCompactFrame = time;
+    }
     this.timer.update(time);
     const delta = Math.min(this.timer.getDelta(), 0.1);
     this.renderFoilCards(time);
     // Grain keeps moving while the 3D sleeps off screen: sections 3·4 and the footer still show it.
-    if (!REDUCED_MOTION.matches) {
+    // Phones draw it in CSS (a tile that steps), so the SVG noise is left alone there.
+    if (!REDUCED_MOTION.matches && !COMPACT.matches) {
       const refreshRate = Math.max(1, Number(this.effectSettings?.grainSpeed ?? DEFAULT_LIGHTING.grainSpeed));
       this.grainLayers.forEach((layer) => {
         if (time - layer.lastUpdate >= 1000 / refreshRate) {
