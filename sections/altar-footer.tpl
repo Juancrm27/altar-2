@@ -58,7 +58,7 @@
     {% endif %}
 
     <nav class="altar-footer__links" aria-label="Altar">
-      <a href="#altar-newsletter-email" data-altar-newsletter-focus><span class="altar-es">Cartas</span><span class="altar-en">Newsletter</span></a>
+      <a href="#altar-newsletter-email" data-altar-newsletter-focus aria-controls="altar-newsletter-email" aria-expanded="false"><span class="altar-es">Cartas</span><span class="altar-en">Newsletter</span></a>
       <a href="{{ altar_instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><span class="altar-footer__long">Instagram</span><span class="altar-footer__short" aria-hidden="true">IG</span></a>
       <a href="{{ altar_tiktok }}" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><span class="altar-footer__long">TikTok</span><span class="altar-footer__short" aria-hidden="true">TT</span></a>
       <a href="{{ altar_youtube }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><span class="altar-footer__long">YouTube</span><span class="altar-footer__short" aria-hidden="true">YT</span></a>

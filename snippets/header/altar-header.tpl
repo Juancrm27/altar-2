@@ -78,7 +78,8 @@
 					<button type="button" class="altar-nav__search" data-altar-search-open aria-expanded="{{ altar_on_search ? 'true' : 'false' }}" aria-controls="altar-search-{{ section.id }}"><span class="altar-es">Buscar</span><span class="altar-en">Search</span></button>
 					<form class="altar-nav__search-form" id="altar-search-{{ section.id }}" action="{{ store.search_url }}" method="get" role="search" data-altar-search-form{% if altar_on_search %} data-altar-search-results="{{ store.products_url }}"{% else %} hidden{% endif %}>
 						<input class="altar-nav__search-input" type="search" name="q" autocomplete="off" placeholder="Buscar" data-placeholder-es="Buscar" data-placeholder-en="Search" aria-label="Buscar"{% if altar_on_search %} value="{{ query }}"{% endif %}>
-						<button type="submit" class="altar-nav__search-submit" aria-label="Buscar">{{ altar_search_icon }}</button>
+						{# Open search: the magnifier becomes an X that closes it (Enter / the keyboard's search key submits). #}
+						<button type="button" class="altar-nav__search-close" data-altar-search-close><svg class="altar-nav__close-icon" viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg><span class="altar-nav__sr"><span class="altar-es">Cerrar búsqueda</span><span class="altar-en">Close search</span></span></button>
 					</form>
 				</div>
 				<a class="altar-nav__account" href="{{ altar_account_url }}">{{ altar_account_label }}</a>

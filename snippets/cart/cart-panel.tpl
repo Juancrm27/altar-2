@@ -46,10 +46,6 @@
 		<p class="altar-cart__empty-text"><span class="altar-es">Todavía no agregaste productos.</span><span class="altar-en">You haven't added any products yet.</span></p>
 		<a href="{{ store.products_url }}" class="altar-cart__link"><span class="altar-es">Volver a la tienda</span><span class="altar-en">Back to the shop</span></a>
 	</div>
-	{# Cart shipping and pickup #}
-	{{ component('nubesdk-slot', { type: "before_cart_shipping_options" }) }}
-	{% include "snippets/cart/cart-fulfillment.tpl" %}
-	{{ component('nubesdk-slot', { type: "after_cart_shipping_options" }) }}
 
 	{# Coupon input #}
 	{% if settings.cart_coupon %}
@@ -60,5 +56,10 @@
 </div>
 
 <div class="cart-row altar-cart__summary">
+	{# Altar (27-nov): shipping lives in the fixed summary, right above the subtotal, so the postal code never scrolls
+	   away under a long list of products. #}
+	{{ component('nubesdk-slot', { type: "before_cart_shipping_options" }) }}
+	{% include "snippets/cart/cart-fulfillment.tpl" %}
+	{{ component('nubesdk-slot', { type: "after_cart_shipping_options" }) }}
 	{% include "snippets/cart/cart-summary.tpl" with {cart_panel_split: true} %}
 </div>

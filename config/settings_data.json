@@ -49,7 +49,7 @@
     "shipping_calculator_product_page": true,
     "ajax_cart": true,
     "cart_open_type": "show_notification",
-    "add_to_cart_recommendations": true,
+    "add_to_cart_recommendations": false,
     "show_cart_shipping": false,
     "inactive_tab_message": true,
     "cart_favicon": null,

@@ -185,6 +185,10 @@
 						</div>
 					{% endif %}
 				{% endif %}
+				{# Altar (Figma 438:657, sold-out case): «Agotado» as the card's last line; the photo dims in CSS. #}
+				{% if not product.is_placeholder and not product.available and product.display_price %}
+					<div class="product-item-stock-notice altar-sold-out"><span class="altar-es">Agotado</span><span class="altar-en">Sold out</span></div>
+				{% endif %}
 			{% endif %}
 
 			{# Altar v3: suggestions in "Agregaste al carrito" (reduced items) end in an outlined button; the whole card links

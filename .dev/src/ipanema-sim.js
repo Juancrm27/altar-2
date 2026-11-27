@@ -187,13 +187,14 @@ function closeSearch() {
 }
 
 function initSearch() {
-  // Nav v3 (snippets/header/altar-header.tpl): the inline field submits ?q= — here it routes to #/buscar.
+  // Nav v3 (snippets/header/altar-header.tpl): the inline field submits ?q= — here it routes to #/buscar (also from the home).
   const inline = $("[data-altar-search-form]");
   if (inline) {
     inline.addEventListener("submit", (event) => {
       event.preventDefault();
       const q = $("input[name='q']", inline).value.trim();
-      if (q) location.hash = `#/buscar?q=${encodeURIComponent(q)}`;
+      // From the home (preview.html) the results live on the shop page, like Tiendanube's /search/?q=.
+      if (q) location.href = `${BASE}#/buscar?q=${encodeURIComponent(q)}`;
     });
   }
   // Local preview: the footer newsletter has no backend; it shows the sent state (Figma Newsletter=Enviado) right away.
@@ -295,8 +296,9 @@ function shippingCalculator() {
         </div>
         <div class="js-shipping-calculator-form form-swap-input transition-up transition-up-active" data-sim-shipping-form>
           <div class="form-label">${esc(t("shipping.shipping_methods", "Calcular envío"))}</div>
-          <div class="input-append"><input type="tel" class="js-shipping-input form-control" placeholder="${esc(t("shipping.your_zipcode", "Tu código postal"))}" aria-label="${esc(t("shipping.your_zipcode", "Tu código postal"))}" required>
+          <div class="input-append"><input type="tel" class="js-shipping-input form-control" placeholder="${esc(t("shipping.your_zipcode", "Tu código postal"))}" aria-label="${esc(t("shipping.your_zipcode", "Tu código postal"))}">
             <button class="js-calculate-shipping btn btn-inline btn-outline" type="button" data-sim-calc><span class="js-calculate-shipping-wording">${esc(t("shipping.calculate", "Calcular"))}</span></button></div>
+          <div class="js-ship-calculator-error invalid-zipcode alert alert-danger" style="display: none;" data-sim-zip-error><span class="altar-es">Ingresá tu código postal.</span><span class="altar-en">Enter your postal code.</span></div>
           <a class="btn btn-link font-small" href="https://www.correoargentino.com.ar/formularios/cpa" target="_blank">${esc(t("shipping.dont_know_zipcode", "No sé mi código postal"))}</a>
         </div>
       </div>
@@ -307,6 +309,8 @@ function shippingCalculator() {
 function calculateShipping(box) {
   const input = $("input", box);
   const zip = input.value.trim();
+  const zipError = $("[data-sim-zip-error]", box);
+  if (zipError) zipError.style.display = zip ? "none" : "";
   if (!zip) { input.focus(); return; }
   $(".js-shipping-calculator-current-zip", box).textContent = zip;
   // as store.js: the head swaps from .with-form to .with-zip
@@ -359,7 +363,7 @@ function renderCart() {
   $$(".js-cart-widget-amount").forEach((el) => { el.textContent = count; });
   const panel = $("[data-sim-cart-panel]");
   if (panel) {
-    // as snippets/cart/cart-panel.tpl: scroll area (free shipping, products, empty state, calculator) + fixed summary
+    // as snippets/cart/cart-panel.tpl: scroll area (free shipping, products, empty state) + fixed summary (calculator, totals)
     panel.innerHTML = `<div class="altar-cart__scroll">
         <div class="js-visible-on-cart-filled" ${count ? "" : 'style="display:none;"'}>${freeShippingBar()}</div>
         <div id="error-ajax-stock" style="display: none;"><div class="alert alert-warning altar-cart__notice">
@@ -374,9 +378,10 @@ function renderCart() {
           <p class="altar-cart__empty-title"><span class="altar-es">Tu carrito está vacío</span><span class="altar-en">Your cart is empty</span></p>
           <p class="altar-cart__empty-text"><span class="altar-es">Todavía no agregaste productos.</span><span class="altar-en">You haven't added any products yet.</span></p>
           <a class="altar-cart__link" href="${BASE}#/tienda"><span class="altar-es">Volver a la tienda</span><span class="altar-en">Back to the shop</span></a></div>
-        <div class="js-fulfillment-info cart-fulfillment-info js-visible-on-cart-filled" ${count ? "" : 'style="display:none;"'}><div class="js-shipping-calculator-container">${shippingCalculator()}</div></div>
       </div>
-      <div class="cart-row altar-cart__summary">${cartSummary()}</div>`;
+      <div class="cart-row altar-cart__summary">
+        <div class="js-fulfillment-info cart-fulfillment-info js-visible-on-cart-filled" ${count ? "" : 'style="display:none;"'}><div class="js-shipping-calculator-container">${shippingCalculator()}</div></div>
+        ${cartSummary()}</div>`;
   }
   if (HAS_VIEW && currentRoute().name === "cart") renderRoute();
 }
@@ -385,19 +390,21 @@ function renderCart() {
 
 let notificationTimer;
 function showAddedNotification(product, variant, qty) {
-  if (settings.cart_open_type === "open_cart") { openModal("#modal-cart"); return; }
+  if (settings.cart_open_type === "show_cart") { openModal("#modal-cart"); return; } // schema value (config/settings_schema.json)
   if (settings.add_to_cart_recommendations) { showAddedWithSuggestions(product, variant, qty); return; }
   const box = $("[data-sim-notification]");
+  // Same markup as snippets/notification.tpl (type add_to_cart, no related products) + Altar's «Ver carrito».
   box.innerHTML = `<div class="notification">
-      <button type="button" class="js-cart-notification-close-private notification-close" aria-label="Cerrar">${icon("times", "notification-close-icon icon-inline")}</button>
-      <div class="notification-cart-item d-grid grid-auto-1">
-        <div class="notification-cart-image-container mr-3"><img src="${product.images[0]}" alt="" width="60"></div>
-        <div><p class="sim-strong">${esc(product.name)}${variant ? ` <span class="sim-muted">(${esc(variant)})</span>` : ""}</p>
-          <p class="sim-muted">${qty} × ${money(product.price)}</p>
-          <p class="notification-cart-success">${icon("check")} ${esc(t("cart.added_to_cart", "¡Agregado al carrito!"))}</p></div>
+      <button class="js-cart-notification-close-private notification-close" aria-label="Cerrar">${icon("times", "notification-close-icon icon-inline")}</button>
+      <div class="js-cart-notification-item-private notification-cart-item d-grid grid-auto-1">
+        <div class="notification-cart-image-container mr-3"><img class="notification-cart-image" src="${product.images[0]}" alt=""></div>
+        <div class="notification-info-container">
+          <div class="notification-info-line"><span>${esc(product.name)}</span>${variant ? `<span><span class="notification-paren">(</span><span>${esc(variant)}</span><span class="notification-paren">)</span></span>` : ""}</div>
+          <div class="notification-info-line"><span class="notification-quantity"><span>${qty}</span><span> x </span></span><span>${money(product.price)}</span></div>
+          <div class="notification-cart-success">${esc(t("notification.add_to_cart_success", "¡Agregado al carrito!"))}</div>
+        </div>
       </div>
-      <div class="notification-cart-total sim-row"><span>${esc(t("general.total", "Total"))} (${cartCount()}): <strong>${money(cartTotal())}</strong></span>
-        <button type="button" class="btn btn-primary btn-small" data-sim-open-cart>${esc(t("product.view_cart", "Ver carrito"))}</button></div>
+      <button type="button" class="js-cart-notification-close-private altar-notif__cart" data-sim-open-cart><span class="altar-es">Ver carrito</span><span class="altar-en">View cart</span></button>
     </div>`;
   box.style.display = "block";
   requestAnimationFrame(() => box.classList.remove("notification-hidden"));
@@ -485,12 +492,30 @@ function stockNotice(product) {
   return "";
 }
 
-// Mirrors item-colors.tpl: «N colores» as plain text (Paloma Wool card).
+// Same name → colour map as item-colors.tpl / product-variants.tpl (used when an option has no Tiendanube colour).
+const SWATCHES = { negro: "#1F2224", black: "#1F2224", blanco: "#F4F1EA", white: "#F4F1EA", hueso: "#E8E1D3", crudo: "#EFE7D6",
+  natural: "#E6DCC6", arena: "#C9B48F", beige: "#C9B48F", camel: "#B08A5E", "marrón": "#6E4B36", marron: "#6E4B36",
+  chocolate: "#4E3326", "óxido": "#8E5A3C", oxido: "#8E5A3C", terracota: "#B07A5E", "bordó": "#5E2A33", bordo: "#5E2A33",
+  vino: "#5A2430", ciruela: "#6B4251", rosa: "#CFA7A0", rojo: "#9E3B32", naranja: "#C9783F", amarillo: "#D9C27A",
+  mostaza: "#C4A146", verde: "#6F8A6A", "verde agua": "#9DB8A8", salvia: "#A9B08A", oliva: "#707A4E", jade: "#4F7F6C",
+  celeste: "#A9C1D1", azul: "#3E5770", "azul niebla": "#8FA3B0", niebla: "#8FA3B0", marino: "#1F2E44", gris: "#8E8E88",
+  plata: "#C4C6C8", dorado: "#C2A35A", cobre: "#B0704A", lila: "#A89AB8", violeta: "#6E5A86" };
+const swatchFor = (product, name) => (product.swatches && product.swatches[name]) || SWATCHES[name.trim().toLowerCase()] || null;
+
+// Mirrors item-colors.tpl: up to three colour circles + «+N» (Sofi 27-nov), no names.
 function itemColors(product) {
   const colors = product.options.Color;
   if (!settings.product_color_variants || !colors || colors.length < 2) return "";
-  return `<div class="product-item-colors-container order-first"><div class="product-item-colors-variation"><div class="product-item-colors" title="${esc(t("product_item.more_colors", "Ver más colores"))}"><span class="product-item-colors-bullet-text">${colors.length} <span class="altar-es">colores</span><span class="altar-en">colors</span></span></div></div></div>`;
+  const known = colors.map((c) => [c, swatchFor(product, c)]).filter(([, hex]) => hex);
+  const more = known.length - Math.min(3, known.length) + (colors.length - known.length);
+  const inner = known.length
+    ? known.slice(0, 3).map(([name, hex]) => `<span class="product-item-colors-bullet altar-swatch" style="background: ${hex}" title="${esc(name)}"></span>`).join("") + (more > 0 ? `<span class="product-item-colors-bullet-text altar-swatch-more">+${more}</span>` : "")
+    : `<span class="product-item-colors-bullet-text">${colors.length} <span class="altar-es">colores</span><span class="altar-en">colors</span></span>`;
+  return `<div class="product-item-colors-container order-first"><div class="product-item-colors-variation"><div class="product-item-colors altar-swatches" title="${colors.length} colores">${inner}</div></div></div>`;
 }
+
+// Mirrors item.tpl's «Agotado» line for sold-out products.
+const soldOut = (product) => stockFor(product, defaultVariant(product)) === 0 ? `<div class="product-item-stock-notice altar-sold-out"><span class="altar-es">Agotado</span><span class="altar-en">Sold out</span></div>` : "";
 
 // Mirrors snippets/product-list/product-item/item.tpl with altar_editorial_card.
 function productItem(product, editorialPosition = 0) {
@@ -510,7 +535,8 @@ function productItem(product, editorialPosition = 0) {
           </div>
           <div class="product-item-installments">${store.installments} cuotas sin interés de ${money(Math.round(product.price / store.installments))}</div>
           ${settings.payment_discount_price ? paymentDiscount(product.price, "product-item-payment-discount") : ""}
-          ${settings.last_product_category ? stockNotice(product) : ""}` : ""}
+          ${settings.last_product_category ? stockNotice(product) : ""}
+          ${soldOut(product)}` : ""}
           ${itemColors(product)}
         </a>
       </div>
@@ -556,13 +582,14 @@ function categoryPage({ slug, query, star = false }) {
       <span aria-hidden="true">·</span><a href="${BASE}#/tienda"><span class="altar-es">Ver toda la colección</span><span class="altar-en">View the whole collection</span></a></p>`;
   }
 
-  const sortOptions = [["relevancia", "Más relevantes"], ["menor", "Precio: menor a mayor"], ["mayor", "Precio: mayor a menor"], ["az", "A - Z"], ["za", "Z - A"], ["antiguos", "Más antiguos"], ["nuevos", "Más nuevos"], ["vendidos", "Más vendidos"]];
-  const selectedSort = sortOptions.find(([value]) => value === sort)?.[1] || sortOptions[0][1];
+  const sortOptions = [["relevancia", "Más relevantes", "Most relevant"], ["menor", "Precio: menor a mayor", "Price: low to high"], ["mayor", "Precio: mayor a menor", "Price: high to low"], ["az", "A - Z", "A - Z"], ["za", "Z - A", "Z - A"], ["antiguos", "Más antiguos", "Oldest"], ["nuevos", "Más nuevos", "Newest"], ["vendidos", "Más vendidos", "Best sellers"]];
+  const sortLabel = ([, es, en]) => `<span class="altar-es">${esc(es)}</span><span class="altar-en">${esc(en)}</span>`;
+  const selectedSort = sortOptions.find(([value]) => value === sort) || sortOptions[0];
   const controls = `<div class="filters-controls-content sim-controls altar-shop-controls">
       ${resultsLine}
       <div class="sim-sort altar-shop-sort">
         <button type="button" class="altar-shop-sort-trigger js-modal-open-private" data-target="#modal-sort-by" aria-haspopup="dialog" aria-controls="modal-sort-by">
-          <span>${esc(selectedSort)}</span>${icon("chevron-down", "altar-shop-sort-chevron icon-inline")}
+          <span>${sortLabel(selectedSort)}</span>${icon("chevron-down", "altar-shop-sort-chevron icon-inline")}
         </button>
       </div>
     </div>`;
@@ -571,7 +598,7 @@ function categoryPage({ slug, query, star = false }) {
     closeClass: "altar-sort-modal__close", closeIconClass: "altar-sort-modal__close-icon", bodyClass: "altar-sort-modal__body", overlayClass: "altar-sort-modal__overlay",
     // as filters-modals.tpl (block modal_header): only the X to close
     header: `<button type="button" class="js-modal-close-private modal-close altar-sort-modal__close" data-target="#modal-sort-by" aria-label="Cerrar"><svg class="altar-sort-modal__x" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M10.0876 3.08756C10.3154 2.85975 10.6846 2.85975 10.9124 3.08756C11.1402 3.31537 11.1402 3.68464 10.9124 3.91243L7.82486 6.99999L10.9124 10.0876C11.1402 10.3154 11.1402 10.6846 10.9124 10.9124C10.6846 11.1402 10.3154 11.1402 10.0876 10.9124L6.99999 7.82486L3.91243 10.9124C3.68464 11.1402 3.31537 11.1402 3.08756 10.9124C2.85975 10.6846 2.85975 10.3154 3.08756 10.0876L6.17512 6.99999L3.08756 3.91243C2.85975 3.68462 2.85975 3.31536 3.08756 3.08756C3.31536 2.85975 3.68462 2.85975 3.91243 3.08756L6.99999 6.17512L10.0876 3.08756Z" fill="currentColor"/></svg></button>`,
-    body: `<ul class="radio-button-container sort-by-options list-unstyled">${sortOptions.map(([value, label]) => `<li class="radio-button-item"><a href="#" class="radio-button ${value === sort ? "selected" : ""}" data-sim-sort-value="${value}"><span class="radio-button-content"><span class="radio-button-label">${esc(label)}</span></span></a></li>`).join("")}</ul>` });
+    body: `<ul class="radio-button-container sort-by-options list-unstyled">${sortOptions.map((option) => { const [value] = option; return `<li class="radio-button-item"><a href="#" class="radio-button ${value === sort ? "selected" : ""}" data-sim-sort-value="${value}"><span class="radio-button-content"><span class="radio-button-label">${sortLabel(option)}</span></span></a></li>`; }).join("")}</ul>` });
   const filters = modal({ id: "modal-filters", title: "Filtrar", from: "left", widthDesktop: "small",
     body: `<p class="form-label">${esc(t("filters.categories_title", "Categorías"))}</p>
       <ul class="list-unstyled sim-filter-list"><li><a href="${BASE}#/tienda">Todas</a></li>${store.categories.map((c) => `<li><a href="${BASE}#/categoria/${c.slug}" ${c.slug === slug ? 'class="sim-strong"' : ""}>${esc(c.name)}</a></li>`).join("")}</ul>
@@ -594,8 +621,15 @@ function productPage({ slug }) {
   // Mirrors snippets/product/product-variants.tpl (label + strong value, js-variant-button chips).
   const variants = optionAxes(product).map(([axis, values], index) => `
     <div class="js-product-variants-group product-detail-variants-group${["Color", "Cor"].includes(axis) ? " js-color-variants-container" : ""}">
-      <label class="form-label">${esc(axis)}<span class="altar-variant-colon">:</span> <strong class="js-insta-variation-label" data-sim-axis-label="${index}">${esc(values[0])}</strong></label>
-      ${values.map((value, i) => `<a class="js-variant-button btn btn-variant ${i === 0 ? "selected" : ""}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content">${esc(value)}</span></a>`).join("")}
+      <label class="form-label${["Color", "Cor"].includes(axis) ? " altar-color-label" : ""}">${esc(axis)}<span class="altar-variant-colon">:</span> <strong class="js-insta-variation-label" data-sim-axis-label="${index}">${esc(values[0])}</strong></label>
+      ${values.map((value, i) => {
+        const hex = ["Color", "Cor"].includes(axis) ? swatchFor(product, value) : null;
+        // Sold out = no stock in any combination with this value (Tiendanube's btn-variant-no-stock).
+        const noStock = product.stock && Object.entries(product.stock).filter(([k]) => k.split(" / ")[index] === value).every(([, n]) => n === 0);
+        return hex
+          ? `<a class="js-variant-button btn btn-variant btn-variant-color altar-swatch-btn ${i === 0 ? "selected" : ""}${noStock ? " btn-variant-no-stock" : ""}" title="${esc(value)}" aria-label="${esc(value)}" data-altar-tooltip="${esc(value)}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content" style="background: ${hex}" data-name="${esc(value)}"></span></a>`
+          : `<a class="js-variant-button btn btn-variant ${i === 0 ? "selected" : ""}${noStock ? " btn-variant-no-stock" : ""}" data-sim-axis="${index}" data-value="${esc(value)}"><span class="btn-variant-content">${esc(value)}</span></a>`;
+      }).join("")}
     </div>`).join("");
   const freeShipping = product.freeShipping
     ? `<span class="text-accent">${esc(t("product.free_shipping", "Envío gratis"))}</span>`

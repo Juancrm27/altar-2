@@ -114,11 +114,23 @@
       if (url) window.open(url, "_blank", "noopener");
       return;
     }
-    // Footer "Cartas / Newsletter": the form is always open, so the link just takes you to the email field.
+    // Footer "Cartas / Newsletter": the email line is folded (hidden, keeping its place); the link opens it
+    // there and puts the cursor in the field, and closes it again on a second press.
     var newsletter = event.target.closest("[data-altar-newsletter-focus]");
     if (newsletter) {
+      var footer = newsletter.closest(".altar-footer--v3");
       var field = document.getElementById("altar-newsletter-email");
-      if (field) { event.preventDefault(); field.focus({ preventScroll: true }); field.scrollIntoView({ block: "center", behavior: "smooth" }); }
+      event.preventDefault();
+      if (!footer || !field) return;
+      var open = !footer.classList.contains("is-newsletter-open");
+      footer.classList.toggle("is-newsletter-open", open);
+      newsletter.setAttribute("aria-expanded", String(open));
+      if (open) { field.focus({ preventScroll: true }); } else { field.blur(); }
+      return;
+    }
+    var searchClose = event.target.closest("[data-altar-search-close]");
+    if (searchClose) {
+      setSearch(searchClose.closest(".altar-nav"), false);
       return;
     }
     var searchOpen = event.target.closest("[data-altar-search-open]");
@@ -157,6 +169,7 @@
 
   syncLanguage();
   document.addEventListener("section:load", syncLanguage);
+
 
   // Newsletter: Tiendanube answers the subscription with a fresh page at the top; bring the footer's reply
   // (Gracias… · Enviado, or the error line) into view so the visitor sees it.

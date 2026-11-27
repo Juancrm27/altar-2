@@ -16,7 +16,19 @@
 	'created-descending': 'sort_by.options.created_descending' | t,
 	'best-selling': 'sort_by.options.best_selling' | t,
 } %}
+{% set altar_sort_en = {
+	'score-descending': 'Most relevant',
+	'user': 'Featured',
+	'price-ascending': 'Price: low to high',
+	'price-descending': 'Price: high to low',
+	'alpha-ascending': 'A - Z',
+	'alpha-descending': 'Z - A',
+	'created-ascending': 'Oldest',
+	'created-descending': 'Newest',
+	'best-selling': 'Best sellers',
+} %}
 {% set altar_current_sort = altar_sort_text[sort_by] | default('sort_by.options.relevance' | t) %}
+{% set altar_current_sort_en = altar_sort_en[sort_by] | default('Most relevant') %}
 
 {# Pagination settings #}
 {% if section.settings.pagination == 'infinite' %}
@@ -138,7 +150,7 @@
                     data-target="#modal-sort-by"
                     aria-haspopup="dialog"
                     aria-controls="modal-sort-by">
-                    <span>{{ altar_current_sort }}</span>
+                    <span><span class="altar-es">{{ altar_current_sort }}</span><span class="altar-en">{{ altar_current_sort_en }}</span></span>
                     <svg class="altar-shop-sort-chevron icon-inline"><use xlink:href="#chevron-down"/></svg>
                   </button>
                 </div>

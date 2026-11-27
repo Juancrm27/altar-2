@@ -79,7 +79,14 @@ html.is-altar-home:not(.altar-home-v3) .altar-nav--v3 .altar-nav__layout-switch 
 .altar-nav--v3 .altar-nav__search-input::-webkit-search-cancel-button { display: none; }
 /* The underline is the field: no box around it, ever (focus, autofill, theme form styles). */
 :root .altar-nav.altar-nav--v3 .altar-nav__search-input:is(:focus, :focus-visible, :hover) { border: 0; outline: 0; box-shadow: none; background: none; }
-:root .altar-nav--v3 .altar-nav__search-submit { display: grid; width: 24px; height: 24px; flex: 0 0 24px; place-items: center; }
+:root .altar-nav--v3 .altar-nav__search-close { display: grid; width: 24px; height: 24px; flex: 0 0 24px; place-items: center; margin: 0 -6px 0 0; padding: 0; border: 0; color: inherit; background: none; cursor: pointer; }
+/* The open search's X (it replaces the magnifier): turns in from the magnifier's angle when the field opens. */
+.altar-nav--v3 .altar-nav__search-close:hover { opacity: .6; }
+.altar-nav--v3 .altar-nav__search-close:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+.altar-nav--v3.is-search-open .altar-nav__close-icon { animation: altar-search-x-in .32s cubic-bezier(.33, 0, .2, 1) both; }
+@keyframes altar-search-x-in { from { opacity: 0; transform: rotate(-45deg) scale(.7); } }
+@media (prefers-reduced-motion: reduce) { .altar-nav--v3.is-search-open .altar-nav__close-icon { animation: none; } }
+.altar-nav__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .altar-nav--v3 .altar-nav__search-icon { display: block; width: 12px; height: 12px; }
 
 :root .altar-nav--v3 .altar-nav__panel { display: none; }
@@ -144,6 +151,9 @@ html.is-altar-home:not(.altar-home-v3) .altar-nav--v3 .altar-nav__layout-switch 
 
 .altar-footer--v3 .altar-footer__links { display: flex; align-items: center; justify-content: space-between; gap: 8px; letter-spacing: .15px; }
 .altar-footer--v3 .altar-footer__short { display: none; }
+/* Cartas/Newsletter keeps the width of its longer word (no jump on the language switch), but its text starts at the
+   left edge, on the line of ©2026 below — not centred in that slot. */
+.altar-footer--v3 .altar-footer__links > :first-child { justify-items: start; }
 
 .altar-footer--v3 .altar-footer__legal-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 10px; line-height: 16px; letter-spacing: .2px; text-transform: none; }
 .altar-footer--v3 .altar-footer__brand { display: flex; align-items: center; gap: 24px; }
@@ -173,3 +183,25 @@ html.is-altar-commerce .altar-footer--v3 > .altar-footer__grain { display: none;
 :root[data-altar-home-layout="b"] { --altar-grain: .09; }
 html.is-altar-commerce .altar-page-grain .altar-section-grain { opacity: var(--altar-grain); }
 :root[data-altar-home-layout="b"] .altar-page-grain .altar-section-grain { mix-blend-mode: screen; }
+
+/* Newsletter folded (user 25-nov): EMAIL ………… ENVIAR stays hidden but keeps its place, so the footer doesn't move;
+   Cartas / Newsletter opens it in that same space (altar-header.js toggles .is-newsletter-open). After sending,
+   or with an error to show, it stays open. */
+.site-footer .altar-footer--v3 .altar-footer__newsletter { opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s; }
+.site-footer .altar-footer--v3.is-newsletter-open .altar-footer__newsletter,
+.site-footer .altar-footer--v3 .altar-footer__newsletter.is-sent,
+.site-footer .altar-footer--v3 .altar-footer__newsletter:has(.altar-footer__status) { opacity: 1; visibility: visible; transform: none; transition: opacity .35s ease, transform .35s ease, visibility 0s; }
+.altar-footer--v3 [data-altar-newsletter-focus][aria-expanded="true"] { text-decoration: underline; text-underline-position: from-font; }
+@media (prefers-reduced-motion: reduce) { .site-footer .altar-footer--v3 .altar-footer__newsletter { transition: none; transform: none; } }
+
+/* Nav (and footer links) without jumps when the language changes (user 25-nov: "pequeños saltos al cambiar de
+   estado"): each label keeps both words stacked in one cell, the other language only hidden, so every slot is as
+   wide as its longer word (COLECCIÓN/COLLECTION, HOLA/HELLO, INGRESAR/LOG IN) and nothing moves on the switch. */
+/* :where() keeps this at zero specificity, so labels the nav hides (INGRESAR on phones, CERRAR while closed) stay hidden. */
+:where(.altar-nav--v3, .altar-footer--v3) :where(a, button, span):has(> .altar-es):has(> .altar-en) { display: inline-grid; justify-items: center; }
+:is(.altar-nav--v3, .altar-footer--v3) :has(> .altar-es):has(> .altar-en) > :is(.altar-es, .altar-en) { display: block !important; grid-area: 1 / 1; }
+:root:not([data-altar-home-layout="b"]) :is(.altar-nav--v3, .altar-footer--v3) :has(> .altar-es):has(> .altar-en) > .altar-en,
+:root[data-altar-home-layout="b"] :is(.altar-nav--v3, .altar-footer--v3) :has(> .altar-es):has(> .altar-en) > .altar-es { visibility: hidden; }
+/* Ingresar / Log in carries its own display (block, hidden on phones), so it gets the stacked cell explicitly on desktop. */
+@media (min-width: 1024px) { :root .altar-nav--v3 .altar-nav__account:has(> .altar-es):has(> .altar-en) { display: inline-grid; } }
+.site-footer .altar-footer--v3 .altar-footer__submit:has(> .altar-es):has(> .altar-en) { display: inline-grid; }

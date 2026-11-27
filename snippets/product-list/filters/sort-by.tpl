@@ -14,6 +14,19 @@
 	'best-selling': 'sort_by.options.best_selling' | t,
 } %}
 
+{# English labels for the language switch (html[data-altar-home-layout="b"]); the store itself stays in Spanish. #}
+{% set altar_sort_en = {
+	'score-descending': 'Most relevant',
+	'user': 'Featured',
+	'price-ascending': 'Price: low to high',
+	'price-descending': 'Price: high to low',
+	'alpha-ascending': 'A - Z',
+	'alpha-descending': 'Z - A',
+	'created-ascending': 'Oldest',
+	'created-descending': 'Newest',
+	'best-selling': 'Best sellers',
+} %}
+
 {% set label = label ?? true %}
 {% set list_title = list_title ?? true %}
 
@@ -31,9 +44,7 @@
 								<div class="radio-button-icon unchecked"></div>
 								<div class="radio-button-icon checked"></div>
 							</span>
-							<span class="radio-button-label">
-								{{ sort_text[sort_method] }}
-							</span>
+							<span class="radio-button-label"><span class="altar-es">{{ sort_text[sort_method] }}</span><span class="altar-en">{{ altar_sort_en[sort_method] | default(sort_text[sort_method]) }}</span></span>
 						</div>
 					</a>
 				</li>

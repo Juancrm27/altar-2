@@ -73,6 +73,10 @@
 					{% endif %}
 				</div>
 			</div>
+			{# Altar: the next step after adding — opens the side cart (Figma «Carrito»). #}
+			{% if not related_products %}
+				<button type="button" class="js-modal-open-private js-cart-notification-close-private altar-notif__cart" data-target="#modal-cart"><span class="altar-es">Ver carrito</span><span class="altar-en">View cart</span></button>
+			{% endif %}
 		</div>
 		{% if related_products %}
 			<div>

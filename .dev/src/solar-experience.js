@@ -638,6 +638,27 @@ const DEFAULT_LIGHTING = {
   // Panel "Cielo": the star field and every planet but the sun (moon and Saturn's ring included).
   showStars: true,
   showPlanets: true,
+  // Panel "Planetas · estilo" (v3 night): Sofi's artifact look — flat palette tone, soft even light, faint sheen,
+  // soft edge and grain. "Textura" brings back the textured models.
+  // Sol → Apariencia (v3, day and night): Sofi's smooth cream disc; "Textura" brings back the textured sun.
+  sunStyle: "Sofi",
+  sunSoftCenter: 0.45,
+  sunSoftRim: 0.55,
+  sunSoftEdge: 0.18,
+  sunSoftGrain: 0.06,
+  sunSoftTexture: 0.06,
+  sunSoftBrightness: 1,
+  planetStyle: "Sofi",
+  planetSoftness: 0.8,
+  planetShadow: 0.42,
+  planetSheen: 0.28,
+  planetEdge: 0.45,
+  planetGrain: 0.1,
+  planetTexture: 0.18,
+  planetGlow: 0.12,
+  planetSaturation: 1,
+  planetLightFromSun: true,
+  planetLightAngle: 135,
   // Panel "Sol → Junto a la foto" (v3 only): the 3D sun, unchanged in look, is sized and placed against the hero
   // film (client mock-up). Size (the sun's diameter) and X are % of the film's width (X from its right edge to
   // the sun's centre), Y is where the sun's bottom edge sits, in % of the film's height from its top.
@@ -1487,6 +1508,150 @@ function tintPlanet(mesh, color) {
   mesh.material = Array.isArray(mesh.material) ? mesh.material.map(tint) : tint(mesh.material);
 }
 
+// Night planets in Sofi's style (her artifact with Altar's colours, FigJam 2020240311: "más sutil y pareja luz"):
+// matte spheres in the flat palette tone, lit softly and evenly so no side goes black, a faint sheen toward the
+// light, a soft edge and a fine grain. The model's own texture can come back as a light relief ("Textura").
+// Every planet shares one uniforms bag, so the "Planetas · estilo" panel updates them all at once.
+const PLANET_STYLE_UNIFORMS = {
+  uSoftness: { value: 0.8 },
+  uShadow: { value: 0.42 },
+  uSheen: { value: 0.28 },
+  uEdge: { value: 0.45 },
+  uGrain: { value: 0.1 },
+  uTexture: { value: 0.18 },
+  uGlow: { value: 0.12 },
+  uSaturation: { value: 1 },
+  uFromSun: { value: 1 },
+  uLightAngle: { value: (135 * Math.PI) / 180 },
+  uSunView: { value: new THREE.Vector3() },
+};
+function softPlanetMaterial(color, map) {
+  const mean = averageTextureColor(map);
+  const meanLum = mean ? Math.max(0.2126 * mean.r + 0.7152 * mean.g + 0.0722 * mean.b, 0.002) : 1;
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      ...PLANET_STYLE_UNIFORMS,
+      uColor: { value: new THREE.Color(color) },
+      uMap: { value: map || null },
+      uHasMap: { value: map ? 1 : 0 },
+      uMeanLum: { value: meanLum },
+    },
+    transparent: true,
+    // The palette tone lands on screen as is (no tone mapping shifting Sofi's colours).
+    toneMapped: false,
+    vertexShader: `
+      varying vec3 vNormalView;
+      varying vec3 vCenterView;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vNormalView = normalize(normalMatrix * normal);
+        vCenterView = (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: `
+      uniform vec3 uColor;
+      uniform sampler2D uMap;
+      uniform float uHasMap, uMeanLum, uSoftness, uShadow, uSheen, uEdge, uGrain, uTexture, uGlow, uSaturation, uFromSun, uLightAngle;
+      uniform vec3 uSunView;
+      varying vec3 vNormalView;
+      varying vec3 vCenterView;
+      varying vec2 vUv;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+      void main() {
+        vec3 n = normalize(vNormalView);
+        // Light from the sun on screen (or a fixed angle), always a little toward the viewer: an even, frontal light.
+        vec2 toSun = uSunView.xy - vCenterView.xy;
+        vec2 fixedDir = vec2(cos(uLightAngle), sin(uLightAngle));
+        vec2 dir2 = normalize(mix(fixedDir, length(toSun) > 0.0001 ? normalize(toSun) : fixedDir, uFromSun));
+        vec3 L = normalize(vec3(dir2 * 0.85, 0.75));
+        float ndl = dot(n, L);
+        // Wrapped light: Suavidad 1 spreads it over the whole disc, Sombra is how dark the far side gets at most.
+        float wrap = clamp((ndl + uSoftness) / (1.0 + uSoftness), 0.0, 1.0);
+        float shade = mix(uShadow, 1.0, smoothstep(0.0, 1.0, wrap));
+        vec3 base = uColor;
+        if (uHasMap > 0.5 && uTexture > 0.0) {
+          vec3 texel = texture2D(uMap, vUv).rgb;
+          float lum = dot(texel, vec3(0.2126, 0.7152, 0.0722)) / uMeanLum;
+          base *= mix(1.0, clamp(lum, 0.35, 1.8), uTexture);
+        }
+        float grey = dot(base, vec3(0.2126, 0.7152, 0.0722));
+        base = mix(vec3(grey), base, uSaturation);
+        vec3 col = base * shade;
+        // Faint sheen toward the light, wide and soft (no hard specular dot).
+        float sheen = pow(max(dot(n, normalize(L + vec3(0.0, 0.0, 1.0))), 0.0), 6.0);
+        col += uSheen * sheen * mix(base, vec3(1.0), 0.35);
+        col += uGlow * base;
+        // Fine grain, fixed to the screen like a print.
+        col *= 1.0 + (hash(floor(gl_FragCoord.xy)) - 0.5) * uGrain;
+        // Soft edge: the rim fades out instead of a hard cut.
+        float facing = clamp(n.z, 0.0, 1.0);
+        float alpha = smoothstep(0.0, max(uEdge, 0.001) * 0.6, facing);
+        gl_FragColor = vec4(col, alpha);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }`,
+  });
+}
+
+// Sun in Sofi's style (same artifact), day and night: a smooth cream disc, a little lighter toward its centre and
+// upper left, a touch warmer at the rim, a barely soft edge and the same fine grain. Its texture can come back as a
+// faint relief. The wide halo is still the sprite of "Sol → Apariencia".
+function softSunMaterial(map) {
+  const mean = averageTextureColor(map);
+  const meanLum = mean ? Math.max(0.2126 * mean.r + 0.7152 * mean.g + 0.0722 * mean.b, 0.002) : 1;
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      uColor: { value: new THREE.Color("#fff3c6") },
+      uCenter: { value: 0.45 },
+      uRim: { value: 0.55 },
+      uEdge: { value: 0.18 },
+      uGrain: { value: 0.06 },
+      uTexture: { value: 0.06 },
+      uBrightness: { value: 1 },
+      uMap: { value: map || null },
+      uHasMap: { value: map ? 1 : 0 },
+      uMeanLum: { value: meanLum },
+    },
+    transparent: true,
+    toneMapped: false,
+    vertexShader: `
+      varying vec3 vNormalView;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vNormalView = normalize(normalMatrix * normal);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: `
+      uniform vec3 uColor;
+      uniform sampler2D uMap;
+      uniform float uHasMap, uMeanLum, uCenter, uRim, uEdge, uGrain, uTexture, uBrightness;
+      varying vec3 vNormalView;
+      varying vec2 vUv;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+      void main() {
+        vec3 n = normalize(vNormalView);
+        float facing = clamp(n.z, 0.0, 1.0);
+        // Lighter toward the centre, a little up and left (as in Sofi's sun); warmer, deeper cream at the rim.
+        float glow = smoothstep(0.15, 1.0, dot(n, normalize(vec3(-0.28, 0.3, 1.0))));
+        vec3 centre = mix(uColor, vec3(1.0, 0.99, 0.94), uCenter);
+        vec3 rim = mix(uColor, uColor * vec3(0.97, 0.93, 0.72), uRim);
+        vec3 col = mix(rim, centre, glow);
+        if (uHasMap > 0.5 && uTexture > 0.0) {
+          float lum = dot(texture2D(uMap, vUv).rgb, vec3(0.2126, 0.7152, 0.0722)) / uMeanLum;
+          col *= mix(1.0, clamp(lum, 0.5, 1.5), uTexture);
+        }
+        col *= uBrightness;
+        col *= 1.0 + (hash(floor(gl_FragCoord.xy)) - 0.5) * uGrain;
+        float alpha = smoothstep(0.0, max(uEdge, 0.001) * 0.6, facing);
+        gl_FragColor = vec4(col, alpha);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }`,
+  });
+}
+
 function fitMeshToRadius(mesh, targetRadius) {
   mesh.geometry.computeBoundingSphere();
   const radius = mesh.geometry.boundingSphere?.radius || 1;
@@ -2273,6 +2438,13 @@ ${stonePositionsMarkup(1)}
             <label>Y % foto <span><input type="range" min="-100" max="200" step="0.5" data-lighting="filmSunY"><output></output></span></label>
           </details>
           <details class="lighting-panel__subgroup" open><summary>Apariencia</summary>
+          <label class="is-select">Estilo sol <select data-lighting="sunStyle"><option>Sofi</option><option>Textura</option></select></label>
+          <label>Luz centro <span><input type="range" min="0" max="1" step="0.01" data-lighting="sunSoftCenter"><output></output></span></label>
+          <label>Tono borde <span><input type="range" min="0" max="1" step="0.01" data-lighting="sunSoftRim"><output></output></span></label>
+          <label>Borde difuso <span><input type="range" min="0" max="1" step="0.01" data-lighting="sunSoftEdge"><output></output></span></label>
+          <label>Grano sol <span><input type="range" min="0" max="0.4" step="0.01" data-lighting="sunSoftGrain"><output></output></span></label>
+          <label>Textura sol <span><input type="range" min="0" max="1" step="0.01" data-lighting="sunSoftTexture"><output></output></span></label>
+          <label>Brillo sol <span><input type="range" min="0.5" max="1.5" step="0.01" data-lighting="sunSoftBrightness"><output></output></span></label>
           <label>Tamaño <span><input type="range" min="0.2" max="3" step="0.01" data-lighting="sunSize"><output></output></span></label>
           <label>Emisión <span><input type="range" min="0" max="10" step="0.05" data-lighting="sunEmissive"><output></output></span></label>
           <label class="is-color">Color emisión <input type="color" data-lighting="sunEmissiveColor"></label>
@@ -2303,6 +2475,19 @@ ${stonePositionsMarkup(1)}
         ${IS_V3_HOME ? `<details><summary>Cielo</summary>
           <label class="is-boolean">Estrellas <input type="checkbox" data-lighting="showStars"></label>
           <label class="is-boolean">Planetas <input type="checkbox" data-lighting="showPlanets"></label>
+        </details>
+        <details><summary>Planetas · estilo</summary>
+          <label class="is-select">Estilo <select data-lighting="planetStyle"><option>Sofi</option><option>Textura</option></select></label>
+          <label>Suavidad luz <span><input type="range" min="0" max="1.5" step="0.01" data-lighting="planetSoftness"><output></output></span></label>
+          <label>Sombra mínima <span><input type="range" min="0" max="1" step="0.01" data-lighting="planetShadow"><output></output></span></label>
+          <label>Brillo suave <span><input type="range" min="0" max="1" step="0.01" data-lighting="planetSheen"><output></output></span></label>
+          <label>Borde difuso <span><input type="range" min="0" max="1" step="0.01" data-lighting="planetEdge"><output></output></span></label>
+          <label>Grano <span><input type="range" min="0" max="0.6" step="0.01" data-lighting="planetGrain"><output></output></span></label>
+          <label>Textura <span><input type="range" min="0" max="1" step="0.01" data-lighting="planetTexture"><output></output></span></label>
+          <label>Luz propia <span><input type="range" min="0" max="1" step="0.01" data-lighting="planetGlow"><output></output></span></label>
+          <label>Saturación <span><input type="range" min="0" max="1.5" step="0.01" data-lighting="planetSaturation"><output></output></span></label>
+          <label class="is-boolean">Luz desde el sol <input type="checkbox" data-lighting="planetLightFromSun"></label>
+          <label>Ángulo luz ° <span><input type="range" min="0" max="360" step="1" data-lighting="planetLightAngle"><output></output></span></label>
         </details>` : ""}
         ${IS_V3_HOME ? "" : `<details><summary>Onda layout</summary>
           <label class="is-color">Color <input type="color" data-lighting="layoutWaveColor"></label>
@@ -2579,7 +2764,17 @@ ${stonePositionsMarkup(1)}
             material.needsUpdate = true;
           });
 
-          if (IS_V3_HOME && V3_PLANET_COLORS[key]) tintPlanet(node, V3_PLANET_COLORS[key]);
+          if (IS_V3_HOME && V3_PLANET_COLORS[key]) {
+            const sourceMaps = (Array.isArray(node.material) ? node.material : [node.material]).map((material) => material?.map || null);
+            tintPlanet(node, V3_PLANET_COLORS[key]);
+            // Two looks per planet, switched by "Planetas · estilo → Estilo": the textured model and Sofi's soft sphere.
+            node.userData.texturedMaterial = node.material;
+            node.userData.softMaterial = Array.isArray(node.material)
+              ? sourceMaps.map((map) => softPlanetMaterial(V3_PLANET_COLORS[key], map))
+              : softPlanetMaterial(V3_PLANET_COLORS[key], sourceMaps[0]);
+            this.styledPlanets = this.styledPlanets || [];
+            this.styledPlanets.push(node);
+          }
 
           if (key === "saturn-ring" && IS_V3_HOME && V3_HIDDEN_BODIES.includes(key)) {
             node.visible = false;
@@ -2699,6 +2894,11 @@ ${stonePositionsMarkup(1)}
     });
     this.sunBaseScale = this.sun.scale.x;
     this.sunRadius = PLANET_LAYOUT.sun.radius;
+    // v3: Sofi's smooth sun (default) or the textured one, switched by "Sol → Apariencia → Estilo sol".
+    if (IS_V3_HOME) {
+      this.sunTexturedMaterial = this.sun.material;
+      this.sunSoftMaterial = softSunMaterial(materials.find((material) => material?.emissiveMap)?.emissiveMap || materials[0]?.map || null);
+    }
 
     this.sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({
       map: createGlowTexture(),
@@ -2798,6 +2998,19 @@ ${stonePositionsMarkup(1)}
       material.emissive.set(settings.sunEmissiveColor);
       material.emissiveIntensity = Number(settings.sunEmissive);
     });
+    if (this.sunSoftMaterial) {
+      const soft = settings.sunStyle !== "Textura";
+      const material = soft ? this.sunSoftMaterial : this.sunTexturedMaterial;
+      if (this.sun.material !== material) this.sun.material = material;
+      const u = this.sunSoftMaterial.uniforms;
+      u.uColor.value.set(settings.sunEmissiveColor);
+      u.uCenter.value = Number(settings.sunSoftCenter);
+      u.uRim.value = Number(settings.sunSoftRim);
+      u.uEdge.value = Number(settings.sunSoftEdge);
+      u.uGrain.value = Number(settings.sunSoftGrain);
+      u.uTexture.value = Number(settings.sunSoftTexture);
+      u.uBrightness.value = Number(settings.sunSoftBrightness);
+    }
 
     const glowIntensity = Number(settings.sunGlowIntensity);
     this.sunGlow.visible = glowIntensity > 0;
@@ -2973,6 +3186,34 @@ ${stonePositionsMarkup(1)}
     const showPlanets = skyVisibility(settings).planets;
     this.nightMeshes.forEach((mesh) => { mesh.visible = showPlanets; });
     if (!showPlanets) this.orbiters.forEach((orbiter) => { orbiter.line.visible = false; });
+    this.updatePlanetStyle(settings);
+  }
+
+  // "Planetas · estilo": Sofi's soft spheres or the textured models, plus the shared look values; the light
+  // direction follows the sun on screen every frame.
+  updatePlanetStyle(settings) {
+    if (!this.styledPlanets?.length) return;
+    const soft = settings.planetStyle !== "Textura";
+    this.styledPlanets.forEach((mesh) => {
+      const material = soft ? mesh.userData.softMaterial : mesh.userData.texturedMaterial;
+      if (mesh.material !== material) mesh.material = material;
+    });
+    if (!soft) return;
+    const u = PLANET_STYLE_UNIFORMS;
+    u.uSoftness.value = Number(settings.planetSoftness);
+    u.uShadow.value = Number(settings.planetShadow);
+    u.uSheen.value = Number(settings.planetSheen);
+    u.uEdge.value = Number(settings.planetEdge);
+    u.uGrain.value = Number(settings.planetGrain);
+    u.uTexture.value = Number(settings.planetTexture);
+    u.uGlow.value = Number(settings.planetGlow);
+    u.uSaturation.value = Number(settings.planetSaturation);
+    u.uFromSun.value = settings.planetLightFromSun === false ? 0 : 1;
+    u.uLightAngle.value = (Number(settings.planetLightAngle) * Math.PI) / 180;
+    if (this.sun && this.camera) {
+      this.sun.getWorldPosition(u.uSunView.value);
+      u.uSunView.value.applyMatrix4(this.camera.matrixWorldInverse);
+    }
   }
 
   // v3 night: Sofi's fixed composition instead of orbits. Each body sits at its offset from the sun, measured in
