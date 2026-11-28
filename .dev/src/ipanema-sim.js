@@ -499,7 +499,9 @@ const SWATCHES = { negro: "#1F2224", black: "#1F2224", blanco: "#F4F1EA", white:
   vino: "#5A2430", ciruela: "#6B4251", rosa: "#CFA7A0", rojo: "#9E3B32", naranja: "#C9783F", amarillo: "#D9C27A",
   mostaza: "#C4A146", verde: "#6F8A6A", "verde agua": "#9DB8A8", salvia: "#A9B08A", oliva: "#707A4E", jade: "#4F7F6C",
   celeste: "#A9C1D1", azul: "#3E5770", "azul niebla": "#8FA3B0", niebla: "#8FA3B0", marino: "#1F2E44", gris: "#8E8E88",
-  plata: "#C4C6C8", dorado: "#C2A35A", cobre: "#B0704A", lila: "#A89AB8", violeta: "#6E5A86" };
+  plata: "#C4C6C8", dorado: "#C2A35A", cobre: "#B0704A", lila: "#A89AB8", violeta: "#6E5A86",
+  "azul marino": "#1F2E44", yeso: "#E9E4DA", perla: "#E6E0D4", pez: "#8C9AA3", magma: "#5A2228",
+  "tornasol bordeaux & verde": "linear-gradient(135deg, #5E2A33 50%, #4F7F6C 50%)", "tornasol azul & verde": "linear-gradient(135deg, #3E5770 50%, #4F7F6C 50%)" };
 const swatchFor = (product, name) => (product.swatches && product.swatches[name]) || SWATCHES[name.trim().toLowerCase()] || null;
 
 // Mirrors item-colors.tpl: up to three colour circles + «+N» (Sofi 27-nov), no names.
