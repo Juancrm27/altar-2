@@ -70,8 +70,10 @@
 			{% if is_button_variant %}
 				<label class="form-label{% if variation.name in ['Color', 'Cor'] %} altar-color-label{% endif %}">{{ variation.name }}<span class="altar-variant-colon">:</span> <strong class="js-insta-variation-label">{{ product.default_options[variation.id] }}</strong></label>
 				{% for option in variation.options %}
-					{% set altar_hex = (not use_text_color_variants and not use_image_color_variants and use_bullet_variants and variation.name in ['Color', 'Cor']) ? (option.custom_data ?: (altar_swatch_map[option.name | lower | trim] ?? null)) : null %}
-					<a data-option="{{ option.id }}" class="js-variant-button btn btn-variant{% if product.default_options[variation.id] is same as(option.id) %} selected{% endif %}{% if not use_text_color_variants and variation.name in ['Color', 'Cor'] and (altar_hex or use_image_color_variants) %} btn-variant-color{% endif %}{% if altar_hex %} altar-swatch-btn{% endif %}" title="{{ option.name }}" {% if altar_hex %}aria-label="{{ option.name }}" data-altar-tooltip="{{ option.name }}"{% endif %} data-option="{{ option.id }}" data-variation-id="{{ variation.id }}">
+					{# Altar: colour options are circles on the product page too. Ipanema's product-form passes
+					   text_color_variants = true for every product page, so that flag is ignored here (27-nov). #}
+					{% set altar_hex = (not use_image_color_variants and use_bullet_variants and variation.name in ['Color', 'Cor']) ? (option.custom_data ?: (altar_swatch_map[option.name | lower | trim] ?? null)) : null %}
+					<a data-option="{{ option.id }}" class="js-variant-button btn btn-variant{% if product.default_options[variation.id] is same as(option.id) %} selected{% endif %}{% if variation.name in ['Color', 'Cor'] and (altar_hex or (not use_text_color_variants and use_image_color_variants)) %} btn-variant-color{% endif %}{% if altar_hex %} altar-swatch-btn{% endif %}" title="{{ option.name }}" {% if altar_hex %}aria-label="{{ option.name }}" data-altar-tooltip="{{ option.name }}"{% endif %} data-option="{{ option.id }}" data-variation-id="{{ variation.id }}">
 						<span class="btn-variant-content {% if not use_text_color_variants and use_image_color_variants and variation.name in ['Color', 'Cor'] %} btn-variant-content-square{% endif %}"{% if altar_hex %} style="background: {{ altar_hex }}"{% endif %} data-name="{{ option.name }}">
 							{% if not use_text_color_variants and use_image_color_variants and variation.name in ['Color', 'Cor'] %}
 								{% if product.default_options[variation.id] is same as(option.id) %}
@@ -97,7 +99,7 @@
 								{% endfor %}
 							{% endif %}
 							{% endif %}
-							{% if use_text_color_variants or not(variation.name in ['Color', 'Cor']) or ((variation.name in ['Color', 'Cor']) and not altar_hex and not use_image_color_variants) %}
+							{% if not altar_hex and (use_text_color_variants or not(variation.name in ['Color', 'Cor']) or ((variation.name in ['Color', 'Cor']) and not use_image_color_variants)) %}
 								{{ option.name }}
 							{% endif %}
 						</span>
