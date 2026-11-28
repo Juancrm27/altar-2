@@ -1711,6 +1711,10 @@ class SolarExperience {
     if (root.hasAttribute("data-lighting-controls")) this.setupLightingControls();
     this.bindEvents();
     this.setupClosingScene();
+    // Without the (local-only) lighting panel the scene starts from the day values, and only the nav switch called
+    // applyV3Layout. Arriving on the home already in EN (e.g. from Collection in English) left the night sky with
+    // the day settings: no stars, no planets, no shooting stars. Start from the night values instead (27-nov).
+    if (IS_V3_HOME && !root.hasAttribute("data-lighting-controls") && currentV3Layout() === "b") this.applyV3Layout("b");
     this.loadModel();
     this.render();
   }
