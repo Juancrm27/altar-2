@@ -158,6 +158,12 @@ html.is-altar-home:not(.altar-home-v3) .altar-nav--v3 .altar-nav__layout-switch 
 .altar-footer--v3 .altar-footer__legal-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 10px; line-height: 16px; letter-spacing: .2px; text-transform: none; }
 .altar-footer--v3 .altar-footer__brand { display: flex; align-items: center; gap: 24px; }
 .altar-footer--v3 .altar-footer__powered :is(a, img, svg) { display: inline-block; vertical-align: middle; color: inherit; }
+/* Tiendanube's real «creado con Tiendanube» is an SVG with no size of its own (it rendered 0 × 0 on the store);
+   size it to the legal line and paint it in the footer colour, so it follows ES / EN like the text beside it. */
+.altar-footer--v3 .altar-footer__powered .powered-by-logo { display: block; width: auto; height: auto; }
+.altar-footer--v3 .altar-footer__powered .powered-by-logo a { display: block; width: 106px; height: 12px; }
+.altar-footer--v3 .altar-footer__powered .powered-by-logo svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+.altar-footer--v3 .altar-footer__powered .powered-by-logo svg * { fill: currentColor; }
 .altar-footer--v3 .altar-footer__consumer { display: flex; flex-wrap: wrap; gap: 12px; }
 
 @media (max-width: 749px) {

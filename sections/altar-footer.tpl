@@ -15,7 +15,9 @@
 
 {{ component('nubesdk-slot', { type: "before_footer" }) }}
 {% if template == 'home' %}
-<div class="altar-closing-v2 altar-v3-closing" id="closing" style="--closing-bg-a: {{ footer_settings.background_color | default('#c6ca9f') }}; --closing-fg-a: {{ footer_settings.text_color | default('#091e2b') }}; --closing-bg-b: {{ footer_settings.alternate_background | default('#091e2b') }}; --closing-fg-b: {{ footer_settings.alternate_text | default('#c6ca9f') }};"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>{% include 'snippets/altar-grain.tpl' with { grain_id: 'closing-footer', grain_class: '' } %}{% endif %}
+<div class="altar-closing-v2 altar-v3-closing" id="closing" style="--closing-bg-a: {{ footer_settings.background_color | default('#c6ca9f') }}; --closing-fg-a: {{ footer_settings.text_color | default('#091e2b') }}; --closing-bg-b: {{ footer_settings.alternate_background | default('#091e2b') }}; --closing-fg-b: {{ footer_settings.alternate_text | default('#c6ca9f') }};"><div class="altar-closing-v2__scene" data-altar-closing-stage role="img" aria-label="Piedras tridimensionales de Altar"></div>{% include 'snippets/altar-grain.tpl' with { grain_id: 'closing-footer', grain_class: '' } %}</div>{% endif %}
+{# The stones area closes BEFORE the footer (as in .dev/preview.html): stones above, then the footer on the same
+   texture. Wrapping the footer inside it put the links on top of the stones in Tiendanube (27-nov). #}
 
 {#
   Footer v3 · Figma "Footer / Illustrator" (819:4095), from Sofi's Illustrator. Same on every page, in the
@@ -84,7 +86,6 @@
   {% endif %}
 </div>
 
-{% if template == 'home' %}</div>{% endif %}
 {{ component('nubesdk-slot', { type: "after_footer" }) }}
 
 {% schema %}
