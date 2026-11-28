@@ -703,7 +703,9 @@ body.template-page .user-content img { max-width: 100%; height: auto; }
 .section-main-product .altar-product .js-quantity-up::before { content: "+"; }
 .section-main-product .altar-product .form-quantity .form-control { width: 3ch; height: auto; padding: 3px 0; background: transparent; font-size: 16px; font-weight: 400; line-height: 1.3; }
 .section-main-product .altar-product .buy-button-container { width: 100%; margin-top: 28px; }
-.section-main-product .altar-product .js-addtocart { height: 44px; font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; }
+/* «Agregar al carrito» matches Tiendanube's own «Ir al carrito» (NubeSDK, injected right below it after adding):
+   full column width, square corners, 46 px (28-nov). */
+.section-main-product .altar-product .js-addtocart { height: 46px; border-radius: 0; font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; }
 .section-main-product .altar-product :is(.product-added-message, .alert) { margin-top: 12px; padding: 0; border: 0; background: transparent; color: inherit; font-size: 16px; line-height: 1.3; }
 .section-main-product .altar-product .product-added-icon { display: none; }
 
@@ -730,7 +732,6 @@ body.template-page .user-content img { max-width: 100%; height: auto; }
 .section-main-product .js-product-payments-container .product-payments-link span { text-decoration: none !important; }
 
 @media (min-width: 1200px) {
-  .section-main-product .altar-product .buy-button-container { max-width: 420px; }
 }
 @media (min-width: 768px) and (max-width: 1199px) {
   .section-main-product .altar-product .product-name { font-size: 30px; }
