@@ -1,17 +1,6 @@
 {% set footer_settings = section.settings %}
 {% set password_page = template == 'password' %}
-{% set background_color = footer_settings.background_color | default('#fff3a9') %}
-{% set text_color = footer_settings.text_color | default('#601e2a') %}
-{% set is_altar_commerce = template != 'home' and template != 'password' %}
-{% if is_altar_commerce %}
-  {% set background_color = footer_settings.commerce_background_color | default('#FBF7E7') %}
-  {% set text_color = footer_settings.commerce_text_color | default('#000000') %}
-{% endif %}
-{% set has_social_network = store.facebook or store.twitter or store.pinterest or store.instagram or store.tiktok or store.youtube %}
 {% set show_newsletter = footer_settings.show_newsletter is not same as(false) %}
-{% set show_contact = footer_settings.show_contact is not same as(false) %}
-{% set show_social = footer_settings.show_social is not same as(false) and has_social_network %}
-{% set footer_theme_class = is_altar_commerce ? 'altar-footer--light' : 'altar-footer--color' %}
 
 {{ component('nubesdk-slot', { type: "before_footer" }) }}
 {% if template == 'home' %}
@@ -90,334 +79,68 @@
 
 {% schema %}
 {
-  "name": "Footer Altar + Tiendanube",
+  "name": "Pie de página Altar",
   "icon": "FooterIcon",
   "wrapper": "footer",
   "class": "site-footer",
   "static": true,
   "limit": 1,
-  "blocks": [
-    {
-      "type": "footer-menu",
-      "limit": 1
-    }
-  ],
   "settings": [
-    { "type": "setting", "setting_type": "color", "id": "alternate_background", "label": "Home B · Fondo", "default": "#091e2b" },
-    { "type": "setting", "setting_type": "color", "id": "alternate_text", "label": "Home B · Texto", "default": "#c6ca9f" },
     {
       "type": "header",
-      "content": "Tema color (inicio)"
+      "content": "Piedras 3D del inicio · colores"
     },
     {
       "type": "setting",
       "setting_type": "color",
       "id": "background_color",
-      "label": "Fondo",
+      "label": "Día (Español) · Fondo",
       "default": "#c6ca9f"
     },
     {
       "type": "setting",
       "setting_type": "color",
       "id": "text_color",
-      "label": "Texto",
+      "label": "Día (Español) · Texto",
       "default": "#091e2b"
     },
     {
-      "type": "header",
-      "content": "Tema claro (tienda y páginas internas)"
+      "type": "setting",
+      "setting_type": "color",
+      "id": "alternate_background",
+      "label": "Noche (Inglés) · Fondo",
+      "default": "#091e2b"
     },
     {
       "type": "setting",
       "setting_type": "color",
-      "id": "commerce_background_color",
-      "label": "Fondo",
-      "default": "#FBF7E7"
-    },
-    {
-      "type": "setting",
-      "setting_type": "color",
-      "id": "commerce_text_color",
-      "label": "Texto",
-      "default": "#000000"
+      "id": "alternate_text",
+      "label": "Noche (Inglés) · Texto",
+      "default": "#c6ca9f"
     },
     {
       "type": "header",
-      "content": "Newsletter y redes"
+      "content": "Pie de página"
     },
     {
       "type": "setting",
       "setting_type": "toggle",
       "id": "show_newsletter",
-      "label": "Mostrar newsletter",
+      "label": "Mostrar newsletter (Cartas)",
       "default": true
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "newsletter_label",
-      "label": "Etiqueta",
-      "default": "[ NEWSLETTER ]"
-    },
-    {
-      "type": "setting",
-      "setting_type": "textarea",
-      "id": "newsletter_text",
-      "label": "Texto",
-      "default": "Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar."
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "newsletter_placeholder",
-      "label": "Texto del campo de correo",
-      "default": "Tu correo"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "newsletter_submit_label",
-      "label": "Texto del botón",
-      "default": "Suscribirme"
-    },
-    {
-      "type": "setting",
-      "setting_type": "toggle",
-      "id": "show_social",
-      "label": "Mostrar redes configuradas en la tienda",
-      "default": true
-    },
-    {
-      "type": "header",
-      "content": "Ayuda"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "help_label",
-      "label": "Título",
-      "default": "Ayuda"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "shipping_label",
-      "label": "Texto de envíos y devoluciones",
-      "default": "Envíos y devoluciones"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "shipping_url",
-      "label": "Link de envíos y devoluciones"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "returns_label",
-      "label": "Texto de solicitud de devolución",
-      "default": "Solicitud de devolución"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "returns_url",
-      "label": "Link de solicitud de devolución"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "faq_label",
-      "label": "Texto de FAQs",
-      "default": "FAQs"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "faq_url",
-      "label": "Link de FAQs"
-    },
-    {
-      "type": "header",
-      "content": "Contacto y contenido"
-    },
-    {
-      "type": "setting",
-      "setting_type": "toggle",
-      "id": "show_contact",
-      "label": "Mostrar contacto",
-      "default": true
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "contact_label",
-      "label": "Título de contacto",
-      "default": "Contacto"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "address",
-      "label": "Dirección visible"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "address_url",
-      "label": "Link del mapa"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "whatsapp_label",
-      "label": "Texto de WhatsApp",
-      "default": "WhatsApp"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "email_label",
-      "label": "Texto del correo",
-      "default": "Correo"
-    },
-    {
-      "type": "header",
-      "content": "Explorar"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "explore_store_label",
-      "label": "Texto de la tienda",
-      "default": "Store"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "explore_store_url",
-      "label": "Link de la tienda"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "explore_about_label",
-      "label": "Texto de About",
-      "default": "About"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "explore_about_url",
-      "label": "Link de About"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "explore_makers_label",
-      "label": "Texto de Makers",
-      "default": "Makers"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "explore_makers_url",
-      "label": "Link de Makers"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "descriptor",
-      "label": "Descriptor central",
-      "default": "CONCEPT STORE  /"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "terms_url",
-      "label": "Términos y condiciones"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "privacy_url",
-      "label": "Política de privacidad"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "terms_label",
-      "label": "Texto de términos",
-      "default": "Términos y condiciones"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "privacy_label",
-      "label": "Texto de privacidad",
-      "default": "Política de privacidad"
     },
     {
       "type": "setting",
       "setting_type": "text",
       "id": "copyright_name",
-      "label": "Nombre en el copyright",
+      "label": "Nombre junto al ©",
       "default": "altar"
-    },
-    {
-      "type": "header",
-      "content": "Medios de pago y envío"
-    },
-    {
-      "type": "setting",
-      "setting_type": "toggle",
-      "id": "footer_payments_show",
-      "label": "Mostrar medios de pago",
-      "default": true
-    },
-    {
-      "type": "setting",
-      "setting_type": "toggle",
-      "id": "footer_shipping_show",
-      "label": "Mostrar medios de envío",
-      "default": true
-    },
-    {
-      "type": "header",
-      "content": "Sellos personalizados"
-    },
-    {
-      "type": "setting",
-      "setting_type": "image_picker",
-      "id": "footer_seal_img",
-      "label": "Imagen del sello"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "footer_seal_url",
-      "label": "Link del sello",
-      "visible_if": "{{ section.settings.footer_seal_img }}"
-    },
-    {
-      "type": "setting",
-      "setting_type": "custom_code",
-      "id": "footer_custom_seal_code",
-      "label": "Código de sello personalizado"
     }
   ],
-  "default": {
-    "blocks": [
-      {
-        "type": "footer-menu",
-        "settings": {
-          "title": "Explorar"
-        }
-      }
-    ]
-  },
   "enabled_on": {
-    "layout_templates": ["footer"]
+    "layout_templates": [
+      "footer"
+    ]
   }
 }
 {% endschema %}

@@ -2,46 +2,7 @@
   "sections": {
     "altar_solar": {
       "type": "altar-solar",
-      "settings": {
-        "scroll_label": "",
-        "accessible_label": "Sistema solar interactivo",
-        "paragraph_text": "Objetos con alma hechos por manos. Un canal en sintonía con el ambiente, un cable a tierra. Un ritmo más consciente de consumo. Fuego, tierra, agua, aire. 10% de las ganancias aportan a @unarbol_ong. Magia, sutileza, fantasía, analógico & digital. Amuletos. Ambient aware. Solar punk. Slow fashion. Buenos Aires, 23 Junio 2025, 17 grados. 20:58. Contact 1157991078. fire, earth, air & water. Altar 2025.",
-        "space_color": "#080808",
-        "horizon_color": "#ff9c71",
-        "sky_color": "#aebfc0"
-      },
-      "blocks": {
-        "channel_1": {
-          "type": "altar-channel",
-          "settings": {
-            "internal_name": "CHANNEL 01"
-          }
-        },
-        "channel_2": {
-          "type": "altar-channel",
-          "settings": {
-            "internal_name": "CHANNEL 02"
-          }
-        },
-        "channel_3": {
-          "type": "altar-channel",
-          "settings": {
-            "internal_name": "CHANNEL 03"
-          }
-        },
-        "channel_4": {
-          "type": "altar-channel",
-          "settings": {
-            "internal_name": "CHANNEL 04"
-          }
-        }
-      },
-      "block_order": [
-        "channel_1",
-        "channel_2",
-        "channel_3",
-        "channel_4"
-      ]
+      "settings": {}
     }
   },
   "order": [

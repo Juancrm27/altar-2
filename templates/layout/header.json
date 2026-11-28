@@ -6,19 +6,6 @@
       "type": "header",
       "settings": {
         "header_style": "altar",
-        "altar_concept_label": "[  CONCEPT_STORE  ]",
-        "altar_wordmark": "altar",
-        "altar_metadata_date": "",
-        "altar_metadata_location": "C.A.B.A. (ARG)",
-        "altar_search_label": "Search",
-        "altar_login_label": "Login",
-        "altar_account_label": "Account",
-        "altar_cart_label": "Cart",
-        "altar_menu_label": "Menu",
-        "altar_close_label": "Close",
-        "altar_show_search": true,
-        "altar_show_account": true,
-        "altar_show_cart": true,
         "logo_position_desktop": "left",
         "section_width": "full",
         "vertical_padding": 0,
@@ -58,8 +45,14 @@
           }
         }
       },
-      "block_order": ["logo", "utilities", "navigation"]
+      "block_order": [
+        "logo",
+        "utilities",
+        "navigation"
+      ]
     }
   },
-  "order": ["header"]
+  "order": [
+    "header"
+  ]
 }

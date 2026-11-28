@@ -13,11 +13,6 @@
       <p aria-hidden="true">{{ solar_settings.paragraph_text }}</p>
     </div>
   </div>
-  <div class="visually-hidden" aria-hidden="true">
-    {% for block in section.blocks %}
-      {% include 'blocks/altar-channel.tpl' with { block: block } %}
-    {% endfor %}
-  </div>
   <div class="altar-solar__stage" data-solar-stage>
     {# 01 · Hero film (Figma 964:17981). The poster shows while the video loads. #}
     {% set film_url = solar_settings.hero_video_url | default('videos/altar-film.mp4' | static_url) %}
@@ -241,82 +236,235 @@
 
 {% schema %}
 {
-  "name": "Home v3 · 01–05",
+  "name": "Inicio Altar · día y noche",
   "icon": "VideoIcon",
   "class": "section-altar-solar",
   "limit": 1,
-  "enabled_on": { "page_templates": ["home"] },
-  "locked_blocks": true,
-  "blocks": [
-    { "type": "altar-channel", "limit": 4 }
-  ],
+  "enabled_on": {
+    "page_templates": [
+      "home"
+    ]
+  },
   "settings": [
-    { "type": "header", "content": "01 · Film" },
-    { "type": "setting", "setting_type": "text", "id": "hero_video_url", "label": "Video (link .mp4; vacío: el film de Altar)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "hero_poster", "label": "Imagen mientras carga el video" },
-    { "type": "setting", "setting_type": "text", "id": "hero_media_alt", "label": "Descripción del film", "default": "Film de campaña Altar" },
-    { "type": "setting", "setting_type": "url", "id": "hero_link", "label": "Enlace del film (vacío: lleva a la colección)" },
-    { "type": "header", "content": "Contenido" },
-    { "type": "setting", "setting_type": "text", "id": "scroll_label", "label": "Texto de desplazamiento", "default": "" },
-    { "type": "setting", "setting_type": "text", "id": "accessible_label", "label": "Descripción accesible", "default": "Sistema solar interactivo" },
-    { "type": "setting", "setting_type": "text", "id": "campaign_label", "label": "Nombre de campaña", "default": "ELEMENTAL / SS 27" },
-    { "type": "setting", "setting_type": "text", "id": "explore_label", "label": "Texto inferior izquierdo", "default": "scroll to explore" },
-    { "type": "setting", "setting_type": "text", "id": "channel_label", "label": "Nombre del canal", "default": "CHANNEL 01" },
-    { "type": "setting", "setting_type": "text", "id": "player_label", "label": "Texto del reproductor", "default": "[  ALBA / AIRE ]  6:00 AM" },
-    { "type": "setting", "setting_type": "text", "id": "spotify_url", "label": "Link de Spotify (tema, playlist o álbum)", "default": "https://open.spotify.com/intl-es/track/3wXY1YNt7JbhgdYEqYS7bk?si=dbd7cd56ba424345" },
-    { "type": "header", "content": "Texto sobre el 3D" },
-    { "type": "setting", "setting_type": "text", "id": "manifesto_code", "label": "Código", "default": "ELM. 01#" },
-    { "type": "setting", "setting_type": "text", "id": "manifesto_collection", "label": "Colección", "default": "101 couture" },
-    { "type": "setting", "setting_type": "textarea", "id": "manifesto_title", "label": "Frase principal (una línea por renglón)", "default": "" },
-    { "type": "setting", "setting_type": "text", "id": "manifesto_note_label", "label": "Etiqueta de la nota", "default": "As bordado" },
-    { "type": "setting", "setting_type": "textarea", "id": "manifesto_note", "label": "Nota", "default": "Hecho despacio, a mano y con intención. Para quien sabe mirar más allá." },
-    { "type": "header", "content": "02 · Statement" },
-    { "type": "setting", "setting_type": "text", "id": "collection_name", "label": "Nombre de la colección", "default": "ELEMENTAL" },
-    { "type": "setting", "setting_type": "text", "id": "statement_label", "label": "Título (se reparte a lo ancho)", "default": "Drop N.º I — ELEMENTAL" },
-    { "type": "setting", "setting_type": "textarea", "id": "statement_text", "label": "Texto (el mismo en español e inglés)", "info": "Enter = salto de línea (corta igual que en el diseño en escritorio). Línea vacía = párrafo nuevo. Todas las líneas se justifican de borde a borde.", "default": "Actualización del sistema operativo a modo avión. Fuego, tierra, aire & agua.\nUn amuleto por elemento en fibras naturales. Ropa creada para acompañar la evolución personal\ny honrar los ciclos.\nUna invitación a entrar en tu órbita y leer entre líneas. Hecho a mano en Buenos Aires, Argentina." },
-    { "type": "header", "content": "03 · Galería (de izquierda a derecha)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_a_1", "label": "Foto 1 · Día (Español)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_b_1", "label": "Foto 1 · Noche (Inglés)" },
-    { "type": "setting", "setting_type": "url", "id": "gallery_link_1", "label": "Foto 1 · Enlace (vacío: la colección)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_a_2", "label": "Foto 2 · Día (Español)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_b_2", "label": "Foto 2 · Noche (Inglés)" },
-    { "type": "setting", "setting_type": "url", "id": "gallery_link_2", "label": "Foto 2 · Enlace (vacío: la colección)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_a_3", "label": "Foto 3 · Día (Español)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_b_3", "label": "Foto 3 · Noche (Inglés)" },
-    { "type": "setting", "setting_type": "url", "id": "gallery_link_3", "label": "Foto 3 · Enlace (vacío: la colección)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_a_4", "label": "Foto 4 · Día (Español)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "gallery_b_4", "label": "Foto 4 · Noche (Inglés)" },
-    { "type": "setting", "setting_type": "url", "id": "gallery_link_4", "label": "Foto 4 · Enlace (vacío: la colección)" },
-    { "type": "header", "content": "04 · Manifiesto y carta" },
-    { "type": "setting", "setting_type": "text", "id": "oracle_sheet_url", "label": "Frases de la carta · planilla (CSV)", "info": "Planilla ORACULO publicada como CSV. Salen solo las filas con estado = activa; se actualiza sola en cada visita.", "default": "https://docs.google.com/spreadsheets/d/1kv9DKruOYKfMOiVNaXE_DlolOcp2AfFKWiSRmkIFf48/gviz/tq?tqx=out:csv&gid=334686543" },
-    { "type": "setting", "setting_type": "text", "id": "manifesto_title_es", "label": "Título · Español", "default": "Atlas latino de textiles, amuletos & rituales" },
-    { "type": "setting", "setting_type": "textarea", "id": "manifesto_body_es", "label": "Texto · Español", "info": "Enter = salto de línea solo en escritorio. Línea vacía = párrafo nuevo. Un párrafo que empieza con + sigue pegado al anterior en escritorio.", "default": "" },
-    { "type": "setting", "setting_type": "text", "id": "manifesto_title_en", "label": "Título · Inglés", "default": "Atlas of Latin textiles, amulets & rituals" },
-    { "type": "setting", "setting_type": "textarea", "id": "manifesto_body_en", "label": "Texto · Inglés", "info": "Enter = salto de línea solo en escritorio. Línea vacía = párrafo nuevo.", "default": "" },
-    { "type": "header", "content": "05 · Foto de campaña" },
-    { "type": "setting", "setting_type": "image_picker", "id": "campaign_image_a", "label": "Foto · Día (Español)" },
-    { "type": "setting", "setting_type": "image_picker", "id": "campaign_image_b", "label": "Foto · Noche (Inglés)" },
-    { "type": "setting", "setting_type": "url", "id": "campaign_link", "label": "Enlace (vacío: la colección)" },
-    { "type": "header", "content": "Carta (respaldo)" },
-    { "type": "setting", "setting_type": "textarea", "id": "card_cta", "label": "Invitación junto a la carta (una línea por renglón)", "default": "" },
-    { "type": "setting", "setting_type": "textarea", "id": "fortune_message", "label": "Mensaje de la carta", "default": "Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar." },
-    { "type": "setting", "setting_type": "textarea", "id": "paragraph_text", "label": "Texto de marquesina", "default": "Objetos con alma hechos por manos. Un canal en sintonía con el ambiente, un cable a tierra. Un ritmo más consciente de consumo. Fuego, tierra, agua, aire. 10% de las ganancias aportan a @unarbol_ong. Magia, sutileza, fantasía, analógico & digital. Amuletos. Ambient aware. Solar punk. Slow fashion. Buenos Aires, 23 Junio 2025, 17 grados. 20:58. Contact 1157991078. fire, earth, air & water. Altar 2025." },
-    { "type": "header", "content": "Colores" },
-    { "type": "setting", "setting_type": "color", "id": "space_color", "label": "Espacio", "default": "#080808" },
-    { "type": "setting", "setting_type": "color", "id": "horizon_color", "label": "Degradado inferior", "default": "#ff9c71" },
-    { "type": "setting", "setting_type": "color", "id": "sky_color", "label": "Reserva de color", "default": "#aebfc0" },
-    { "type": "setting", "setting_type": "color", "id": "ground_color", "label": "Tierra 3D · Off white", "default": "#f4f0e8" }
+    {
+      "type": "header",
+      "content": "01 · Film de portada"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "hero_video_url",
+      "label": "Video (link .mp4)",
+      "info": "Vacío: se usa el film incluido en el tema."
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "hero_poster",
+      "label": "Imagen mientras carga el video"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "hero_media_alt",
+      "label": "Descripción del film (accesibilidad)",
+      "default": "Film de campaña Altar"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "hero_link",
+      "label": "Enlace al tocar el film",
+      "info": "Vacío: lleva a la colección."
+    },
+    {
+      "type": "header",
+      "content": "02 · Drop"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "statement_label",
+      "label": "Título (se reparte a lo ancho)",
+      "default": "Drop N.º I — ELEMENTAL"
+    },
+    {
+      "type": "setting",
+      "setting_type": "textarea",
+      "id": "statement_text",
+      "label": "Texto (igual en día y noche)",
+      "info": "Enter = salto de línea (corta igual que en el diseño en escritorio). Línea vacía = párrafo nuevo. Todas las líneas se justifican de borde a borde.",
+      "default": "Actualización del sistema operativo a modo avión. Fuego, tierra, aire & agua.\nUn amuleto por elemento en fibras naturales. Ropa creada para acompañar la evolución personal\ny honrar los ciclos.\nUna invitación a entrar en tu órbita y leer entre líneas. Hecho a mano en Buenos Aires, Argentina."
+    },
+    {
+      "type": "header",
+      "content": "03 · Galería · 4 fotos de izquierda a derecha"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_a_1",
+      "label": "Foto 1 · Día (Español)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_b_1",
+      "label": "Foto 1 · Noche (Inglés)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "gallery_link_1",
+      "label": "Foto 1 · Enlace",
+      "info": "Vacío: lleva a la colección."
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_a_2",
+      "label": "Foto 2 · Día (Español)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_b_2",
+      "label": "Foto 2 · Noche (Inglés)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "gallery_link_2",
+      "label": "Foto 2 · Enlace",
+      "info": "Vacío: lleva a la colección."
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_a_3",
+      "label": "Foto 3 · Día (Español)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_b_3",
+      "label": "Foto 3 · Noche (Inglés)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "gallery_link_3",
+      "label": "Foto 3 · Enlace",
+      "info": "Vacío: lleva a la colección."
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_a_4",
+      "label": "Foto 4 · Día (Español)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "gallery_b_4",
+      "label": "Foto 4 · Noche (Inglés)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "gallery_link_4",
+      "label": "Foto 4 · Enlace",
+      "info": "Vacío: lleva a la colección."
+    },
+    {
+      "type": "header",
+      "content": "04 · Manifiesto"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "manifesto_title_es",
+      "label": "Título · Día (Español)",
+      "default": "Atlas latino de textiles, amuletos & rituales"
+    },
+    {
+      "type": "setting",
+      "setting_type": "textarea",
+      "id": "manifesto_body_es",
+      "label": "Texto · Día (Español)",
+      "info": "Enter = salto de línea solo en escritorio. Línea vacía = párrafo nuevo. Un párrafo que empieza con + sigue pegado al anterior en escritorio.",
+      "default": ""
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "manifesto_title_en",
+      "label": "Título · Noche (Inglés)",
+      "default": "Atlas of Latin textiles, amulets & rituals"
+    },
+    {
+      "type": "setting",
+      "setting_type": "textarea",
+      "id": "manifesto_body_en",
+      "label": "Texto · Noche (Inglés)",
+      "info": "Enter = salto de línea solo en escritorio. Línea vacía = párrafo nuevo.",
+      "default": ""
+    },
+    {
+      "type": "header",
+      "content": "04 · Carta del oráculo"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "oracle_sheet_url",
+      "label": "Planilla de frases (CSV)",
+      "info": "Planilla ORACULO publicada como CSV. Salen solo las filas con estado = activa; se actualiza sola en cada visita.",
+      "default": "https://docs.google.com/spreadsheets/d/1kv9DKruOYKfMOiVNaXE_DlolOcp2AfFKWiSRmkIFf48/gviz/tq?tqx=out:csv&gid=334686543"
+    },
+    {
+      "type": "setting",
+      "setting_type": "textarea",
+      "id": "card_cta",
+      "label": "Invitación junto a la carta (una línea por renglón)",
+      "default": ""
+    },
+    {
+      "type": "setting",
+      "setting_type": "textarea",
+      "id": "fortune_message",
+      "label": "Frase de respaldo",
+      "default": "Una nueva etapa comienza en silencio. Lo que hoy parece incierto encontrará su lugar.",
+      "info": "Se muestra solo si la planilla no responde."
+    },
+    {
+      "type": "header",
+      "content": "05 · Foto de campaña"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "campaign_image_a",
+      "label": "Foto · Día (Español)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "campaign_image_b",
+      "label": "Foto · Noche (Inglés)"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "campaign_link",
+      "label": "Enlace",
+      "info": "Vacío: lleva a la colección."
+    }
   ],
   "presets": [
     {
-      "name": "Experiencia solar 3D",
-      "category": "Marca",
-      "blocks": [
-        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 01" } },
-        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 02" } },
-        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 03" } },
-        { "type": "altar-channel", "settings": { "internal_name": "CHANNEL 04" } }
-      ]
+      "name": "Inicio Altar · día y noche",
+      "category": "Marca"
     }
   ]
 }

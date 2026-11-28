@@ -7,42 +7,9 @@
       "settings": {
         "background_color": "#c6ca9f",
         "text_color": "#091e2b",
-        "commerce_background_color": "#FBF7E7",
-        "commerce_text_color": "#000000",
         "show_newsletter": true,
-        "newsletter_label": "[ NEWSLETTER ]",
-        "newsletter_text": "Colecciones, objetos, historias y encuentros. Sin ruido, cuando haya algo que contar.",
-        "show_social": true,
-        "help_label": "Ayuda",
-        "shipping_label": "Envíos y devoluciones",
-        "returns_label": "Solicitud de devolución",
-        "faq_label": "FAQs",
-        "show_contact": true,
-        "contact_label": "Contacto",
-        "address": "Buenos Aires, Arg.",
-        "whatsapp_label": "WhatsApp",
-        "email_label": "Correo",
-        "explore_store_label": "Store",
-        "explore_about_label": "About",
-        "explore_makers_label": "Makers",
-        "descriptor": "CONCEPT STORE  /  C.A.B.A. (ARG)",
-        "footer_payments_show": false,
-        "footer_shipping_show": false,
-        "newsletter_placeholder": "Tu correo",
-        "newsletter_submit_label": "Suscribirme",
         "copyright_name": "altar"
-      },
-      "blocks": {
-        "explore": {
-          "type": "footer-menu",
-          "settings": {
-            "title": "Explorar"
-          }
-        }
-      },
-      "block_order": [
-        "explore"
-      ]
+      }
     }
   },
   "order": [

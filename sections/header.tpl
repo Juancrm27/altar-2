@@ -179,146 +179,88 @@
   "locked_blocks": true,
   "limit": 1,
   "blocks": [
-    { "type": "header-logo" },
-    { "type": "header-utilities" },
-    { "type": "header-navigation" }
+    {
+      "type": "header-logo"
+    },
+    {
+      "type": "header-utilities"
+    },
+    {
+      "type": "header-navigation"
+    }
   ],
-	"settings": [
-	  {
-	    "type": "header",
-	    "content": "Identidad de Altar"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "select",
-	    "id": "header_style",
-	    "label": "Estilo del encabezado",
-	    "options": [
-	      { "value": "classic", "label": "Ipanema" },
-	      { "value": "altar", "label": "Altar" }
-	    ],
-	    "default": "classic"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "image_picker",
-	    "id": "altar_logo",
-	    "label": "Símbolo de Altar",
-	    "info": "Si queda vacío se usa el símbolo incluido en el tema.",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_concept_label",
-	    "label": "Etiqueta de marca",
-	    "default": "[  CONCEPT_STORE  ]",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_wordmark",
-	    "label": "Nombre visible",
-	    "default": "altar",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_metadata_date",
-	    "label": "Fecha fija",
-	    "info": "Dejar vacío para mostrar la fecha actual.",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_metadata_location",
-	    "label": "Ubicación",
-	    "default": "C.A.B.A. (ARG)",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_search_label",
-	    "label": "Texto de búsqueda",
-	    "default": "Search",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_login_label",
-	    "label": "Texto de ingreso",
-	    "default": "Login",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_account_label",
-	    "label": "Texto de cuenta iniciada",
-	    "default": "Account",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_cart_label",
-	    "label": "Texto del carrito",
-	    "default": "Cart",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_menu_label",
-	    "label": "Texto del menú móvil",
-	    "default": "Menu",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "text",
-	    "id": "altar_close_label",
-	    "label": "Texto para cerrar el menú",
-	    "default": "Close",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "toggle",
-	    "id": "altar_show_search",
-	    "label": "Mostrar búsqueda",
-	    "default": true,
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "toggle",
-	    "id": "altar_show_account",
-	    "label": "Mostrar acceso a la cuenta",
-	    "default": true,
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "setting",
-	    "setting_type": "toggle",
-	    "id": "altar_show_cart",
-	    "label": "Mostrar carrito",
-	    "default": true,
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
-	    "type": "header",
-	    "content": "Colores de páginas comerciales",
-	    "visible_if": "{{ section.settings.header_style == 'altar' }}"
-	  },
-	  {
+  "settings": [
+    {
       "type": "header",
-      "content": "t:names.disposition"
+      "content": "Encabezado Altar"
+    },
+    {
+      "type": "setting",
+      "setting_type": "select",
+      "id": "header_style",
+      "label": "Estilo del encabezado",
+      "options": [
+        {
+          "value": "altar",
+          "label": "Altar"
+        },
+        {
+          "value": "classic",
+          "label": "Ipanema (original de Tiendanube)"
+        }
+      ],
+      "default": "altar",
+      "info": "Altar es el menú del diseño (Colección · Collab · Hola · PLAY). Las opciones de Ipanema solo aparecen si elegís Ipanema."
+    },
+    {
+      "type": "setting",
+      "setting_type": "image_picker",
+      "id": "altar_logo",
+      "label": "Símbolo de Altar",
+      "info": "Vacío: se usa el símbolo incluido en el tema.",
+      "visible_if": "{{ section.settings.header_style == 'altar' }}"
+    },
+    {
+      "type": "header",
+      "content": "Links del menú",
+      "visible_if": "{{ section.settings.header_style == 'altar' }}"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "altar_collection_url",
+      "label": "Colección · enlace",
+      "info": "Vacío: lleva a todos los productos.",
+      "visible_if": "{{ section.settings.header_style == 'altar' }}"
+    },
+    {
+      "type": "setting",
+      "setting_type": "url",
+      "id": "altar_star_url",
+      "label": "Collab · enlace (categoría o página)",
+      "visible_if": "{{ section.settings.header_style == 'altar' }}"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "altar_contact_email",
+      "label": "Hola · correo",
+      "default": "altarmundi@gmail.com",
+      "info": "El link Hola abre un mail a esta dirección.",
+      "visible_if": "{{ section.settings.header_style == 'altar' }}"
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "altar_spotify_url",
+      "label": "PLAY · playlist de Spotify",
+      "default": "https://open.spotify.com/playlist/4u5jTDz4fqFHfjSqXiAtNN?si=ca78c9d4614a4abe",
+      "visible_if": "{{ section.settings.header_style == 'altar' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:names.disposition",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
@@ -326,17 +268,25 @@
       "id": "logo_position_desktop",
       "label": "t:settings.logo_position_desktop",
       "options": [
-        { "value": "left", "label": "t:options.left" },
-        { "value": "center", "label": "t:options.center" }
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
       ],
-      "default": "left"
+      "default": "left",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
       "setting_type": "toggle",
       "id": "use_different_mobile_position",
       "label": "t:settings.use_different_mobile_position",
-      "default": false
+      "default": false,
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
@@ -344,15 +294,22 @@
       "id": "logo_position_mobile",
       "label": "t:settings.logo_position_mobile",
       "options": [
-        { "value": "left", "label": "t:options.left" },
-        { "value": "center", "label": "t:options.center" }
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
       ],
       "default": "center",
-      "visible_if": "{{ section.settings.use_different_mobile_position }}"
+      "visible_if": "{{ section.settings.header_style == 'classic' and section.settings.use_different_mobile_position }}"
     },
     {
       "type": "header",
-      "content": "t:names.design"
+      "content": "t:names.design",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
@@ -360,10 +317,17 @@
       "id": "section_width",
       "label": "t:settings.section_width",
       "options": [
-        { "value": "page", "label": "t:options.page" },
-        { "value": "full", "label": "t:options.full" }
+        {
+          "value": "page",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full",
+          "label": "t:options.full"
+        }
       ],
-      "default": "page"
+      "default": "page",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
@@ -375,7 +339,8 @@
       "step": 4,
       "unit": "px",
       "default": 24,
-      "icon": "vertical_padding"
+      "icon": "vertical_padding",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
@@ -388,14 +353,16 @@
       "unit": "px",
       "default": 32,
       "icon": "horizontal_padding",
-      "disabled_if": "{{ section.settings.section_width == 'page' }}"
+      "disabled_if": "{{ section.settings.section_width == 'page' }}",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
       "setting_type": "toggle",
       "id": "use_different_mobile_padding",
       "label": "t:settings.use_different_mobile_padding",
-      "default": false
+      "default": false,
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
@@ -408,7 +375,7 @@
       "unit": "px",
       "default": 16,
       "icon": "vertical_padding",
-      "visible_if": "{{ section.settings.use_different_mobile_padding }}"
+      "visible_if": "{{ section.settings.header_style == 'classic' and section.settings.use_different_mobile_padding }}"
     },
     {
       "type": "setting",
@@ -421,7 +388,7 @@
       "unit": "px",
       "default": 20,
       "icon": "horizontal_padding",
-      "visible_if": "{{ section.settings.use_different_mobile_padding }}",
+      "visible_if": "{{ section.settings.header_style == 'classic' and section.settings.use_different_mobile_padding }}",
       "disabled_if": "{{ section.settings.section_width == 'page' }}"
     },
     {
@@ -429,51 +396,29 @@
       "setting_type": "toggle",
       "id": "head_fix_desktop",
       "label": "t:settings.sticky_header",
-      "default": true
+      "default": true,
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "header",
-      "content": "t:names.colors"
+      "content": "t:names.colors",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
       "setting_type": "color",
       "id": "background_color",
       "label": "t:settings.background",
-      "default_setting": "background_color"
+      "default_setting": "background_color",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     },
     {
       "type": "setting",
       "setting_type": "color",
       "id": "text_color",
       "label": "t:settings.text",
-      "default_setting": "text_color"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "altar_collection_url",
-      "label": "V2 · Enlace Collection"
-    },
-    {
-      "type": "setting",
-      "setting_type": "url",
-      "id": "altar_star_url",
-      "label": "Enlace Collab (categoría o página)"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "altar_contact_email",
-      "label": "V2 · Correo de Contacto (el link Contacto abre un mail)",
-      "default": "altarmundi@gmail.com"
-    },
-    {
-      "type": "setting",
-      "setting_type": "text",
-      "id": "altar_spotify_url",
-      "label": "V2 · Link de PLAY (playlist de Spotify)",
-      "default": "https://open.spotify.com/playlist/4u5jTDz4fqFHfjSqXiAtNN?si=ca78c9d4614a4abe"
+      "default_setting": "text_color",
+      "visible_if": "{{ section.settings.header_style == 'classic' }}"
     }
   ],
   "default": {
@@ -503,7 +448,9 @@
     ]
   },
   "enabled_on": {
-    "layout_templates": ["header"]
+    "layout_templates": [
+      "header"
+    ]
   }
 }
 {% endschema %}
