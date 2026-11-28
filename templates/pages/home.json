@@ -2,7 +2,10 @@
   "sections": {
     "altar_solar": {
       "type": "altar-solar",
-      "settings": {}
+      "settings": {
+        "hero_video_url": "https://altarmundi-v2.netlify.app/media/altar-film.mp4",
+        "hero_video_url_mobile": "https://altarmundi-v2.netlify.app/media/altar-film-mobile.mp4"
+      }
     }
   },
   "order": [

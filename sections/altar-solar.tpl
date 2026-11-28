@@ -14,11 +14,33 @@
     </div>
   </div>
   <div class="altar-solar__stage" data-solar-stage>
-    {# 01 · Hero film (Figma 964:17981). The poster shows while the video loads. #}
-    {% set film_url = solar_settings.hero_video_url | default('videos/altar-film.mp4' | static_url) %}
+    {# 01 · Hero film (Figma 964:17981). Source priority (panel «01 · Film de portada»):
+       1. hero_video — YouTube/Vimeo link (Tiendanube video_url): played as a silent, looping background embed;
+       2. hero_video_url — direct .mp4 link (Google Drive pages are ignored: they are not a video file);
+       3. the film bundled with the theme (+ a lighter file on mobile).
+       The poster covers the embed until it is playing, so the YouTube/Vimeo start-up chrome is never seen. #}
+    {% set hero_embed = solar_settings.hero_video %}
+    {% set hero_embed_id = hero_embed and hero_embed.id ? hero_embed.id : null %}
+    {% set hero_embed_type = hero_embed_id ? (hero_embed.type | default('youtube')) : null %}
+    {% set hero_mp4 = solar_settings.hero_video_url and 'drive.google.com' not in solar_settings.hero_video_url ? solar_settings.hero_video_url : null %}
+    {% set hero_mp4_mobile = hero_mp4 and solar_settings.hero_video_url_mobile and 'drive.google.com' not in solar_settings.hero_video_url_mobile ? solar_settings.hero_video_url_mobile : null %}
+    {% set film_url = hero_mp4 | default('videos/altar-film.mp4' | static_url) %}
     {% set poster_media = solar_settings.hero_poster and solar_settings.hero_poster starts with '@media-lib:' ? (solar_settings.hero_poster | resolve_media) : null %}
-    <a class="altar-hero-v2__campaign altar-hero-v3__film" id="altar-hero-campaign" href="{{ solar_settings.hero_link | default(store.products_url) }}" aria-label="{{ solar_settings.hero_media_alt | default('Film de campaña Altar') }} · Ver colección" data-cursor-label="{{ 'Arrastrar' | translate }}" data-cursor-icon="move">
-      <video class="altar-hero-v2__media"{% if not solar_settings.hero_video_url %} data-src-mobile="{{ 'videos/altar-film-mobile.mp4' | static_url }}"{% endif %} src="{{ film_url }}" poster="{{ poster_media ? poster_media.sourceUrl : ('images/altar-film-poster.jpg' | static_url) }}" width="1344" height="1008" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video><script>(function (v) { if (v && v.dataset.srcMobile && matchMedia("(max-width: 749px)").matches) { v.src = v.dataset.srcMobile; } })(document.currentScript.previousElementSibling);</script>
+    {% set poster_url = poster_media ? poster_media.sourceUrl : ((hero_embed_id and hero_embed.thumbnail) ? hero_embed.thumbnail : ('images/altar-film-poster.jpg' | static_url)) %}
+    <a class="altar-hero-v2__campaign altar-hero-v3__film{% if hero_embed_id %} altar-hero-v3__film--embed{% endif %}" id="altar-hero-campaign" href="{{ solar_settings.hero_link | default(store.products_url) }}" aria-label="{{ solar_settings.hero_media_alt | default('Film de campaña Altar') }} · Ver colección" data-cursor-label="{{ 'Arrastrar' | translate }}" data-cursor-icon="move">
+      {% if hero_embed_id %}
+        {% if hero_embed_type == 'vimeo' %}
+          {% set embed_src = 'https://player.vimeo.com/video/' ~ hero_embed_id ~ '?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1' %}
+        {% else %}
+          {% set embed_src = 'https://www.youtube-nocookie.com/embed/' ~ hero_embed_id ~ '?autoplay=1&mute=1&loop=1&playlist=' ~ hero_embed_id ~ '&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0' %}
+        {% endif %}
+        <div class="altar-hero-v2__media altar-hero-v3__embed" aria-hidden="true">
+          <iframe src="{{ embed_src }}" title="{{ solar_settings.hero_media_alt | default('Film de campaña Altar') }}" allow="autoplay; encrypted-media; picture-in-picture" tabindex="-1" loading="eager" referrerpolicy="strict-origin-when-cross-origin" onload="var f=this.closest('.altar-hero-v3__embed');setTimeout(function(){f.classList.add('is-playing')},1800)"></iframe>
+          <img class="altar-hero-v3__embed-poster" src="{{ poster_url }}" alt="" width="1344" height="1008">
+        </div>
+      {% else %}
+        <video class="altar-hero-v2__media"{% if not hero_mp4 %} data-src-mobile="{{ 'videos/altar-film-mobile.mp4' | static_url }}"{% elseif hero_mp4_mobile %} data-src-mobile="{{ hero_mp4_mobile }}"{% endif %} src="{{ film_url }}" poster="{{ poster_url }}" width="1344" height="1008" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video><script>(function (v) { if (v && v.dataset.srcMobile && matchMedia("(max-width: 749px)").matches) { v.src = v.dataset.srcMobile; } })(document.currentScript.previousElementSibling);</script>
+      {% endif %}
     </a>
     <div class="altar-solar__sky" aria-hidden="true">
       <i class="altar-solar__glow altar-solar__glow--rose"></i>
@@ -252,16 +274,32 @@
     },
     {
       "type": "setting",
+      "setting_type": "video_url",
+      "id": "hero_video",
+      "label": "Video de YouTube o Vimeo",
+      "icon": "VideoIcon",
+      "info": "Pegá el link del video. Se reproduce sin sonido, en loop y sin botones. Vacío: se usa el film incluido en el tema."
+    },
+    {
+      "type": "setting",
       "setting_type": "text",
       "id": "hero_video_url",
-      "label": "Video (link .mp4)",
-      "info": "Vacío: se usa el film incluido en el tema."
+      "label": "Video .mp4 (avanzado)",
+      "info": "Solo si no hay link de YouTube o Vimeo. Tiene que ser un link directo que termine en .mp4 (Google Drive no sirve)."
+    },
+    {
+      "type": "setting",
+      "setting_type": "text",
+      "id": "hero_video_url_mobile",
+      "label": "Video .mp4 para celular (avanzado, opcional)",
+      "info": "Versión liviana del mismo video. Vacío: el celular usa el .mp4 de arriba."
     },
     {
       "type": "setting",
       "setting_type": "image_picker",
       "id": "hero_poster",
-      "label": "Imagen mientras carga el video"
+      "label": "Imagen mientras carga el video",
+      "info": "Se ve mientras arranca el video. Vacío: la miniatura del video o la del film del tema."
     },
     {
       "type": "setting",

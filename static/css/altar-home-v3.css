@@ -450,3 +450,10 @@ html.altar-home-v3 .altar-manifesto__oracle { overflow: visible; }
 }
 /* <picture> wrappers (mobile photo copies) stay out of the layout: the img keeps sizing against its link. */
 .altar-collection__photo picture, .altar-v3-campaign picture { display: contents; }
+
+/* 01 · Film from YouTube/Vimeo (panel «Video de YouTube o Vimeo»): a 16:9 player cropped to cover the 4:3 frame,
+   no pointer events (the film stays draggable and clickable), poster on top until the player is running. */
+.altar-hero-v3__embed { overflow: hidden; background: #000; }
+.altar-hero-v3__embed iframe { position: absolute; top: 50%; left: 50%; width: 133.34%; height: 100%; min-width: 100%; min-height: 75%; border: 0; translate: -50% -50%; pointer-events: none; }
+.altar-hero-v3__embed-poster { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; pointer-events: none; transition: opacity 900ms ease; }
+.altar-hero-v3__embed.is-playing .altar-hero-v3__embed-poster { opacity: 0; }
