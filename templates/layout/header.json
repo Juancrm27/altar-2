@@ -13,7 +13,8 @@
         "use_different_mobile_padding": true,
         "vertical_padding_mobile": 0,
         "horizontal_padding_mobile": 0,
-        "head_fix_desktop": true
+        "head_fix_desktop": true,
+        "altar_star_url": "https://altarmundi.ar/collab-14r86/"
       },
       "blocks": {
         "logo": {
