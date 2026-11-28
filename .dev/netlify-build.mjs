@@ -16,6 +16,8 @@ rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, "preview"), { recursive: true });
 
 cpSync(join(root, "static"), join(dist, "static"), { recursive: true, filter: (path) => !skip(path) });
+// media/: heavy files (the hero film) served from Netlify by direct link — too big for Tiendanube's ~1 MB theme upload limit.
+if (existsSync(join(root, "media"))) cpSync(join(root, "media"), join(dist, "media"), { recursive: true, filter: (path) => !skip(path) });
 for (const entry of ["preview.html", "storefront.html", "storefront-mock.html", "storefront.css", "ipanema.html", "ipanema-sim.css", "src", "data"]) {
   const from = join(dev, entry);
   if (existsSync(from)) cpSync(from, join(dist, "preview", entry), { recursive: true, filter: (path) => !skip(path) });

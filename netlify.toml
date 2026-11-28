@@ -22,3 +22,10 @@
   for = "/static/models/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# Hero film files linked from the Tiendanube panel (Inicio → 01 · Film de portada).
+[[headers]]
+  for = "/media/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+    Access-Control-Allow-Origin = "*"
