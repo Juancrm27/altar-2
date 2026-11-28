@@ -277,7 +277,7 @@
 		<div class="product-actions{% if show_product_quantity and not product.isSubscribable() %} grid grid-auto-1{% endif %}">
 			{% set product_quantity_home_product_value = home_main_product ? true : false %}
 			{% if show_product_quantity %}
-				{% if not home_main_product %}<span class="altar-qty-label"><span class="altar-es">cantidad</span><span class="altar-en">quantity</span></span>{% endif %}
+				{% if not home_main_product %}<span class="altar-qty-label"><span class="altar-es">Cantidad</span><span class="altar-en">Quantity</span></span>{% endif %}
 				{% include "snippets/product/product-quantity.tpl" with {home_main_product: product_quantity_home_product_value, product_stock: show_stock} %}
 			{% endif %}
 
@@ -372,7 +372,7 @@
 							</div>
 						</div>
 						<a id="btn-installments" class="product-payments-link btn-link" href="#" {% if not (product.get_max_installments and product.get_max_installments(false)) %}style="display: none;"{% endif %}>
-							<span class="altar-es">medios de pago</span><span class="altar-en">payment methods</span>
+							<span class="altar-es">Medios de pago</span><span class="altar-en">Payment methods</span>
 						</a>
 					</div>
 				</div>

@@ -660,7 +660,7 @@ function productPage({ slug }) {
               <div class="js-product-variants product-detail-variants">${variants}</div>
               <div class="product-stock-alert" data-sim-stock></div>
               <div class="product-actions">
-                ${hasPrice(product) ? `<span class="altar-qty-label"><span class="altar-es">cantidad</span><span class="altar-en">quantity</span></span><div class="form-quantity-container"><div class="form-quantity">
+                ${hasPrice(product) ? `<span class="altar-qty-label"><span class="altar-es">Cantidad</span><span class="altar-en">Quantity</span></span><div class="form-quantity-container"><div class="form-quantity">
                   <span class="js-quantity-down form-quantity-icon btn" data-sim-step="-1" aria-label="Restar">${icon("minus")}</span>
                   <input class="form-control js-quantity-input" type="number" min="1" value="1" data-sim-qty-input aria-label="Cantidad">
                   <span class="js-quantity-up form-quantity-icon btn" data-sim-step="1" aria-label="Sumar">${icon("plus")}</span>
@@ -688,7 +688,7 @@ function productPage({ slug }) {
               </div>
               <div class="js-product-payments-container product-payments-info altar-spec-row"${hasPrice(product) ? "" : ' style="display: none;"'}>
                 <div class="altar-spec"><span class="altar-spec-label">Cuotas:</span><div class="product-installment">${store.installments} cuotas sin interés de ${cuota}</div></div>
-                <div class="altar-spec"><span class="altar-spec-label">Medios de pago:</span><div class="product-payment-discount">${Math.round(store.transferDiscount * 100)}% de descuento pagando con ${esc(store.transferName)}</div><a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments"><span class="altar-es">medios de pago</span><span class="altar-en">payment methods</span></a></div>
+                <div class="altar-spec"><span class="altar-spec-label">Medios de pago:</span><div class="product-payment-discount">${Math.round(store.transferDiscount * 100)}% de descuento pagando con ${esc(store.transferName)}</div><a class="product-payments-link btn-link" href="#" data-sim-open="#modal-payments"><span class="altar-es">Medios de pago</span><span class="altar-en">Payment methods</span></a></div>
               </div>
               <div class="altar-spec-row">
                 <div class="altar-spec altar-spec-stock"><span class="altar-spec-label">Stock:</span><span class="altar-spec-value altar-stock-available">Disponible</span><span class="altar-spec-value altar-stock-none">${esc(t("product.out_of_stock", "Sin stock"))}</span></div>

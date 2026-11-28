@@ -662,7 +662,7 @@ body.template-page .user-content img { max-width: 100%; height: auto; }
 .section-main-product .altar-product .product-detail-variants-group.js-color-variants-container { width: 100%; gap: 0 18px; }
 .section-main-product .altar-product .product-detail-variants-group + .product-detail-variants-group { margin-top: 20px; }
 .section-main-product .altar-product .product-detail-variants-group .form-label,
-.section-main-product .altar-product .product-detail-variants-group.js-color-variants-container .form-label { margin: 0 0 4px; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: lowercase; opacity: 1; }
+.section-main-product .altar-product .product-detail-variants-group.js-color-variants-container .form-label { margin: 0 0 4px; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: none; opacity: 1; }
 .section-main-product .altar-product :is(.altar-variant-colon, .product-detail-variants-group .form-label strong) { display: none !important; }
 .section-main-product .altar-product .btn-variant { height: auto; min-height: 0; padding: 3px 0; background: transparent; border: 0; border-radius: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: none; box-shadow: none; }
 .section-main-product .altar-product .btn-variant .btn-variant-content { font-size: 16px; line-height: 1.3; text-transform: none; }
@@ -715,7 +715,7 @@ body.template-page .user-content img { max-width: 100%; height: auto; }
 /* cambios / pago seguro / medios de pago: Paloma Wool rows — lowercase label + chevron, the text opens below (Figma «Producto / Desplegable») */
 .section-main-product .altar-product-info > .product-purchase-info { gap: 8px !important; padding-top: 36px; }
 .section-main-product .altar-product-info > .product-purchase-info .icon-text-item { display: flex !important; flex-direction: column; gap: 6px; }
-.section-main-product .altar-product-info > .product-purchase-info .icon-text-item-title { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; padding: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: lowercase; opacity: 1; cursor: pointer; }
+.section-main-product .altar-product-info > .product-purchase-info .icon-text-item-title { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; padding: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: none; opacity: 1; cursor: pointer; }
 .section-main-product .altar-product-info > .product-purchase-info .icon-text-item-title::after,
 .section-main-product .js-product-payments-container .product-payments-link::after { content: ""; width: 5px; height: 5px; flex: none; border: solid currentColor; border-width: 1px 1px 0 0; transform: rotate(45deg); }
 .section-main-product .altar-product-info > .product-purchase-info .is-open .icon-text-item-title::after { margin-top: -4px; transform: rotate(135deg); }
@@ -726,7 +726,7 @@ body.template-page .user-content img { max-width: 100%; height: auto; }
 .section-main-product .altar-product-specs .js-product-payments-container:not([style*="display: none"]) { padding: 0; }
 .section-main-product .js-product-payments-container > .altar-spec:last-child { display: block; }
 .section-main-product .js-product-payments-container > .altar-spec:last-child > :is(.altar-spec-label, .product-payment-discount) { display: none !important; }
-.section-main-product .js-product-payments-container .product-payments-link { display: inline-flex; align-items: center; gap: 6px; padding: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: lowercase; text-decoration: none !important; opacity: 1; }
+.section-main-product .js-product-payments-container .product-payments-link { display: inline-flex; align-items: center; gap: 6px; padding: 0; font-size: 16px; font-weight: 400; line-height: 1.3; letter-spacing: 0; text-transform: none; text-decoration: none !important; opacity: 1; }
 .section-main-product .js-product-payments-container .product-payments-link span { text-decoration: none !important; }
 
 @media (min-width: 1200px) {
