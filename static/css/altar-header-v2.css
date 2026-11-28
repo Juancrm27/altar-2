@@ -92,7 +92,7 @@ body.template-home:has(.altar-nav--v2) .altar-collection__photo img { width: 100
 html[data-altar-home-layout="b"] body.template-home .altar-collection { padding-top: 0; }
 html[data-altar-home-layout="b"] .altar-collection__continuation {
   display: block; width: 100%; height: max(0px,calc(100vw * 1006 / 1536 - 50svh));
-  margin-bottom: 12px; background-image: var(--altar-hero-expanded-image,url('../images/altar-v2-hero-expanded.png'));
+  margin-bottom: 12px; background-image: var(--altar-hero-expanded-image,var(--altar-asset-altar-v2-hero-expanded-webp, url('../images/altar-v2-hero-expanded.webp')));
   background-size: 100vw auto; background-position: center bottom; background-repeat: no-repeat;
 }
 @media (max-width: 749px) {

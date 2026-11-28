@@ -531,7 +531,7 @@ body.template-password { display: flex; min-height: 100vh; min-height: 100svh; f
 body.template-password > .main-content { display: flex; flex: 1 0 auto; flex-direction: column; }
 .altar-password-head { display: flex; height: 99px; padding: 0 var(--chrome-gutter, 32px); align-items: center; justify-content: space-between; color: var(--chrome-fg); background: none; }
 /* The mark is painted in the language colour through a mask, as in the nav */
-.altar-password-head__logo { display: block; width: 40px; height: 39px; background: currentColor; -webkit-mask: url("../images/altar-logo.svg") center / contain no-repeat; mask: url("../images/altar-logo.svg") center / contain no-repeat; }
+.altar-password-head__logo { display: block; width: 40px; height: 39px; background: currentColor; -webkit-mask: var(--altar-asset-altar-logo-svg, url("../images/altar-logo.svg")) center / contain no-repeat; mask: var(--altar-asset-altar-logo-svg, url("../images/altar-logo.svg")) center / contain no-repeat; }
 .altar-password-head__logo img { display: block; width: 100%; height: 100%; opacity: 0; }
 .altar-password-head .altar-nav__layout-switch { position: relative; width: 22px; height: 12px; padding: 0; border: 0; border-radius: 20px; background: currentColor; cursor: pointer; }
 .altar-password-head .altar-nav__layout-switch span { position: absolute; top: 1.5px; left: 1.5px; width: 9px; height: 9px; border-radius: 50%; background: var(--chrome-bg); transition: transform .2s; }

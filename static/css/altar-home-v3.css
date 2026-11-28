@@ -19,7 +19,7 @@ html.is-altar-home.altar-home-v3 {
   --v3-switch-knob: var(--v3-sage);
   --v3-grain-blend: multiply;
   --v3-m4-top: #e4a980; --v3-m4-bottom: #b7c29f;
-  --v3-texture: url("../images/altar-v3-texture-a.jpg");
+  --v3-texture: var(--altar-asset-altar-v3-texture-a-jpg, url("../images/altar-v3-texture-a.jpg"));
   color-scheme: light;
   background: var(--v3-bg);
 }
@@ -32,7 +32,7 @@ html.is-altar-home.altar-home-v3[data-altar-home-layout="b"] {
   --v3-switch-knob: #0f0f0f;
   --v3-grain-blend: screen;
   --v3-m4-top: #7e9079; --v3-m4-bottom: #091e2b;
-  --v3-texture: url("../images/altar-v3-texture-b.jpg");
+  --v3-texture: var(--altar-asset-altar-v3-texture-b-jpg, url("../images/altar-v3-texture-b.jpg"));
   color-scheme: dark;
 }
 /* Copy per layout: .v3-a (Spanish) and .v3-b (English). Blocks swap with display. */
@@ -87,7 +87,7 @@ html.altar-home-v3 {
 
 /* Navigation / Site — #091E2B (A) · #C6CA9F (B) */
 .altar-home-v3 .altar-nav.altar-nav--v2 { --altar-nav-color: var(--v3-fg); color: var(--v3-fg); }
-.altar-home-v3 .altar-nav--v2 .altar-nav__logo { background: var(--v3-fg); -webkit-mask: url("../images/altar-logo.svg") center / contain no-repeat; mask: url("../images/altar-logo.svg") center / contain no-repeat; }
+.altar-home-v3 .altar-nav--v2 .altar-nav__logo { background: var(--v3-fg); -webkit-mask: var(--altar-asset-altar-logo-svg, url("../images/altar-logo.svg")) center / contain no-repeat; mask: var(--altar-asset-altar-logo-svg, url("../images/altar-logo.svg")) center / contain no-repeat; }
 .altar-home-v3 .altar-nav--v2 .altar-nav__logo img { opacity: 0; }
 .altar-home-v3 .altar-nav--v2 .altar-nav__layout-switch { background: var(--v3-switch-track); }
 .altar-home-v3 .altar-nav--v2 .altar-nav__layout-switch span { background: var(--v3-switch-knob); }
@@ -187,7 +187,7 @@ html.altar-home-v3 body.template-home .altar-manifesto-v2 {
 .altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { display: block; font-size: 0; line-height: 0; letter-spacing: 0; }
 .altar-v3-logo {
   display: block; height: calc(var(--m4-logo, 86) * var(--m4, 1px)); aspect-ratio: 165.23 / 80.34;
-  background: currentColor; -webkit-mask: url("../images/altar-logo-wordmark.svg") left top / contain no-repeat; mask: url("../images/altar-logo-wordmark.svg") left top / contain no-repeat;
+  background: currentColor; -webkit-mask: var(--altar-asset-altar-logo-wordmark-svg, url("../images/altar-logo-wordmark.svg")) left top / contain no-repeat; mask: var(--altar-asset-altar-logo-wordmark-svg, url("../images/altar-logo-wordmark.svg")) left top / contain no-repeat;
 }
 .altar-home-v3 .altar-manifesto-v2 .altar-closing__identity { gap: 0; }
 .altar-home-v3 .altar-manifesto-v2 .altar-closing__wordmark { font-weight: 300; }
@@ -278,7 +278,7 @@ html.altar-home-v3 body.template-home .altar-footer-min { background: transparen
 .altar-footer-min__brand { display: flex; align-items: center; gap: 16px; }
 .altar-footer-min__brand p { margin: 0; font-size: inherit; line-height: inherit; }
 /* The Tiendanube mark follows the text colour: the SVG is used as a mask. */
-.altar-footer-min__brand a { display: block; width: 155px; height: 17px; background: currentColor; -webkit-mask: url("../images/altar-creado-con-tiendanube.svg") center / contain no-repeat; mask: url("../images/altar-creado-con-tiendanube.svg") center / contain no-repeat; }
+.altar-footer-min__brand a { display: block; width: 155px; height: 17px; background: currentColor; -webkit-mask: var(--altar-asset-altar-creado-con-tiendanube-svg, url("../images/altar-creado-con-tiendanube.svg")) center / contain no-repeat; mask: var(--altar-asset-altar-creado-con-tiendanube-svg, url("../images/altar-creado-con-tiendanube.svg")) center / contain no-repeat; }
 .altar-footer-min__brand img { display: block; width: 155px; height: 17px; opacity: 0; }
 .altar-footer-min__claim { display: flex; flex-wrap: wrap; gap: 8px; }
 .altar-footer-min__claim a:last-child { text-decoration: underline; text-underline-position: from-font; }
@@ -436,11 +436,11 @@ html.altar-home-v3 .altar-manifesto__oracle { overflow: visible; }
    750 px); same layers, same opacity and blend, so it still sits over every background. The 06 + footer texture and
    the photos load their 1000 / 800 px copies (*-m.jpg). */
 @media (max-width: 749px) {
-  html.is-altar-home.altar-home-v3 { --v3-texture: url("../images/altar-v3-texture-a-m.jpg"); }
-  html.is-altar-home.altar-home-v3[data-altar-home-layout="b"] { --v3-texture: url("../images/altar-v3-texture-b-m.jpg"); }
+  html.is-altar-home.altar-home-v3 { --v3-texture: var(--altar-asset-altar-v3-texture-a-m-jpg, url("../images/altar-v3-texture-a-m.jpg")); }
+  html.is-altar-home.altar-home-v3[data-altar-home-layout="b"] { --v3-texture: var(--altar-asset-altar-v3-texture-b-m-jpg, url("../images/altar-v3-texture-b-m.jpg")); }
   html.altar-home-v3 :is(.altar-solar__grain, .altar-section-grain) > rect { display: none; }
   html.altar-home-v3 :is(.altar-solar__grain, .altar-section-grain) {
-    background: url("../images/altar-grain-tile.png") 0 0 / 128px 128px repeat;
+    background: var(--altar-asset-altar-grain-tile-png, url("../images/altar-grain-tile.png")) 0 0 / 128px 128px repeat;
     animation: altar-grain-step 1s steps(10) infinite;
   }
 }

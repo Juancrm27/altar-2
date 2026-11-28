@@ -224,7 +224,7 @@
   {% set campaign_b = solar_settings.campaign_image_b and solar_settings.campaign_image_b starts with '@media-lib:' ? (solar_settings.campaign_image_b | resolve_media) : null %}
   <section class="altar-v3-campaign" aria-label="Campaña Altar">
     <a href="{{ solar_settings.campaign_link | default(store.products_url) }}" data-cursor-label="{{ 'Ver colección' | translate }}">
-      <picture>{% if not campaign_a %}<source media="(max-width: 749px)" srcset="{{ 'images/altar-v3-campaign-a-m.jpg' | static_url }}">{% endif %}<img class="v3-a" src="{{ campaign_a ? campaign_a.sourceUrl : ('images/altar-v3-campaign-a.jpg' | static_url) }}" alt="Campaña Altar" width="2400" height="1599" loading="lazy"></picture>
+      <picture>{% if not campaign_a %}<source media="(max-width: 749px)" srcset="{{ 'images/altar-v3-campaign-a-m.jpg' | static_url }}">{% endif %}<img class="v3-a" src="{{ campaign_a ? campaign_a.sourceUrl : ('images/altar-v3-campaign-a.webp' | static_url) }}" alt="Campaña Altar" width="2400" height="1599" loading="lazy"></picture>
       <picture>{% if not campaign_b %}<source media="(max-width: 749px)" srcset="{{ 'images/altar-v3-campaign-b-m.jpg' | static_url }}">{% endif %}<img class="v3-b" src="{{ campaign_b ? campaign_b.sourceUrl : ('images/altar-v3-campaign-b.jpg' | static_url) }}" alt="Altar campaign" width="2400" height="1599" loading="lazy"></picture>
     </a>
   </section>

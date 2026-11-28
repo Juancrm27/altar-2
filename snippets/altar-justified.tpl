@@ -7,7 +7,9 @@
   Each line is printed plainly, so it is escaped exactly like every other setting of the theme.
   Usage: {% include 'snippets/altar-justified.tpl' with { text: settings.x, lang: 'es', variant: 'v3-a' } %}
 #}
-{% set altar_lines = text | default('') | trim | replace({"\r\n": "\n", "\r": "\n"}) | split("\n") %}
+{# Tiendanube does not support replace({…}) with a mapping: the whole section silently disappears (27-nov). Split by
+   line and trim each line instead (trim also drops a stray \r). #}
+{% set altar_lines = text | default('') | trim | split("\n") %}
 <div class="altar-v3-justified{% if variant %} {{ variant }}{% endif %}" lang="{{ lang }}">
   {%- for altar_line in altar_lines -%}
     {%- set altar_text = altar_line | trim -%}

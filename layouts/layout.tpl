@@ -186,6 +186,26 @@
       {# Home v3 (Figma 964:17981: día ES · noche EN), last so it wins over the shared sheets, as in .dev/preview.html. #}
       <link rel="stylesheet" href="{{ 'css/altar-home-v3.css' | static_url }}">
     {% endif %}
+    {# Tiendanube serves theme CSS and theme files from different paths, so a CSS url("../images/…") 403s there.
+       The real file URLs come from static_url here; the CSS reads them as variables and keeps the relative path
+       only as a fallback for the local preview / Netlify. @font-face cannot take a variable, so fonts are declared
+       here too (this block comes after the sheets, so these faces win). #}
+    <style>
+      :root {
+        --altar-asset-altar-creado-con-tiendanube-svg: url("{{ 'images/altar-creado-con-tiendanube.svg' | static_url }}");
+        --altar-asset-altar-grain-tile-png: url("{{ 'images/altar-grain-tile.png' | static_url }}");
+        --altar-asset-altar-logo-wordmark-svg: url("{{ 'images/altar-logo-wordmark.svg' | static_url }}");
+        --altar-asset-altar-logo-svg: url("{{ 'images/altar-logo.svg' | static_url }}");
+        --altar-asset-altar-v2-hero-expanded-webp: url("{{ 'images/altar-v2-hero-expanded.webp' | static_url }}");
+        --altar-asset-altar-v3-texture-a-m-jpg: url("{{ 'images/altar-v3-texture-a-m.jpg' | static_url }}");
+        --altar-asset-altar-v3-texture-a-jpg: url("{{ 'images/altar-v3-texture-a.jpg' | static_url }}");
+        --altar-asset-altar-v3-texture-b-m-jpg: url("{{ 'images/altar-v3-texture-b-m.jpg' | static_url }}");
+        --altar-asset-altar-v3-texture-b-jpg: url("{{ 'images/altar-v3-texture-b.jpg' | static_url }}");
+      }
+      @font-face { font-family: "Altar Minion"; src: url("{{ 'fonts/minion-plus-s-regular.woff2' | static_url }}") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+      @font-face { font-family: "Altar Minion"; src: url("{{ 'fonts/minion-plus-s-italic.woff2' | static_url }}") format("woff2"); font-style: italic; font-weight: 400; font-display: swap; }
+      @font-face { font-family: 'Altar Gestura'; src: url("{{ 'fonts/gestura-text-regular.otf' | static_url }}") format('opentype'); font-style: normal; font-weight: 300 400; font-display: swap; }
+    </style>
     <script src="{{ 'js/altar-header.js' | static_url }}" defer></script>
     <script src="{{ 'js/altar-site.js' | static_url }}" defer></script>
     {% if template == 'home' %}

@@ -41,7 +41,7 @@ html.is-altar-home:not(.altar-home-v3) .altar-nav.altar-nav--v3 { --chrome-fg: #
 :root .altar-nav--v3 .altar-nav__pending { cursor: default; }
 
 .altar-nav--v3 .altar-nav__bar { display: flex; height: 99px; padding: 30px var(--chrome-gutter); align-items: center; justify-content: space-between; gap: 24px; }
-:root .altar-nav--v3 .altar-nav__logo { display: block; width: 40px; height: 39px; flex: 0 0 40px; background: currentColor; -webkit-mask: url("../images/altar-logo.svg") center / contain no-repeat; mask: url("../images/altar-logo.svg") center / contain no-repeat; }
+:root .altar-nav--v3 .altar-nav__logo { display: block; width: 40px; height: 39px; flex: 0 0 40px; background: currentColor; -webkit-mask: var(--altar-asset-altar-logo-svg, url("../images/altar-logo.svg")) center / contain no-repeat; mask: var(--altar-asset-altar-logo-svg, url("../images/altar-logo.svg")) center / contain no-repeat; }
 :root .altar-nav--v3 .altar-nav__logo:hover { opacity: 1; }
 :root .altar-nav--v3 .altar-nav__logo img { width: 100%; height: 100%; opacity: 0; filter: none; }
 
